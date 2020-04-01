@@ -31,6 +31,6 @@ Route::post('/assign/', [
     'as' => 'saveAssignee'
 ])->middleware('auth');
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index')->name('home');
