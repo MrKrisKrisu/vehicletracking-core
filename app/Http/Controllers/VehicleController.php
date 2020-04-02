@@ -41,6 +41,7 @@ class VehicleController extends Controller
             ->where('scans.vehicle_name','>', 0) //temp
             ->groupBy('scans.bssid')
             ->select('devices.*')
+            ->orderBy('devices.lastSeen', 'DESC')
             ->first();
 
         if($device == null)
