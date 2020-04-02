@@ -6,9 +6,8 @@
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
                     <h5 class="card-title">{{__('Device')}}</h5>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <p>LastSeen: {{$device->lastSeen}}</p>
-                    </div>
+                    <p>BSSID: {{$device->bssid}}</p>
+                    <p>LastSeen: {{$device->lastSeen}}</p>
                 </div>
             </div>
             <div class="card mb-4 box-shadow">
