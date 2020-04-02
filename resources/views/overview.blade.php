@@ -12,9 +12,11 @@
                                 <tr>
                                     <td>{{$scan->ssid}}<br /><small>
                                             @php
-                                                $q = \Illuminate\Support\Facades\DB::select("SELECT GROUP_CONCAT(vehicle_name SEPARATOR ', ') AS test FROM (SELECT vehicle_name, COUNT(*) FROM `scans` s1 WHERE s1.bssid LIKE :bssid AND s1.vehicle_name > 0 AND bssid NOT IN (SELECT bssid FROM `scans` WHERE `vehicle_name` LIKE '0' GROUP BY bssid) GROUP BY s1.vehicle_name ORDER BY COUNT(*) desc) a", ["bssid" => $scan->bssid]);
-                                                foreach ($q as $q1)
-                                                    echo($q1->test);
+                                                $d = DB::table('scans')->where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->groupBy('vehicle_name')->select('vehicle_name')->get();
+                                                $arr = [];
+                                                foreach ($d as $da)
+                                                    if(!in_array($da->vehicle_name, $arr)) $arr[] = $da->vehicle_name;
+                                                    echo implode(', ', $arr);
 
                                                 $vID =  \App\Device::where('bssid', $scan->bssid)->first()->vehicle_id;
                                                 if($vID == NULL)
