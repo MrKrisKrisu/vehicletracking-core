@@ -18,11 +18,14 @@
                                                     if(!in_array($da->vehicle_name, $arr)) $arr[] = $da->vehicle_name;
                                                     echo implode(', ', $arr);
 
-                                                $vID =  \App\Device::where('bssid', $scan->bssid)->first()->vehicle_id;
+                                                $vID =  \App\Device::where('bssid', $scan->bssid)
+                                                ->join('vehicles', 'devices.vehicle_id', '=', 'vehicles.id')
+                                                ->first();
+
                                                 if($vID == NULL)
                                                     echo '<br /><span style="color: #E70000;">Unverifiziert</span>';
                                                 else
-                                                    echo '<br /><span style="color: darkgreen;">Verifiziert</span>';
+                                                    echo '<br /><span style="color: darkgreen;">Verifiziert ('.$vID->vehicle_name.')</span>';
                                             @endphp
                                         </small></td>
                                     <td>
