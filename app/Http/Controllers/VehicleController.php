@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Scan;
 use App\Device;
@@ -26,6 +27,52 @@ class VehicleController extends Controller
         $scan->save();
 
         return self::render();
+    }
+
+    public static function verify() {
+
+        $device = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
+            ->where('devices.vehicle_id', null)
+            ->where(function($query) {
+                $query->where('devices.moveVerifyUntil', '<', Carbon::now())
+                    ->orWhere('devices.moveVerifyUntil', null);
+            })
+            ->where('scans.vehicle_name','<>', null)
+            ->groupBy('scans.bssid')
+            ->select('devices.*')
+            ->first();
+
+        if($device == null)
+            abort(204);
+
+        $scans = Scan::where('bssid', $device->bssid)->where('vehicle_name', '<>', null)->get();
+
+        return view('todo', ['device' => $device, 'scans' => $scans]);
+    }
+
+    public static function saveVerify(Request $request) {
+
+        if($request->action == 'save') {
+            $vehicle = Vehicle::where('company_id', 1)->where('vehicle_name', $request->vehicle_name)->first();
+
+            if($vehicle == null) {
+                $vehicle = new Vehicle();
+                $vehicle->company_id = 1;
+                $vehicle->vehicle_name = $request->vehicle_name;
+                $vehicle->save();
+            }
+
+            $device = Device::where('bssid', $request->bssid)->first();
+            $device->vehicle_id = $vehicle->id;
+            $device->save();
+
+        } else if($request->action == 'notVerifiable') {
+            $device = Device::where('bssid', $request->bssid)->first();
+            $device->moveVerifyUntil = Carbon::now()->addDays(7);
+            $device->save();
+        }
+
+        return self::verify();
     }
 
     public static function renderVehicle($vehicle_id)

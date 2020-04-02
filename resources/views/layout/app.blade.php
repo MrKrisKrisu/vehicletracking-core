@@ -15,12 +15,22 @@
 <body>
 
 <header>
-    <div class="navbar navbar-dark bg-dark box-shadow">
-        <div class="container d-flex justify-content-between">
-            <a href="/" class="navbar-brand d-flex align-items-center">
-                <strong>{{__('Vehicle tracking')}}</strong>
-            </a>
-            <ul class="navbar-nav ml-auto">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">{{__('Vehicle tracking')}}</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/verify/">{{ __('Verify') }}</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav mr-auto">
                 @guest
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
@@ -49,9 +59,9 @@
                         </div>
                     </li>
                 @endguest
-            </ul>
+            </div>
         </div>
-    </div>
+    </nav>
 </header>
 
 <main role="main">

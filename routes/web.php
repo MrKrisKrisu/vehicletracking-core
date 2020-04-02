@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'VehicleController@render')->middleware('auth');
 Route::post('/', 'VehicleController@saveVehicle')->middleware('auth');
 
+Route::get('/verify', 'VehicleController@verify')->middleware('auth');
+Route::post('/verify', 'VehicleController@saveVerify')->middleware('auth');
+
 Route::get('/vehicle/{vehicle_id}', [
     'uses' => 'VehicleController@renderVehicle',
     'as' => 'vehicle'
