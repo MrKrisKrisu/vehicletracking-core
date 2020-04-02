@@ -40,8 +40,8 @@
                                                 </div>
                                             </div>
                                         </form>
-                                    </td>
-                                    <td>{{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->diffForHumans()}} <small>({{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->format('H:i:s')}})</small></td>
+                                    <br/>
+                                    {{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->diffForHumans()}} <small>({{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->format('H:i:s')}})</small></td>
                                 </tr>
                             @endforeach
                         </table>
