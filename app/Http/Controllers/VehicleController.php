@@ -64,12 +64,12 @@ class VehicleController extends Controller
 
             $device = Device::where('bssid', $request->bssid)->first();
             $device->vehicle_id = $vehicle->id;
-            $device->save();
+            $device->update();
 
         } else if($request->action == 'notVerifiable') {
             $device = Device::where('bssid', $request->bssid)->firstOrFail();
             $device->moveVerifyUntil = Carbon::now()->addDays(7);
-            $device->save();
+            $device->update();
         }
 
         return self::verify();
