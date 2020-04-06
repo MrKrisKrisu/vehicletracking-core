@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
                     <h5 class="card-title">{{__('Last scans')}}</h5>
