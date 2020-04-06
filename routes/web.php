@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/public/{device_id}', 'VehicleController@renderPublic');
+
 Route::get('/', 'VehicleController@render')->middleware('auth');
 Route::post('/', 'VehicleController@saveVehicle')->middleware('auth');
 
