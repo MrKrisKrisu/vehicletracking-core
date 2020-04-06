@@ -79,10 +79,11 @@ Route::get('vehicle/{company_id}/{vehicle_id}', function ($company_id, $vehicle_
 Route::post('scan', function (Request $request) {
     $token = $request->header('X-Api-Token');
     $deviceID = null;
+    $scanDevice = null;
     if ($token != null) {
-        $scandevice = DB::table('scan_devices')->where('token', $token)->first();
-        if ($scandevice != null)
-            $deviceID = $scandevice->id;
+        $scanDevice = DB::table('scan_devices')->where('token', $token)->first();
+        if ($scanDevice != null)
+            $deviceID = $scanDevice->id;
     }
 
     $scan = new Scan();
@@ -100,6 +101,26 @@ Route::post('scan', function (Request $request) {
 
     DB::insert("INSERT INTO devices (bssid, ssid, firstSeen, lastSeen) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) " .
         "ON DUPLICATE KEY UPDATE ssid = ?, lastSeen = CURRENT_TIMESTAMP", [$request->bssid, $request->ssid, $request->ssid]);
+
+    $device = Device::where('bssid', $request->bssid)->first();
+    if ($device != null && $device->vehicle_id != null) {
+        $vehicle = Vehicle::find($device->vehicle_id);
+        \App\Http\Controllers\TelegramController::broadcastMessage('Fahrzeug "' . $vehicle->vehicle_name . '" gesichtet (' . $scanDevice->name . ')');
+    } else if ($device != null) {
+        $scans = DB::table('scans')->where('bssid', $request->bssid)->where('vehicle_name', '<>', null)->get();
+        $possible = [];
+        foreach ($scans as $scanElement) {
+            $spl = explode(',', $scanElement->vehicle_name);
+            foreach ($spl as $splElement)
+                if (!in_array($splElement, $possible))
+                    $possible[] = $splElement;
+        }
+        $message = "Fahrzeug gesichtet, welches nicht genau bestimmt werden konnte. (" . $scanDevice->name . ") \r\n\r\n";
+        $message .= "Mögliche Fahrzeuge: \r\n";
+        foreach ($possible as $ve)
+            $message .= " - $ve \r\n";
+        \App\Http\Controllers\TelegramController::broadcastMessage($message);
+    }
 
     return $request;
 });

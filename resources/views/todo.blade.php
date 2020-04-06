@@ -45,9 +45,9 @@
                         <form method="post" accept-charset="utf-8">
                             @csrf
                             <input type="hidden" name="bssid" value="{{$device->bssid}}" />
-                                <div class="form-group">
-                                        <input type="number" class="form-control" placeholder="Vehicle name" name="vehicle_name">
-                                </div>
+                            <div class="form-group">
+                                <input type="number" class="form-control" placeholder="Vehicle name" name="vehicle_name">
+                            </div>
                             <button type="submit" name="action" value="save" class="btn btn-info">Save</button>
                             <button type="submit" name="action" value="notVerifiable" class="btn btn-danger">Not verifiable yet</button>
                         </form>
