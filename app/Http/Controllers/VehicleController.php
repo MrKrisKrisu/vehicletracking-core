@@ -138,7 +138,7 @@ class VehicleController extends Controller
                 DB::raw('(SELECT GROUP_CONCAT(vehicle_name SEPARATOR \',\') FROM `scans` WHERE scans.bssid LIKE devices.bssid AND scans.vehicle_name IS NOT NULL) as possibleVehicles')
             )
             ->orderBy('created_at', 'desc')
-            ->limit(30)
+            ->limit(100)
             ->get();
 
         return view('public', ['scans' => $scans]);
