@@ -63,6 +63,10 @@ Route::post('/vehicle/locate/', function (Request $request) {
     ];
 });
 
+Route::get('/scan/prefix/', function () {
+    return \App\DevicePrefix::select('prefix', 'description')->get();
+});
+
 Route::get('company/{company_id}', function ($company_id) {
     return Company::where([
         'id' => $company_id
