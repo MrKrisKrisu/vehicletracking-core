@@ -10,13 +10,18 @@
                         <table class="table">
                             @foreach ($lastScan as $scan)
                                 <tr>
-                                    <td style="max-width: 50%">{{$scan->ssid}}<br /><small>
+                                    <td>{{$scan->ssid}}<br/><small>
                                             @php
                                                 $d = DB::table('scans')->where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->groupBy('vehicle_name')->select('vehicle_name')->get();
                                                 $arr = [];
                                                 foreach ($d as $da)
-                                                    if(!in_array($da->vehicle_name, $arr)) $arr[] = $da->vehicle_name;
-                                                    echo implode(', ', $arr);
+                                                    foreach(explode(',', $da->vehicle_name) as $da2) {
+                                                        $tr = trim($da2);
+                                                        if(strlen($tr) == 4 && !in_array($tr, $arr)) {
+                                                            $arr[] = $tr;
+                                                            echo '<small>'.$tr.'</small><br />';
+                                                        }
+                                                    }
 
                                                 $vID =  \App\Device::where('bssid', $scan->bssid)
                                                 ->join('vehicles', 'devices.vehicle_id', '=', 'vehicles.id')
@@ -28,20 +33,18 @@
                                                     echo '<br /><span style="color: darkgreen;">Verifiziert ('.$vID->vehicle_name.')</span>';
                                             @endphp
                                         </small></td>
-                                    <td>
+                                    <td style="min-width: 50%;">
                                         <form action="/" method="post" accept-charset="utf-8">
                                             @csrf
                                             <input type="hidden" name="scanID" value="{{$scan->id}}"/>
-                                            <div class="contact-form">
-                                                <div class="form-group">
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="name" placeholder="FzgNr." name="vehicle_name" value="{{$scan->vehicle_name}}">
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <input type="text" class="form-control" id="name"
+                                                   placeholder="FzgNr." name="vehicle_name"
+                                                   value="{{$scan->vehicle_name}}">
                                         </form>
-                                    <br/>
-                                    {{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->diffForHumans()}} <small>({{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->format('H:i:s')}})</small></td>
+                                        <br/>
+                                        {{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->diffForHumans()}}
+                                        <small>({{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->format('H:i:s')}}
+                                            )</small></td>
                                 </tr>
                             @endforeach
                         </table>
