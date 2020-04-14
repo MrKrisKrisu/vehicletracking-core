@@ -10,7 +10,7 @@
                         <table class="table">
                             @foreach ($lastScan as $scan)
                                 <tr>
-                                    <td>{{$scan->ssid}}<br/><small>
+                                    <td>{{$scan->ssid}} (ID: {{$scan->scanDeviceId}})<br/><small>
                                             @php
                                                 $d = DB::table('scans')->where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->groupBy('vehicle_name')->select('vehicle_name')->get();
                                                 $arr = [];
