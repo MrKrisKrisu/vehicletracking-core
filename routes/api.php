@@ -106,7 +106,7 @@ Route::post('scan', function (Request $request) {
     DB::insert("INSERT INTO devices (bssid, ssid, firstSeen, lastSeen) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) " .
         "ON DUPLICATE KEY UPDATE ssid = ?, lastSeen = CURRENT_TIMESTAMP", [$request->bssid, $request->ssid, $request->ssid]);
 
-    $device = DB::table('devices')->join('vehicles', 'devices.vehicle_id', '=', 'vehicles.id')->where('devices.bssid', $request->bssid)->first();
+    $device = Device::where('bssid', $request->bssid)->first();
 
     /*
     if ($device != null && $device->vehicle_id != null) {
