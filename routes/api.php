@@ -128,7 +128,7 @@ Route::post('scan', function (Request $request) {
         \App\Http\Controllers\TelegramController::broadcastMessage($message);
     }*/
 
-    return $device;
+    return $device->vehicle;
 });
 
 Route::post('scan/device/registernew', function (Request $request) {
