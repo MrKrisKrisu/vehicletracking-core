@@ -23,9 +23,11 @@ class VehicleController extends Controller
 
     public static function saveVehicle(Request $request)
     {
-        $scan = Scan::where('id', $request->scanID)->first();
-        $scan->vehicle_name = $request->vehicle_name;
-        $scan->save();
+        foreach ($request->scans as $scanID => $v) {
+            $scan = Scan::where('id', $scanID)->first();
+            $scan->vehicle_name = $request->vehicle_name;
+            $scan->save();
+        }
 
         return self::render();
     }

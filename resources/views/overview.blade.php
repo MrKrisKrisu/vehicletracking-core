@@ -5,8 +5,10 @@
         <div class="col-md-12">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
-                    <h5 class="card-title">{{__('Last scans')}}</h5>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <form action="/" method="post" accept-charset="utf-8">
+                        @csrf
+                        <input type="text" class="form-control" id="name" placeholder="FzgNr." name="vehicle_name">
+                        <h5 class="card-title">{{__('Last scans')}}</h5>
                         <table class="table">
                             @foreach ($lastScan as $scan)
                                 <tr>
@@ -34,21 +36,14 @@
                                             @endphp
                                         </small></td>
                                     <td style="min-width: 50%;">
-                                        <form action="/" method="post" accept-charset="utf-8">
-                                            @csrf
-                                            <input type="hidden" name="scanID" value="{{$scan->id}}"/>
-                                            <input type="text" class="form-control" id="name"
-                                                   placeholder="FzgNr." name="vehicle_name"
-                                                   value="{{$scan->vehicle_name}}">
-                                        </form>
-                                        <br/>
+                                        <p><input type="checkbox" name="scans[{{$scan->id}}]" /> <small>{{$scan->vehicle_name}}</small></p>
                                         {{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->diffForHumans()}}
                                         <small>({{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->format('H:i:s')}}
                                             )</small></td>
                                 </tr>
                             @endforeach
                         </table>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
