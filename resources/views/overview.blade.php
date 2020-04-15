@@ -8,6 +8,7 @@
                     <form action="/" method="post" accept-charset="utf-8">
                         @csrf
                         <input type="text" class="form-control" id="name" placeholder="FzgNr." name="vehicle_name">
+                        <hr />
                         <h5 class="card-title">{{__('Last scans')}}</h5>
                         <table class="table">
                             @foreach ($lastScan as $scan)
