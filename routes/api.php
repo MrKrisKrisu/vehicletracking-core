@@ -107,6 +107,8 @@ Route::post('scan', function (Request $request) {
         "ON DUPLICATE KEY UPDATE ssid = ?, lastSeen = CURRENT_TIMESTAMP", [$request->bssid, $request->ssid, $request->ssid]);
 
     $device = Device::where('bssid', $request->bssid)->first();
+
+    /*
     if ($device != null && $device->vehicle_id != null) {
         $vehicle = Vehicle::find($device->vehicle_id);
         \App\Http\Controllers\TelegramController::broadcastMessage('Fahrzeug "' . $vehicle->vehicle_name . '" gesichtet (' . $scanDevice->name . ')');
@@ -124,9 +126,9 @@ Route::post('scan', function (Request $request) {
         foreach ($possible as $ve)
             $message .= " - $ve \r\n";
         \App\Http\Controllers\TelegramController::broadcastMessage($message);
-    }
+    }*/
 
-    return $request;
+    return $device;
 });
 
 Route::post('scan/device/registernew', function (Request $request) {
