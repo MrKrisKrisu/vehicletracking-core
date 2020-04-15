@@ -108,10 +108,11 @@ Route::post('scan', function (Request $request) {
 
     $device = Device::where('bssid', $request->bssid)->first();
 
-    /*
+
     if ($device != null && $device->vehicle_id != null) {
         $vehicle = Vehicle::find($device->vehicle_id);
-        \App\Http\Controllers\TelegramController::broadcastMessage('Fahrzeug "' . $vehicle->vehicle_name . '" gesichtet (' . $scanDevice->name . ')');
+        return $vehicle;
+        // \App\Http\Controllers\TelegramController::broadcastMessage('Fahrzeug "' . $vehicle->vehicle_name . '" gesichtet (' . $scanDevice->name . ')');
     } else if ($device != null) {
         $scans = DB::table('scans')->where('bssid', $request->bssid)->where('vehicle_name', '<>', null)->get();
         $possible = [];
@@ -125,8 +126,9 @@ Route::post('scan', function (Request $request) {
         $message .= "Mögliche Fahrzeuge: \r\n";
         foreach ($possible as $ve)
             $message .= " - $ve \r\n";
-        \App\Http\Controllers\TelegramController::broadcastMessage($message);
-    }*/
+        return $possible;
+        // \App\Http\Controllers\TelegramController::broadcastMessage($message);
+    }
 
     return $device;
 });
