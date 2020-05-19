@@ -20,6 +20,10 @@ class Device extends Model
         'firstSeen', 'lastSeen',
     ];
 
+    public function scans() {
+        return $this->hasMany(Scan::class, 'bssid', 'bssid');
+    }
+
     /*public function vehicle() {
         return $this->belongsTo('App\Vehicle', 'id', 'vehicle_id');
     }*/
