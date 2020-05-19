@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Company;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Scan;
@@ -58,28 +59,43 @@ class VehicleController extends Controller
 
         $scans = Scan::where('bssid', $device->bssid)->where('vehicle_name', '<>', null)->get();
 
-        return view('todo', ['device' => $device, 'scans' => $scans]);
+        return view('todo', [
+            'device' => $device,
+            'scans' => $scans,
+            'companies' => Company::all()
+        ]);
     }
 
     public static function saveVerify(Request $request)
     {
 
         if ($request->action == 'save') {
-            $vehicle = Vehicle::where('company_id', 1)->where('vehicle_name', $request->vehicle_name)->first();
+
+            $validated = $request->validate([
+                'company_id' => ['required', 'integer', 'exists:companies,id'],
+                'vehicle_name' => ['required'],
+                'bssid' => ['required', 'exists:devices,bssid'],
+            ]);
+
+            $vehicle = Vehicle::where('company_id', $validated['company_id'])->where('vehicle_name', $validated['vehicle_name'])->first();
 
             if ($vehicle == null) {
                 $vehicle = new Vehicle();
-                $vehicle->company_id = 1;
-                $vehicle->vehicle_name = $request->vehicle_name;
+                $vehicle->company_id = $validated['company_id'];
+                $vehicle->vehicle_name = $validated['vehicle_name'];
                 $vehicle->save();
             }
 
-            $device = Device::where('bssid', $request->bssid)->first();
+            $device = Device::where('bssid', $validated['bssid'])->first();
             $device->vehicle_id = $vehicle->id;
             $device->update();
 
         } else if ($request->action == 'notVerifiable') {
-            $device = Device::where('bssid', $request->bssid)->firstOrFail();
+            $validated = $request->validate([
+                'bssid' => ['required', 'exists:devices,bssid'],
+            ]);
+
+            $device = Device::where('bssid', $validated['bssid'])->firstOrFail();
             $device->moveVerifyUntil = Carbon::now()->addDays(7);
             $device->update();
         }

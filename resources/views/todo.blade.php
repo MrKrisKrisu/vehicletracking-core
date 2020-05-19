@@ -44,16 +44,29 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <form method="post" accept-charset="utf-8">
                             @csrf
-                            <input type="hidden" name="bssid" value="{{$device->bssid}}" />
+                            <input type="hidden" name="bssid" value="{{$device->bssid}}"/>
+
                             <div class="form-group">
-                                <input type="number" class="form-control" placeholder="Vehicle name" name="vehicle_name">
+                                <label>Unternehmen bzw. Kategorie</label>
+                                <select class="form-control" name="company_id">
+                                    @foreach($companies as $company)
+                                        <option value="{{$company->id}}">{{$company->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Bezeichnung</label>
+                                <input type="text" class="form-control" placeholder="Vehicle name"
+                                       name="vehicle_name">
                             </div>
                             <button type="submit" name="action" value="save" class="btn btn-info">Save</button>
-                            <button type="submit" name="action" value="notVerifiable" class="btn btn-danger">Not verifiable yet</button>
+                            <button type="submit" name="action" value="notVerifiable" class="btn btn-danger">Not
+                                verifiable yet
+                            </button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-</div>
+    </div>
 @endsection
