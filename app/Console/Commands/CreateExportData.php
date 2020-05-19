@@ -106,7 +106,7 @@ class CreateExportData extends Command
                 $qRes = trim($qRes);
                 if (!isset($bssidList[$q1->bssid]))
                     $bssidList[$q1->bssid] = [];
-                if (!in_array($qRes, $bssidList[$q1->bssid]))
+                if (!in_array($qRes, $bssidList[$q1->bssid]) && strlen($qRes) > 1)
                     $bssidList[$q1->bssid][] = $qRes;
             }
         }
