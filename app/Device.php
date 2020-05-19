@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
 {
-    public $timestamps = false;
+    public const CREATED_AT = 'firstSeen';
+    public const UPDATED_AT = 'lastSeen';
 
     protected $fillable = [
         'bssid', 'ssid', 'firstSeen', 'lastSeen'
@@ -20,12 +21,14 @@ class Device extends Model
         'firstSeen', 'lastSeen',
     ];
 
-    public function scans() {
+    public function scans()
+    {
         return $this->hasMany(Scan::class, 'bssid', 'bssid');
     }
 
-    /*public function vehicle() {
-        return $this->belongsTo('App\Vehicle', 'id', 'vehicle_id');
-    }*/
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id', 'id');
+    }
 
 }

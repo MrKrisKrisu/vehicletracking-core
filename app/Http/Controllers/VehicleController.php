@@ -190,4 +190,25 @@ class VehicleController extends Controller
 
         return view('public', ['scans' => $scans]);
     }
+
+    public static function getPossibleVehicles(string $bssid)
+    {
+        $scans = Scan::where('bssid', $bssid)
+            ->where('vehicle_name', '<>', null)
+            ->groupBy('vehicle_name')
+            ->select('vehicle_name')
+            ->get();
+
+        $data = [];
+        foreach ($scans as $scan) {
+            $scanPos = $scan->possibleVehiclesRaw();
+            foreach ($scanPos as $p) {
+                if (!in_array($p, $data))
+                    $data[] = $p;
+            }
+        }
+        sort($data);
+
+        return $data;
+    }
 }
