@@ -36,8 +36,10 @@
                                         </form>
                                     </td>
                                     <td>
-                                        <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
-                                           title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
+                                        @if($scan->modified_vehicle_name != NULL)
+                                            <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
+                                               title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
+                                        @endif
                                     </td>
                                     <td>{{$scan->created_at->isoFormat('DD.MM.YYYY HH:mm')}}</td>
                                 </tr>
