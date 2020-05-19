@@ -48,8 +48,8 @@ class VehicleController extends Controller
                     ->orWhere('devices.moveVerifyUntil', null);
             })
             ->where('scans.vehicle_name', '<>', null)
-            ->where('scans.vehicle_name', '>', 0) //temp
             ->groupBy('scans.bssid')
+            ->having(DB::raw('count(*)'), '>', 2)
             ->select('devices.*')
             ->orderBy('devices.lastSeen', 'DESC')
             ->first();
