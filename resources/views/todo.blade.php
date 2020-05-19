@@ -7,7 +7,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{__('Device')}}</h5>
                     <p>BSSID: {{$device->bssid}}</p>
-                    <p>LastSeen: {{$device->lastSeen}}</p>
+                    <p>LastSeen: {{$device->lastSeen->isoFormat('DD.MM.YYYY HH:mm')}}</p>
                 </div>
             </div>
             <div class="card mb-4 box-shadow">
@@ -27,7 +27,7 @@
                                 <tr>
                                     <td>{{$scan->ssid}}</td>
                                     <td>{{$scan->vehicle_name}}</td>
-                                    <td>{{$scan->created_at}}</td>
+                                    <td>{{$scan->created_at->isoFormat('DD.MM.YYYY HH:mm')}}</td>
                                 </tr>
                             @endforeach
                             </tbody>

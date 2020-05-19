@@ -9,8 +9,4 @@ class Scan extends Model
     protected $fillable = [
         'vehicle_id', 'bssid', 'ssid', 'signal', 'quality', 'frequency', 'bitrates', 'encrypted', 'channel'
     ];
-
-    protected $dates = [
-        'created_at', 'updated_at',
-    ];
 }
