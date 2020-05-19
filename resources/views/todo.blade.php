@@ -26,7 +26,14 @@
                             @foreach($scans as $scan)
                                 <tr>
                                     <td>{{$scan->ssid}}</td>
-                                    <td>{{$scan->vehicle_name}}</td>
+                                    <td>
+                                        <form method="POST">
+                                            @csrf
+                                            <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
+                                            <input type="text" class="form-control" name="modified_vehicle_name"
+                                                   value="{{$scan->modified_vehicle_name ?? $scan->vehicle_name}}"/>
+                                        </form>
+                                    </td>
                                     <td>{{$scan->created_at->isoFormat('DD.MM.YYYY HH:mm')}}</td>
                                 </tr>
                             @endforeach

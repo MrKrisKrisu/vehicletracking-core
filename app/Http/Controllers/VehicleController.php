@@ -68,8 +68,18 @@ class VehicleController extends Controller
 
     public static function saveVerify(Request $request)
     {
+        if (isset($request->modified_vehicle_name)) {
 
-        if ($request->action == 'save') {
+            $validated = $request->validate([
+                'modified_scan_id' => ['required', 'integer', 'exists:scans,id'],
+                'modified_vehicle_name' => ['required']
+            ]);
+
+            $scan = Scan::find($validated['modified_scan_id']);
+            $scan->modified_vehicle_name = $validated['modified_vehicle_name'];
+            $scan->update();
+
+        } else if ($request->action == 'save') {
 
             $validated = $request->validate([
                 'company_id' => ['required', 'integer', 'exists:companies,id'],
