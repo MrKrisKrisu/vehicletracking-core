@@ -26,6 +26,45 @@ use Illuminate\Support\Str;
     return $request->user();
 });*/
 
+
+Route::get('/vehicle/last_seen', function (Request $request) {
+    $lastScans = Device::with('vehicle')
+        ->where('vehicle_id', '<>', null)
+        ->orderBy('lastSeen', 'desc')
+        ->limit(100)
+        ->get();
+
+    $data = [];
+    foreach ($lastScans as $scan) {
+        $data[] = [
+            'vehicle_name' => $scan->vehicle->vehicle_name,
+            'last_seen' => [
+                'display' => $scan->lastSeen->diffForHumans(),
+                'timestamp' => $scan->lastSeen
+            ]
+        ];
+    }
+
+    return ['data' => $data];
+});
+
+Route::get('/vehicle/new', function (Request $request) {
+    $newDevices = Device::orderBy('firstSeen', 'desc')->limit(30)->get();
+
+    $data = [];
+    foreach ($newDevices as $device) {
+        $data[] = [
+            'ssid' => $device->ssid,
+            'last_seen' => [
+                'display' => $device->firstSeen->diffForHumans(),
+                'timestamp' => $device->firstSeen
+            ]
+        ];
+    }
+
+    return ['data' => $data];
+});
+
 Route::post('/vehicle/locate/', function (Request $request) {
     $verifiedVehicles = [];
     $possibleVehicles = [];

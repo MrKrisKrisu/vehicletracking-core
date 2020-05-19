@@ -22,9 +22,10 @@ class VehicleController extends Controller
         $lastScans = Scan::orderBy('created_at', 'desc')->limit(30)->get();
         $newDevices = Device::orderBy('firstSeen', 'desc')->limit(30)->get();
         //$vehicles = Device::with(['vehicle'])->where('vehicle_id', '<>', null)->orderByDesc('lastSeen')->limit(10) ->get();
-        $vehicles = DB::select("SELECT v.id, v.vehicle_name, s.created_at FROM scans s, vehicles v, devices d WHERE s.bssid IN (SELECT bssid FROM devices WHERE vehicle_id IS NOT NULL) AND s.bssid = d.bssid AND d.vehicle_id = v.id ORDER BY s.created_at DESC LIMIT 50");
 
-        return view('overview', ['lastScan' => $lastScans, 'newDevices' => $newDevices, 'lastVehicles' => $vehicles]);
+        //$vehicles = Vehicle::where();
+
+        return view('overview', ['lastScan' => $lastScans]);
     }
 
     public static function saveVehicle(Request $request)

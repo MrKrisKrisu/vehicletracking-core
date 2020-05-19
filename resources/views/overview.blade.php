@@ -51,16 +51,35 @@
                 <div class="card-body">
                     <h5 class="card-title">{{__('Last vehicles')}}</h5>
                     <div class="d-flex justify-content-between align-items-center">
-                        <table class="table">
-                            @foreach ($lastVehicles as $vehicle)
-                                <tr>
-                                    <td>
-                                        <a href="{{route('vehicle', [$vehicle->id])}}">{{$vehicle->vehicle_name}}</a>
-                                    </td>
-                                    <td>{{\Carbon\Carbon::createFromTimeStamp(strtotime($vehicle->created_at))->diffForHumans()}}</td>
-                                </tr>
-                            @endforeach
+                        <table class="table" id="vehicles">
+                            <thead>
+                            <tr>
+                                <th>Fahrzeug</th>
+                                <th>Timestamp</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
                         </table>
+                        <script>
+                            $('#vehicles').DataTable({
+                                "language": {
+                                    "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/German.json"
+                                },
+                                "order": [[1, 'desc']],
+                                "pageLength": 5,
+                                "lengthMenu": [5, 10, 25, 50, 75, 100],
+                                "ajax": '/api/vehicle/last_seen',
+                                columns: [
+                                    {data: 'vehicle_name'},
+                                    {
+                                        data: {
+                                            _: 'last_seen.display',
+                                            sort: 'last_seen.timestamp'
+                                        }
+                                    }
+                                ]
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
@@ -70,14 +89,35 @@
                 <div class="card-body">
                     <h5 class="card-title">{{__('New Devices')}}</h5>
                     <div class="d-flex justify-content-between align-items-center">
-                        <table class="table">
-                            @foreach ($newDevices as $device)
-                                <tr>
-                                    <td>{{$device->ssid}}</td>
-                                    <td>{{\Carbon\Carbon::createFromTimeStamp(strtotime($device->firstSeen))->diffForHumans()}}</td>
-                                </tr>
-                            @endforeach
+                        <table class="table" id="new_devices">
+                            <thead>
+                            <tr>
+                                <th>SSID</th>
+                                <th>Timestamp</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
                         </table>
+                        <script>
+                            $('#new_devices').DataTable({
+                                "language": {
+                                    "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/German.json"
+                                },
+                                "order": [[1, 'desc']],
+                                "pageLength": 5,
+                                "lengthMenu": [5, 10, 25, 50, 75, 100],
+                                "ajax": '/api/vehicle/new',
+                                columns: [
+                                    {data: 'ssid'},
+                                    {
+                                        data: {
+                                            _: 'last_seen.display',
+                                            sort: 'last_seen.timestamp'
+                                        }
+                                    }
+                                ]
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
