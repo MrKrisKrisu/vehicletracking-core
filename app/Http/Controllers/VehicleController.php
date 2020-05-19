@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class VehicleController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public static function render()
     {
         $lastScans = Scan::orderBy('created_at', 'desc')->limit(30)->get();
