@@ -19,6 +19,7 @@
                             <tr>
                                 <th>SSID</th>
                                 <th>VehicleID</th>
+                                <th></th>
                                 <th>Scantime</th>
                             </tr>
                             </thead>
@@ -33,6 +34,10 @@
                                             <input type="text" class="form-control" name="modified_vehicle_name"
                                                    value="{{$scan->modified_vehicle_name ?? $scan->vehicle_name}}"/>
                                         </form>
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
+                                           title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
                                     </td>
                                     <td>{{$scan->created_at->isoFormat('DD.MM.YYYY HH:mm')}}</td>
                                 </tr>

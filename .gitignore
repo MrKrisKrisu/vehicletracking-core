@@ -15,3 +15,6 @@ yarn-error.log
 composer.lock
 package-lock.json
 .editorconfig
+public/js/app.js
+public/css/app.css
+public/fonts/vendor
