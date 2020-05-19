@@ -54,6 +54,19 @@ class VehicleController extends Controller
             ->orderBy('devices.lastSeen', 'DESC')
             ->first();
 
+        $count = count(Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
+            ->where('devices.vehicle_id', null)
+            ->where(function ($query) {
+                $query->where('devices.moveVerifyUntil', '<', Carbon::now())
+                    ->orWhere('devices.moveVerifyUntil', null);
+            })
+            ->where('scans.vehicle_name', '<>', null)
+            ->groupBy('scans.bssid')
+            ->having(DB::raw('count(*)'), '>', 2)
+            ->select('devices.*')
+            ->orderBy('devices.lastSeen', 'DESC')
+            ->get());
+
         if ($device == null)
             abort(204);
 
@@ -61,6 +74,7 @@ class VehicleController extends Controller
 
         return view('todo', [
             'device' => $device,
+            'count' => $count,
             'scans' => $scans,
             'companies' => Company::all()
         ]);

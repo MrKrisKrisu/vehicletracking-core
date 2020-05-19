@@ -18,7 +18,7 @@
                             <thead>
                             <tr>
                                 <th>SSID</th>
-                                <th>VehicleID</th>
+                                <th>Erfassung</th>
                                 <th></th>
                                 <th>Scantime</th>
                             </tr>
@@ -76,6 +76,14 @@
                                 verifiable yet
                             </button>
                         </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p>Es gibt noch <b>{{$count}} Funknetze</b> zum zuordnen.</p>
                     </div>
                 </div>
             </div>
