@@ -9,6 +9,7 @@ use App\Vehicle;
 use App\Device;
 use App\Scan;
 use App\Company;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,36 +86,37 @@ Route::post('scan', function (Request $request) {
     $deviceID = null;
     $scanDevice = null;
     if ($token != null) {
-        $scanDevice = DB::table('scan_devices')->where('token', $token)->first();
+        $scanDevice = ScanDevice::where('token', $token)->first();
         if ($scanDevice != null)
             $deviceID = $scanDevice->id;
     }
 
-    $scan = new Scan();
-    $scan->vehicle_name = $request->vehicle_id ?: null;
-    $scan->bssid = $request->bssid;
-    $scan->ssid = $request->ssid;
-    $scan->signal = $request->signal;
-    $scan->quality = $request->quality;
-    $scan->frequency = $request->frequency;
-    $scan->bitrates = $request->bitrates;
-    $scan->encrypted = $request->encrypted;
-    $scan->channel = $request->channel;
-    $scan->scanDeviceId = $deviceID;
-    $scan->save();
+    $scan = Scan::create([
+        'vehicle_name' => $request->vehicle_id ?: null,
+        'bssid' => $request->bssid,
+        'ssid' => $request->ssid,
+        'signal' => $request->signal,
+        'quality' => $request->quality,
+        'frequency' => $request->frequency,
+        'bitrates' => $request->bitrates,
+        'encrypted' => $request->encrypted,
+        'channel' => $request->channel,
+        'scanDeviceId' => $deviceID
+    ]);
 
-    DB::insert("INSERT INTO devices (bssid, ssid, firstSeen, lastSeen) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) " .
-        "ON DUPLICATE KEY UPDATE ssid = ?, lastSeen = CURRENT_TIMESTAMP", [$request->bssid, $request->ssid, $request->ssid]);
-
-    $device = Device::where('bssid', $request->bssid)->first();
-
+    $device = Device::updateOrCreate([
+        'bssid' => $request->bssid
+    ], [
+        'ssid' => $request->ssid,
+        'lastSeen' => Carbon::now(),
+    ]);
 
     if ($device != null && $device->vehicle_id != null) {
         $vehicle = Vehicle::find($device->vehicle_id);
-        return $vehicle;
+        return ['status' => 'ok', 'accuracy' => 'checked', 'vehicles' => [$vehicle]];
         // \App\Http\Controllers\TelegramController::broadcastMessage('Fahrzeug "' . $vehicle->vehicle_name . '" gesichtet (' . $scanDevice->name . ')');
     } else if ($device != null) {
-        $scans = DB::table('scans')->where('bssid', $request->bssid)->where('vehicle_name', '<>', null)->get();
+        $scans = Scan::where('bssid', $request->bssid)->where('vehicle_name', '<>', null)->get();
         $possible = [];
         foreach ($scans as $scanElement) {
             $spl = explode(',', $scanElement->vehicle_name);
@@ -126,20 +128,19 @@ Route::post('scan', function (Request $request) {
         $message .= "Mögliche Fahrzeuge: \r\n";
         foreach ($possible as $ve)
             $message .= " - $ve \r\n";
-        return $possible;
+        return ['status' => 'ok', 'accuracy' => 'estimated', 'vehicles' => $possible];
         // \App\Http\Controllers\TelegramController::broadcastMessage($message);
     }
 
-    return $device;
+    return response(['status' => 'error'], 400);
 });
 
 Route::post('scan/device/registernew', function (Request $request) {
-    $uuid = \Illuminate\Support\Str::uuid();
 
-    $scandevice = new ScanDevice();
-    $scandevice->token = $uuid;
-    $scandevice->save();
+    $scan_device = ScanDevice::create([
+        'token' => Str::uuid()
+    ]);
 
-    return response((String)$uuid, 200, ['Content-type: text/plain']);
+    return response((string)$scan_device->token, 200, ['Content-type: text/plain']);
 });
 
