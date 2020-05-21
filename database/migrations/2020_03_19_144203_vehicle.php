@@ -19,7 +19,7 @@ class Vehicle extends Migration
             $table->id();
             $table->integer('company_id')->unsigned()
                 ->references('id')->on('companies');
-            $table->string('vehicle_name', 32);
+            $table->string('vehicle_name', 255);
             $table->timestamps();
 
             $table->unique(['company_id', 'vehicle_name']);
