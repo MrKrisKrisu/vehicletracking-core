@@ -104,10 +104,11 @@ class CreateExportData extends Command
             $expl = str_replace('oder', ',', $expl);
             foreach (explode(',', $expl) as $qRes) {
                 $qRes = trim($qRes);
-                if (!isset($bssidList[$q1->bssid]))
-                    $bssidList[$q1->bssid] = [];
-                if (!in_array($qRes, $bssidList[$q1->bssid]) && strlen($qRes) > 1)
-                    $bssidList[$q1->bssid][] = $qRes;
+                $bssid = strtoupper($q1->bssid);
+                if (!isset($bssidList[$bssid]))
+                    $bssidList[$bssid] = [];
+                if (!in_array($qRes, $bssidList[$bssid]) && strlen($qRes) > 1)
+                    $bssidList[$bssid][] = $qRes;
             }
         }
 
