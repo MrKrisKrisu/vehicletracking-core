@@ -50,7 +50,7 @@ class VehicleController extends Controller
             })
             ->where('scans.vehicle_name', '<>', null)
             ->groupBy('scans.bssid')
-            ->having(DB::raw('count(*)'), '>', 2)
+            ->having(DB::raw('count(*)'), '>', 1)
             ->select('devices.*')
             ->orderBy('devices.lastSeen', 'DESC')
             ->first();
@@ -63,7 +63,7 @@ class VehicleController extends Controller
             })
             ->where('scans.vehicle_name', '<>', null)
             ->groupBy('scans.bssid')
-            ->having(DB::raw('count(*)'), '>', 2)
+            ->having(DB::raw('count(*)'), '>', 1)
             ->select('devices.*')
             ->orderBy('devices.lastSeen', 'DESC')
             ->get());
