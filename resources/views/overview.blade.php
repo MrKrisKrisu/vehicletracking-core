@@ -16,13 +16,14 @@
                                     <td>
                                         {{$scan->ssid}} (ID: {{$scan->scanDeviceId}})<br/><small>
                                             @php
-                                                $possible = \App\Http\Controllers\VehicleController::getPossibleVehicles($scan->bssid);
                                                 $vID =  \App\Device::where('bssid', $scan->bssid)->first()->vehicle;
                                             @endphp
 
-                                            @foreach($possible as $p)
-                                                <small>{{$p}}</small><br/>
-                                            @endforeach
+                                            @isset($possibleVehicles[$scan->bssid])
+                                                @foreach($possibleVehicles[$scan->bssid] as $p)
+                                                    <small>{{$p}}</small><br/>
+                                                @endforeach
+                                            @endisset
 
                                             @isset($vID)
                                                 <br/><span style="color: darkgreen;">Verifiziert ({{$vID->vehicle_name}})</span>

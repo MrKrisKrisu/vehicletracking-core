@@ -20,12 +20,34 @@ class VehicleController extends Controller
     public static function render()
     {
         $lastScans = Scan::orderBy('created_at', 'desc')->limit(30)->get();
-        $newDevices = Device::orderBy('firstSeen', 'desc')->limit(30)->get();
-        //$vehicles = Device::with(['vehicle'])->where('vehicle_id', '<>', null)->orderByDesc('lastSeen')->limit(10) ->get();
 
-        //$vehicles = Vehicle::where();
+        $possibleVehicles = [];
+        $bssidList = [];
+        foreach ($lastScans as $scan)
+            if (!in_array($scan->bssid, $bssidList))
+                $bssidList[] = $scan->bssid;
 
-        return view('overview', ['lastScan' => $lastScans]);
+        $scans = Scan::whereIn('bssid', $bssidList)
+            ->where('vehicle_name', '<>', null)
+            ->groupBy('bssid', 'vehicle_name')
+            ->select('bssid', 'vehicle_name')
+            ->get();
+
+        foreach ($scans as $scan) {
+            if (!isset($possibleVehicles[$scan->bssid]))
+                $possibleVehicles[$scan->bssid] = [];
+
+            $scanPos = $scan->possibleVehiclesRaw();
+            foreach ($scanPos as $p) {
+                if (!in_array($p, $possibleVehicles[$scan->bssid]))
+                    $possibleVehicles[$scan->bssid][] = $p;
+            }
+        }
+
+        return view('overview', [
+            'lastScan' => $lastScans,
+            'possibleVehicles' => $possibleVehicles
+        ]);
     }
 
     public static function saveVehicle(Request $request)
