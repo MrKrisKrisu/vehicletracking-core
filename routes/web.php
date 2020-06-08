@@ -21,6 +21,8 @@ Route::post('/', 'VehicleController@saveVehicle');
 Route::get('/verify', 'VehicleController@verify');
 Route::post('/verify', 'VehicleController@saveVerify');
 
+Route::get("/stats", "StatController@renderStatpage");
+
 Route::get('/vehicle/{vehicle_id}', [
     'uses' => 'VehicleController@renderVehicle',
     'as' => 'vehicle'
