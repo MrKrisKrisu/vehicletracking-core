@@ -15,7 +15,7 @@
         $(document).ready(function () {
             var chart_dayTime = document.getElementById('chart_dayTime').getContext('2d');
             window.chart_dayTime = new Chart(chart_dayTime, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: [
                         @foreach($data as $dRow)
@@ -30,7 +30,7 @@
                             @foreach($data as $dRow)
                             {{$dRow->cnt}},
                             @endforeach
-                            
+
                         ]
                     }]
 
