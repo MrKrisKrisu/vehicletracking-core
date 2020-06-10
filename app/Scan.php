@@ -8,7 +8,7 @@ class Scan extends Model
 {
     protected $fillable = [
         'vehicle_id', 'vehicle_name', 'modified_vehicle_name', 'bssid', 'ssid', 'signal',
-        'quality', 'frequency', 'bitrates', 'encrypted', 'channel', 'scanDeviceId'
+        'quality', 'frequency', 'bitrates', 'encrypted', 'channel', 'scanDeviceId', 'created_at'
     ];
 
     public function device()

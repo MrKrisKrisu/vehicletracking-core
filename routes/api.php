@@ -130,48 +130,52 @@ Route::post('scan', function (Request $request) {
             $deviceID = $scanDevice->id;
     }
 
-    $scan = Scan::create([
-        'vehicle_name' => $request->vehicle_id ?: null,
-        'bssid' => $request->bssid,
-        'ssid' => $request->ssid,
-        'signal' => $request->signal,
-        'quality' => $request->quality,
-        'frequency' => $request->frequency,
-        'bitrates' => $request->bitrates,
-        'encrypted' => $request->encrypted,
-        'channel' => $request->channel,
-        'scanDeviceId' => $deviceID
-    ]);
+    $data = $request->getContent();
+    $jData = json_decode($data);
 
-    $device = Device::updateOrCreate([
-        'bssid' => $request->bssid
-    ], [
-        'ssid' => $request->ssid,
-        'lastSeen' => Carbon::now(),
-    ]);
+    $vehicles_secured = [];
+    $vehicles_estimated = [];
 
-    if ($device != null && $device->vehicle_id != null) {
-        $vehicle = Vehicle::find($device->vehicle_id);
-        return ['status' => 'ok', 'accuracy' => 'checked', 'vehicles' => [$vehicle]];
-        // \App\Http\Controllers\TelegramController::broadcastMessage('Fahrzeug "' . $vehicle->vehicle_name . '" gesichtet (' . $scanDevice->name . ')');
-    } else if ($device != null) {
-        $scans = Scan::where('bssid', $request->bssid)->where('vehicle_name', '<>', null)->get();
-        $possible = [];
-        foreach ($scans as $scanElement) {
-            $spl = explode(',', $scanElement->vehicle_name);
-            foreach ($spl as $splElement)
-                if (!in_array($splElement, $possible))
-                    $possible[] = $splElement;
+    foreach ($jData as $network) {
+        $scanData = [
+            'vehicle_name' => $network->vehicle_id ?? null,
+            'bssid' => $network->bssid ?? null,
+            'ssid' => $network->ssid ?? null,
+            'signal' => $network->signal ?? null,
+            'quality' => $network->quality ?? null,
+            'frequency' => $network->frequency ?? null,
+            'bitrates' => $network->bitrates ?? null,
+            'encrypted' => $network->encrypted ?? null,
+            'channel' => $network->channel ?? null,
+            'scanDeviceId' => $deviceID
+        ];
+
+        if (isset($network->created_at))
+            $scanData['created_at'] = $network->created_at;
+
+        $scan = Scan::create($scanData);
+
+        $device = Device::updateOrCreate([
+            'bssid' => $scan->bssid
+        ], [
+            'ssid' => $scan->ssid,
+            'lastSeen' => Carbon::now(),
+        ]);
+
+        if ($device != null && $device->vehicle_id != null) {
+            $vehicle = Vehicle::find($device->vehicle_id);
+            $vehicles_secured[] = $vehicle;
+        } else if ($device != null) {
+            $scans = Scan::where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->get();
+            foreach ($scans as $scanElement) {
+                $spl = explode(',', $scanElement->vehicle_name);
+                foreach ($spl as $splElement)
+                    if (!in_array($splElement, $vehicles_estimated))
+                        $vehicles_estimated[] = $splElement;
+            }
         }
-        $message = "Fahrzeug gesichtet, welches nicht genau bestimmt werden konnte. (" . $scanDevice->name . ") \r\n\r\n";
-        $message .= "Mögliche Fahrzeuge: \r\n";
-        foreach ($possible as $ve)
-            $message .= " - $ve \r\n";
-        return ['status' => 'ok', 'accuracy' => 'estimated', 'vehicles' => $possible];
-        // \App\Http\Controllers\TelegramController::broadcastMessage($message);
     }
-
-    return response(['status' => 'error'], 400);
+    return response(['status' => 'ok', 'vehicles' => ['secured' => $vehicles_secured, 'estimated' => $vehicles_estimated]]);
 });
 
 Route::post('scan/device/registernew', function (Request $request) {
