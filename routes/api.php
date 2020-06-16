@@ -137,42 +137,46 @@ Route::post('scan', function (Request $request) {
     $vehicles_estimated = [];
 
     foreach ($jData as $network) {
-        $scanData = [
-            'vehicle_name' => $network->vehicle_id ?? null,
-            'bssid' => $network->bssid ?? null,
-            'ssid' => $network->ssid ?? null,
-            'signal' => $network->signal ?? null,
-            'quality' => $network->quality ?? null,
-            'frequency' => $network->frequency ?? null,
-            'bitrates' => $network->bitrates ?? null,
-            'encrypted' => $network->encrypted ?? null,
-            'channel' => $network->channel ?? null,
-            'scanDeviceId' => $deviceID
-        ];
+        try {
+            $scanData = [
+                'vehicle_name' => $network->vehicle_id ?? null,
+                'bssid' => $network->bssid ?? null,
+                'ssid' => $network->ssid ?? null,
+                'signal' => $network->signal ?? null,
+                'quality' => $network->quality ?? null,
+                'frequency' => $network->frequency ?? null,
+                'bitrates' => $network->bitrates ?? null,
+                'encrypted' => $network->encrypted ?? null,
+                'channel' => $network->channel ?? null,
+                'scanDeviceId' => $deviceID
+            ];
 
-        if (isset($network->created_at))
-            $scanData['created_at'] = $network->created_at;
+            if (isset($network->created_at))
+                $scanData['created_at'] = $network->created_at;
 
-        $scan = Scan::create($scanData);
+            $scan = Scan::create($scanData);
 
-        $device = Device::updateOrCreate([
-            'bssid' => $scan->bssid
-        ], [
-            'ssid' => $scan->ssid,
-            'lastSeen' => Carbon::now(),
-        ]);
+            $device = Device::updateOrCreate([
+                'bssid' => $scan->bssid
+            ], [
+                'ssid' => $scan->ssid,
+                'lastSeen' => Carbon::now(),
+            ]);
 
-        if ($device != null && $device->vehicle_id != null) {
-            $vehicle = Vehicle::find($device->vehicle_id);
-            $vehicles_secured[] = $vehicle;
-        } else if ($device != null) {
-            $scans = Scan::where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->get();
-            foreach ($scans as $scanElement) {
-                $spl = explode(',', $scanElement->vehicle_name);
-                foreach ($spl as $splElement)
-                    if (!in_array($splElement, $vehicles_estimated))
-                        $vehicles_estimated[] = $splElement;
+            if ($device != null && $device->vehicle_id != null) {
+                $vehicle = Vehicle::find($device->vehicle_id);
+                $vehicles_secured[] = $vehicle;
+            } else if ($device != null) {
+                $scans = Scan::where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->get();
+                foreach ($scans as $scanElement) {
+                    $spl = explode(',', $scanElement->vehicle_name);
+                    foreach ($spl as $splElement)
+                        if (!in_array($splElement, $vehicles_estimated))
+                            $vehicles_estimated[] = $splElement;
+                }
             }
+        } catch (Exception $e) {
+            report($e);
         }
     }
     return response(['status' => 'ok', 'vehicles' => ['secured' => $vehicles_secured, 'estimated' => $vehicles_estimated]]);
