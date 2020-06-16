@@ -37,8 +37,8 @@
                                             <input class="form-check-input" type="checkbox" name="scans[{{$scan->id}}]">
                                             <label class="form-check-label"><small>{{$scan->vehicle_name}}</small></label>
                                         </div>
-                                        {{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->diffForHumans()}}
-                                        <small>({{\Carbon\Carbon::createFromTimeStamp(strtotime($scan->created_at))->format('H:i:s')}}
+                                        {{$scan->created_at->diffForHumans()}}
+                                        <small>({{$scan->created_at->format('H:i:s')}}
                                             )</small></td>
                                 </tr>
                             @endforeach
