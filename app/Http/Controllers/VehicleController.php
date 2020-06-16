@@ -19,7 +19,7 @@ class VehicleController extends Controller
 
     public static function render()
     {
-        $lastScans = Scan::orderBy('updated_at', 'desc')->limit(80)->get();
+        $lastScans = Scan::orderBy('created_at', 'desc')->limit(80)->get();
 
         $possibleVehicles = [];
         $bssidList = [];
