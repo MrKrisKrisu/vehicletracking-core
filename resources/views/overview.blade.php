@@ -37,9 +37,13 @@
                                             <input class="form-check-input" type="checkbox" name="scans[{{$scan->id}}]">
                                             <label class="form-check-label"><small>{{$scan->vehicle_name}}</small></label>
                                         </div>
-                                        {{$scan->created_at->diffForHumans()}}
-                                        <small>({{$scan->created_at->format('H:i:s')}}
-                                            )</small></td>
+                                        <p>Found: {{$scan->created_at->diffForHumans()}}
+                                            <small>({{$scan->created_at->format('H:i:s')}}
+                                                )</small></p>
+                                        <p>Uploaded: {{$scan->updated_at->diffForHumans()}}
+                                            <small>({{$scan->updated_at->format('H:i:s')}}
+                                                )</small></p>
+                                    </td>
                                 </tr>
                             @endforeach
                         </table>
