@@ -148,6 +148,8 @@ Route::post('scan', function (Request $request) {
                 'bitrates' => $network->bitrates ?? null,
                 'encrypted' => $network->encrypted ?? null,
                 'channel' => $network->channel ?? null,
+                'latitude' => $network->latitude ?? null,
+                'longitude' => $network->longitude ?? null,
                 'scanDeviceId' => $deviceID
             ];
 
