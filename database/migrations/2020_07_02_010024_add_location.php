@@ -14,10 +14,10 @@ class AddLocation extends Migration
     public function up()
     {
         Schema::table('scans', function (Blueprint $table) {
-            $table->string('longitude')
+            $table->decimal('longitude', 9, 6)
                 ->nullable()
                 ->after('encrypted');
-            $table->string('latitude')
+            $table->decimal('latitude', 9, 6)
                 ->nullable()
                 ->after('encrypted');
         });

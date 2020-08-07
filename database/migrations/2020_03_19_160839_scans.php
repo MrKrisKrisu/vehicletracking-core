@@ -18,12 +18,12 @@ class Scans extends Migration
             $table->text('vehicle_name')->nullable();
             $table->text('bssid');
             $table->text('ssid');
-            $table->text('signal');
-            $table->text('quality');
-            $table->text('frequency');
-            $table->text('bitrates');
-            $table->text('encrypted');
-            $table->text('channel');
+            $table->integer('signal')->nullable();
+            $table->text('quality')->nullable();
+            $table->text('frequency')->nullable();
+            $table->text('bitrates')->nullable();
+            $table->text('encrypted')->nullable();
+            $table->integer('channel')->nullable();
             $table->timestamps();
         });
     }

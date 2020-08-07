@@ -25,13 +25,14 @@
                         <tbody>
                         @foreach($scans as $scan)
                             <tr>
-                                <td>{{$scan->ssid}}</td>
+                                <td><small>{{$scan->ssid}}</small></td>
                                 <td>
                                     <form method="POST">
                                         @csrf
                                         <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
-                                        <input type="text" class="form-control" name="modified_vehicle_name"
-                                               value="{{$scan->modified_vehicle_name ?? $scan->vehicle_name}}"/>
+                                        <textarea type="text" class="form-control"
+                                                  name="modified_vehicle_name">{{$scan->modified_vehicle_name ?? $scan->vehicle_name}}</textarea>
+                                        <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i></button>
                                     </form>
                                 </td>
                                 <td>

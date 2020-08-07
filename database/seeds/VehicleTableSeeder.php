@@ -13,25 +13,12 @@ class VehicleTableSeeder extends Seeder
      */
     public function run()
     {
-        $vehicle = new Vehicle;
-        $vehicle->company_id = 1;
-        $vehicle->vehicle_id = 1001;
-        $vehicle->save();
-
-        $vehicle = new Vehicle;
-        $vehicle->company_id = 1;
-        $vehicle->vehicle_id = 1002;
-        $vehicle->save();
-
-        $vehicle = new Vehicle;
-        $vehicle->company_id = 2;
-        $vehicle->vehicle_id = 2001;
-        $vehicle->save();
-
-        $vehicle = new Vehicle;
-        $vehicle->company_id = 1;
-        $vehicle->vehicle_id = 2002;
-        $vehicle->save();
+        for ($company_id = 1; $company_id <= 2; $company_id++)
+            for ($vehicle_name = 1; $vehicle_name < 10; $vehicle_name++)
+                Vehicle::create([
+                    'company_id' => $company_id,
+                    'vehicle_name' => "Fahrzeug $vehicle_name"
+                ]);
 
     }
 }
