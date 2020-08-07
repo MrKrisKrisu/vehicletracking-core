@@ -30,7 +30,7 @@
                                     <form method="POST">
                                         @csrf
                                         <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
-                                        <textarea type="text" class="form-control"
+                                        <textarea type="text" class="form-control" rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
                                                   name="modified_vehicle_name">{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
                                         <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i></button>
                                     </form>
