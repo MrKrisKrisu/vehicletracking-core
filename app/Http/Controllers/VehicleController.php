@@ -115,7 +115,7 @@ class VehicleController extends Controller
             ]);
 
             $scan = Scan::find($validated['modified_scan_id']);
-            $scan->modified_vehicle_name = $validated['modified_vehicle_name'];
+            $scan->modified_vehicle_name = str_replace("\r\n", ',', $validated['modified_vehicle_name']);
             $scan->update();
 
         } else if ($request->action == 'save') {

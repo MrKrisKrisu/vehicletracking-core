@@ -31,7 +31,7 @@
                                         @csrf
                                         <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
                                         <textarea type="text" class="form-control"
-                                                  name="modified_vehicle_name">{{$scan->modified_vehicle_name ?? $scan->vehicle_name}}</textarea>
+                                                  name="modified_vehicle_name">{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
                                         <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i></button>
                                     </form>
                                 </td>
