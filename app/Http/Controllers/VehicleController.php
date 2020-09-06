@@ -19,7 +19,14 @@ class VehicleController extends Controller
 
     public static function render()
     {
-        $lastScans = Scan::orderBy('created_at', 'desc')->limit(80)->get();
+        $hiddenBssids = DB::table('devices')
+            ->join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
+            ->join('companies', 'companies.id', '=', 'vehicles.company_id')
+            ->where('companies.name', 'Stationary')
+            ->pluck('devices.bssid');
+
+        $lastScans = Scan::whereNotIn('bssid', $hiddenBssids)
+            ->orderBy('created_at', 'desc')->limit(80)->get();
 
         $possibleVehicles = [];
         $bssidList = [];
