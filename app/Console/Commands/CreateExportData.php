@@ -82,43 +82,5 @@ class CreateExportData extends Command
             }
             fclose($fp);
         }
-
-        $q = DB::table('devices')->join('scans', 'scans.bssid', '=', 'devices.bssid')
-               ->where('devices.vehicle_id', null)
-               ->where(function ($q) {
-                   $q->where('scans.modified_vehicle_name', '<>', null)
-                     ->orWhere('scans.vehicle_name', '<>', null);
-               })
-               ->orderBy('devices.bssid', 'asc')
-               ->get();
-
-        $fp = fopen($exportPath . 'unsorted assignments.csv', 'w+');
-        fputcsv($fp, [
-            'bssid',
-            'possible_assignments',
-        ]);
-
-        $bssidList = [];
-        foreach ($q as $q1) {
-            $expl = $q1->modified_vehicle_name ?? $q1->vehicle_name;
-            $expl = str_replace('oder', ',', $expl);
-            foreach (explode(',', $expl) as $qRes) {
-                $qRes = trim($qRes);
-                $bssid = strtoupper($q1->bssid);
-                if (!isset($bssidList[$bssid]))
-                    $bssidList[$bssid] = [];
-                if (!in_array($qRes, $bssidList[$bssid]) && strlen($qRes) > 1)
-                    $bssidList[$bssid][] = $qRes;
-            }
-        }
-
-        foreach ($bssidList as $bssid => $data) {
-            sort($data);
-            fputcsv($fp, [
-                strtoupper($bssid),
-                implode(',', $data),
-            ]);
-        }
-        fclose($fp);
     }
 }
