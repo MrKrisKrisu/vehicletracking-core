@@ -107,20 +107,20 @@ Route::get('/scan/prefix/', function () {
     return \App\DevicePrefix::select('prefix', 'description')->get();
 });
 
-Route::get('company/{company_id}', function ($company_id) {
+Route::get('/company/{company_id}', function ($company_id) {
     return Company::where([
         'id' => $company_id
     ])->first();
 });
 
-Route::get('vehicle/{company_id}/{vehicle_id}', function ($company_id, $vehicle_id) {
+Route::get('/vehicle/{company_id}/{vehicle_id}', function ($company_id, $vehicle_id) {
     return Vehicle::where([
         'company_id' => $company_id,
         'vehicle_name' => $vehicle_id
     ])->firstOrFail()->devices;
 });
 
-Route::post('scan', function (Request $request) {
+Route::post('/scan', function (Request $request) {
     $token = $request->header('X-Api-Token');
     $deviceID = null;
     $scanDevice = null;
@@ -184,7 +184,7 @@ Route::post('scan', function (Request $request) {
     return response(['status' => 'ok', 'vehicles' => ['secured' => $vehicles_secured, 'estimated' => $vehicles_estimated]]);
 });
 
-Route::post('scan/device/registernew', function (Request $request) {
+Route::post('/scan/device/registernew', function (Request $request) {
 
     $scan_device = ScanDevice::create([
         'token' => Str::uuid()
