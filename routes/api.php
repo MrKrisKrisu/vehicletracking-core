@@ -1,15 +1,7 @@
 <?php
 
-use App\ScanDevice;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
-use App\Vehicle;
-use App\Device;
-use App\Scan;
-use App\Company;
-use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,169 +19,12 @@ use Illuminate\Support\Str;
 });*/
 
 
-Route::get('/vehicle/last_seen', function (Request $request) {
-    $lastScans = Device::with('vehicle')
-        ->where('vehicle_id', '<>', null)
-        ->orderBy('lastSeen', 'desc')
-        ->limit(100)
-        ->get();
-
-    $data = [];
-    foreach ($lastScans as $scan) {
-        $data[] = [
-            'vehicle_name' => $scan->vehicle->vehicle_name,
-            'last_seen' => [
-                'display' => $scan->lastSeen->diffForHumans(),
-                'timestamp' => $scan->lastSeen
-            ]
-        ];
-    }
-
-    return ['data' => $data];
-});
-
-Route::get('/vehicle/new', function (Request $request) {
-    $newDevices = Device::orderBy('firstSeen', 'desc')->limit(30)->get();
-
-    $data = [];
-    foreach ($newDevices as $device) {
-        $data[] = [
-            'ssid' => $device->ssid,
-            'last_seen' => [
-                'display' => $device->firstSeen->diffForHumans(),
-                'timestamp' => $device->firstSeen
-            ]
-        ];
-    }
-
-    return ['data' => $data];
-});
-
-Route::post('/vehicle/locate/', function (Request $request) {
-    $verifiedVehicles = [];
-    $possibleVehicles = [];
-
-    $json = json_decode($request->getContent());
-
-    if (!is_array($json))
-        return response('Request contains no valid json.', 400);
-
-    foreach ($json as $bssid) {
-        $device = DB::table('devices')->where('bssid', $bssid)->where('vehicle_id', '<>', null)->first();
-        if ($device !== null) {
-            //There are verified rows about the found bssid
-            $vehicle = DB::table('vehicles')->where('id', $device->vehicle_id)->first();
-            if ($vehicle != null && !in_array($vehicle->vehicle_name, $verifiedVehicles))
-                $verifiedVehicles[] = $vehicle->vehicle_name;
-        } else {
-            //There are no verified rows about the found bssid, so we will try to analyse the given data
-            $result = DB::table('scans')->select('vehicle_name', DB::raw('COUNT(*) as cnt'))
-                ->where('bssid', $bssid)
-                ->where('vehicle_name', '<>', null)
-                ->where('vehicle_name', '<>', 0)
-                ->groupBy('vehicle_name')
-                ->orderBy('cnt', 'DESC')
-                ->limit(1)
-                ->first();
-
-            if ($result != null && !in_array($result->vehicle_name, $possibleVehicles))
-                $possibleVehicles[] = $result->vehicle_name;
-        }
-    }
-
-    return [
-        'verified' => $verifiedVehicles,
-        'possible' => $possibleVehicles
-    ];
-});
-
-Route::get('/scan/prefix/', function () {
-    return \App\DevicePrefix::select('prefix', 'description')->get();
-});
-
-Route::get('/company/{company_id}', function ($company_id) {
-    return Company::where([
-        'id' => $company_id
-    ])->first();
-});
-
-Route::get('/vehicle/{company_id}/{vehicle_id}', function ($company_id, $vehicle_id) {
-    return Vehicle::where([
-        'company_id' => $company_id,
-        'vehicle_name' => $vehicle_id
-    ])->firstOrFail()->devices;
-});
-
-Route::post('/scan', function (Request $request) {
-    $token = $request->header('X-Api-Token');
-    $deviceID = null;
-    $scanDevice = null;
-    if ($token != null) {
-        $scanDevice = ScanDevice::where('token', $token)->first();
-        if ($scanDevice != null)
-            $deviceID = $scanDevice->id;
-    }
-
-    $data = $request->getContent();
-    $jData = json_decode($data);
-
-    $vehicles_secured = [];
-    $vehicles_estimated = [];
-
-    foreach ($jData as $network) {
-        try {
-            $scanData = [
-                'vehicle_name' => $network->vehicle_id ?? null,
-                'bssid' => $network->bssid ?? null,
-                'ssid' => $network->ssid ?? null,
-                'signal' => $network->signal ?? null,
-                'quality' => $network->quality ?? null,
-                'frequency' => $network->frequency ?? null,
-                'bitrates' => $network->bitrates ?? null,
-                'encrypted' => $network->encrypted ?? null,
-                'channel' => $network->channel ?? null,
-                'latitude' => $network->latitude ?? null,
-                'longitude' => $network->longitude ?? null,
-                'scanDeviceId' => $deviceID
-            ];
-
-            if (isset($network->created_at))
-                $scanData['created_at'] = $network->created_at;
-
-            $scan = Scan::create($scanData);
-
-            $device = Device::updateOrCreate([
-                'bssid' => $scan->bssid
-            ], [
-                'ssid' => $scan->ssid,
-                'lastSeen' => Carbon::now(),
-            ]);
-
-            if ($device != null && $device->vehicle_id != null) {
-                $vehicle = Vehicle::find($device->vehicle_id);
-                $vehicles_secured[] = $vehicle;
-            } else if ($device != null) {
-                $scans = Scan::where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->get();
-                foreach ($scans as $scanElement) {
-                    $spl = explode(',', $scanElement->vehicle_name);
-                    foreach ($spl as $splElement)
-                        if (!in_array($splElement, $vehicles_estimated))
-                            $vehicles_estimated[] = $splElement;
-                }
-            }
-        } catch (Exception $e) {
-            report($e);
-        }
-    }
-    return response(['status' => 'ok', 'vehicles' => ['secured' => $vehicles_secured, 'estimated' => $vehicles_estimated]]);
-});
-
-Route::post('/scan/device/registernew', function (Request $request) {
-
-    $scan_device = ScanDevice::create([
-        'token' => Str::uuid()
-    ]);
-
-    return response((string)$scan_device->token, 200, ['Content-type: text/plain']);
-});
+Route::get('/vehicle/last_seen', [ApiController::class, 'getLastSeenVehicles']);
+Route::get('/vehicle/new', [ApiController::class, 'getNewVehicles']);
+Route::post('/vehicle/locate/', [ApiController::class, 'locate']);
+Route::get('/scan/prefix/', [ApiController::class, 'prefix']);
+Route::get('/company/{company_id}', [ApiController::class, 'getCompany']);
+Route::get('/vehicle/{company_id}/{vehicle_id}', [ApiController::class, 'getVehicles']);
+Route::post('/scan', [ApiController::class, 'scan']);
+Route::post('/scan/device/registernew', [ApiController::class, 'registerNew']);
 
