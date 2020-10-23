@@ -16,7 +16,8 @@
                                     <td>
                                         {{$scan->ssid}} (ID: {{$scan->scanDeviceId}})<br/><small>
                                             @php
-                                                $vID =  \App\Device::where('bssid', $scan->bssid)->first()->vehicle;
+                                                $device = \App\Device::where('bssid', $scan->bssid)->first();
+                                                    $vID = $device != null ? $device->vehicle : null;
                                             @endphp
 
                                             @isset($possibleVehicles[$scan->bssid])
@@ -58,10 +59,10 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <table class="table" id="vehicles">
                             <thead>
-                            <tr>
-                                <th>Fahrzeug</th>
-                                <th>Timestamp</th>
-                            </tr>
+                                <tr>
+                                    <th>Fahrzeug</th>
+                                    <th>Timestamp</th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
@@ -96,10 +97,10 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <table class="table" id="new_devices">
                             <thead>
-                            <tr>
-                                <th>SSID</th>
-                                <th>Timestamp</th>
-                            </tr>
+                                <tr>
+                                    <th>SSID</th>
+                                    <th>Timestamp</th>
+                                </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
