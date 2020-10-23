@@ -7,7 +7,7 @@ use App\Scan;
 use App\ScanDevice;
 use App\Vehicle;
 use Carbon\Carbon;
-use Device;
+use App\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
