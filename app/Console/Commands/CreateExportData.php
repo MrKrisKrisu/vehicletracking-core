@@ -49,7 +49,7 @@ class CreateExportData extends Command
             return;
         }
 
-        $companies = Company::all();
+        $companies = Company::where('id', '<>', 4)->get();
 
         $fp = fopen($exportPath . 'companies.csv', 'w+');
         fputcsv($fp, [
@@ -58,7 +58,7 @@ class CreateExportData extends Command
         ]);
         foreach ($companies as $company)
             fputcsv($fp, [
-                'id' => $company->id,
+                'id'   => $company->id,
                 'name' => $company->name,
             ]);
         fclose($fp);
@@ -71,9 +71,9 @@ class CreateExportData extends Command
                 'vehicle',
             ]);
             $devices = Device::join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
-                ->where('vehicles.company_id', $company->id)
-                ->orderBy('devices.bssid', 'asc')
-                ->get();
+                             ->where('vehicles.company_id', $company->id)
+                             ->orderBy('devices.bssid', 'asc')
+                             ->get();
             foreach ($devices as $device) {
                 fputcsv($fp, [
                     strtoupper($device->bssid),
@@ -84,13 +84,13 @@ class CreateExportData extends Command
         }
 
         $q = DB::table('devices')->join('scans', 'scans.bssid', '=', 'devices.bssid')
-            ->where('devices.vehicle_id', null)
-            ->where(function ($q) {
-                $q->where('scans.modified_vehicle_name', '<>', null)
-                    ->orWhere('scans.vehicle_name', '<>', null);
-            })
-            ->orderBy('devices.bssid', 'asc')
-            ->get();
+               ->where('devices.vehicle_id', null)
+               ->where(function ($q) {
+                   $q->where('scans.modified_vehicle_name', '<>', null)
+                     ->orWhere('scans.vehicle_name', '<>', null);
+               })
+               ->orderBy('devices.bssid', 'asc')
+               ->get();
 
         $fp = fopen($exportPath . 'unsorted assignments.csv', 'w+');
         fputcsv($fp, [
