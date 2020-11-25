@@ -15,19 +15,14 @@
                                 <tr>
                                     <td>
                                         {{$scan->ssid}} (ID: {{$scan->scanDeviceId}})<br/><small>
-                                            @php
-                                                $device = \App\Device::where('bssid', $scan->bssid)->first();
-                                                    $vID = $device != null ? $device->vehicle : null;
-                                            @endphp
-
                                             @isset($possibleVehicles[$scan->bssid])
                                                 @foreach($possibleVehicles[$scan->bssid] as $p)
                                                     <small>{{$p}}</small><br/>
                                                 @endforeach
                                             @endisset
 
-                                            @isset($vID)
-                                                <br/><span style="color: darkgreen;">Verifiziert ({{$vID->vehicle_name}})</span>
+                                            @if(isset($scan->device) && isset($scan->device->vehicle))
+                                                <br/><span style="color: darkgreen;">Verifiziert ({{$scan->device->vehicle->vehicle_name}})</span>
                                             @else
                                                 <br/><span style="color: #E70000;">Unverifiziert</span>
                                             @endif
