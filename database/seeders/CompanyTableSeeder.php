@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Company;
@@ -13,12 +15,7 @@ class CompanyTableSeeder extends Seeder
      */
     public function run()
     {
-        $company = new Company;
-        $company->name = "OSI 4 Transport UG (haftungsbeschränkt)";
-        $company->save();
-
-        $company = new Company;
-        $company->name = "Beispiel-Verkehrsunternehmen AG";
-        $company->save();
+        Company::create(['name' => 'OSI 4 Transport UG (haftungsbeschränkt)']);
+        Company::create(['name' => 'Beispiel-Verkehrsunternehmen AG']);
     }
 }
