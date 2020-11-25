@@ -25,8 +25,8 @@ class ApiController extends Controller
 
     public function scan(Request $request)
     {
-        $token = $request->header('X-Api-Token');
-        $deviceID = null;
+        $token      = $request->header('X-Api-Token');
+        $deviceID   = null;
         $scanDevice = null;
         if ($token != null) {
             $scanDevice = ScanDevice::where('token', $token)->first();
@@ -34,10 +34,10 @@ class ApiController extends Controller
                 $deviceID = $scanDevice->id;
         }
 
-        $data = $request->getContent();
+        $data  = $request->getContent();
         $jData = json_decode($data);
 
-        $vehicles_secured = [];
+        $vehicles_secured   = [];
         $vehicles_estimated = [];
 
         foreach ($jData as $network) {
@@ -70,8 +70,11 @@ class ApiController extends Controller
                                                  ]);
 
                 if ($device != null && $device->vehicle_id != null) {
-                    $vehicle = Vehicle::find($device->vehicle_id);
-                    $vehicles_secured[] = $vehicle;
+                    $vehicle            = Vehicle::find($device->vehicle_id);
+                    $vehicles_secured[] = [
+                        'company_name' => $vehicle->company->name,
+                        'vehicle_name' => $vehicle->vehicle_name
+                    ];
                 } elseif ($device != null) {
                     $scans = Scan::where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->get();
                     foreach ($scans as $scanElement) {
