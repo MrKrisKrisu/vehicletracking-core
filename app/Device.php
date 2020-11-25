@@ -9,12 +9,9 @@ class Device extends Model
 {
     use HasFactory;
 
-    public const CREATED_AT = 'firstSeen';
-    public const UPDATED_AT = 'lastSeen';
-
     protected $fillable = ['bssid', 'ssid', 'firstSeen', 'lastSeen'];
     protected $hidden   = ['id', 'ssid', 'firstSeen', 'vehicle_id'];
-    protected $dates    = ['firstSeen', 'lastSeen',];
+    protected $dates    = ['firstSeen', 'lastSeen'];
 
     public function scans()
     {
