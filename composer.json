@@ -11,9 +11,7 @@
     "guzzlehttp/guzzle": "^7.0.1",
     "laravel/framework": "^8.0",
     "laravel/tinker": "^2.0",
-    "laravel/ui": "^3.0",
-    "unreal4u/telegram-api": "^3.5",
-    "vyuldashev/laravel-openapi": "^0.23.0"
+    "laravel/ui": "^3.0"
   },
   "require-dev": {
     "barryvdh/laravel-debugbar": "^3.3",
