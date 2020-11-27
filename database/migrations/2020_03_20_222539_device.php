@@ -17,8 +17,7 @@ class Device extends Migration
             $table->id();
             $table->string('bssid', 34)->unique();
             $table->string('ssid')->nullable();
-            $table->integer('vehicle_id')->nullable()
-                ->references('id')->on('vehicles');
+            $table->integer('vehicle_id')->nullable();
             $table->timestamp('firstSeen')->useCurrent();
             $table->timestamp('lastSeen')->useCurrent();
         });

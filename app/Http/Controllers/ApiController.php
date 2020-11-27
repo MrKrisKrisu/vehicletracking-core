@@ -23,6 +23,9 @@ class ApiController extends Controller
         return response((string)$scan_device->token, 200, ['Content-type: text/plain']);
     }
 
+    /**
+     * @deprecated Use POST: /api/v1/scan instead
+     */
     public function scan(Request $request)
     {
         $token      = $request->header('X-Api-Token');
@@ -70,10 +73,9 @@ class ApiController extends Controller
                                                  ]);
 
                 if ($device != null && $device->vehicle_id != null) {
-                    $vehicle            = Vehicle::find($device->vehicle_id);
                     $vehicles_secured[] = [
-                        'company_name' => $vehicle->company->name,
-                        'vehicle_name' => $vehicle->vehicle_name
+                        'company_name' => $device->vehicle->company->name,
+                        'vehicle_name' => $device->vehicle->vehicle_name
                     ];
                 } elseif ($device != null) {
                     $scans = Scan::where('bssid', $scan->bssid)->where('vehicle_name', '<>', null)->get();

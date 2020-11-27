@@ -17,8 +17,7 @@ class Vehicle extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
-            $table->integer('company_id')->unsigned()
-                ->references('id')->on('companies');
+            $table->integer('company_id')->unsigned();
             $table->string('vehicle_name', 255);
             $table->timestamps();
 
