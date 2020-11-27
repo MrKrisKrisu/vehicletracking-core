@@ -19,9 +19,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         User::factory()
-            ->has(ScanDevice::factory(2))
+            ->has(ScanDevice::factory(2), 'scanDevices')
             ->create(['email' => 'dev@dev.de']);
-
         Device::factory(100)->create();
         $this->call(ScanSeeder::class);
         $this->call(CompanyTableSeeder::class);
