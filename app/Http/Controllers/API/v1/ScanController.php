@@ -6,13 +6,13 @@ use App\Device;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\ScanDeviceAuthentification;
 use App\Scan;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class ScanController extends Controller
-{
+class ScanController extends Controller {
     /**
      * POST: /api/v1/scan
      *
@@ -20,8 +20,7 @@ class ScanController extends Controller
      * @return JsonResponse
      * @throws ValidationException
      */
-    public function scan(Request $request): JsonResponse
-    {
+    public function scan(Request $request): JsonResponse {
         $validator = Validator::make($request->all(), [
             '*.vehicle_name' => ['nullable', 'max:255'],
             '*.bssid'        => ['required', 'regex:/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/'],
@@ -36,30 +35,38 @@ class ScanController extends Controller
             '*.longitude'    => ['nullable', 'numeric'],
         ]);
 
-        if ($validator->fails()) {
+        if($validator->fails()) {
             return response()->json(['status' => false, 'errors' => array_values($validator->errors()->toArray())], 400);
         }
 
-        $verified   = [];
+        $verified = [];
         $unverified = [];
 
         $validated = $validator->validate();
-        foreach ($validated as $scanElement) {
+        foreach($validated as $scanElement) {
             $scanElement['scanDeviceId'] = ScanDeviceAuthentification::getDevice()->id;
 
-            Device::updateOrCreate(['bssid' => $scanElement['bssid']], ['ssid' => $scanElement['ssid']]);
+            if($scanElement['ssid'] == '')
+                $scanElement['ssid'] = null;
+
+            Device::updateOrCreate([
+                                       'bssid' => $scanElement['bssid']
+                                   ], [
+                                       'ssid'     => $scanElement['ssid'],
+                                       'lastSeen' => Carbon::now()
+                                   ]);
 
             $scan = Scan::create($scanElement);
-            if (isset($scan->device->vehicle)) {
-                $vehicle                = $scan->device->vehicle;
+            if(isset($scan->device->vehicle)) {
+                $vehicle = $scan->device->vehicle;
                 $verified[$vehicle->id] = [
                     'company' => $vehicle->company->name,
                     'vehicle' => $vehicle->vehicle_name
                 ];
             } else
-                foreach ($scan->device->scans->whereNotNull('vehicle_name')->pluck('vehicle_name') as $possibleRow)
-                    foreach (explode(',', $possibleRow) as $possible)
-                        if (!in_array($possible, $unverified))
+                foreach($scan->device->scans->whereNotNull('vehicle_name')->pluck('vehicle_name') as $possibleRow)
+                    foreach(explode(',', $possibleRow) as $possible)
+                        if(!in_array($possible, $unverified))
                             $unverified[] = $possible;
 
         }
