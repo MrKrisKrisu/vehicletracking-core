@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,11 @@ Route::middleware(['auth'])->group(function() {
          ->name('unban.ssid');
     Route::post('/unban/bssid', [VehicleController::class, 'unbanBSSID'])
          ->name('unban.bssid');
+
+    Route::get('/location', [LocationController::class, 'renderOverview'])
+         ->name('location');
+    Route::post('/location/import', [LocationController::class, 'importLocations'])
+         ->name('location.import');
 });
 
 Route::get('/company', [VehicleController::class, 'renderCompanies']);

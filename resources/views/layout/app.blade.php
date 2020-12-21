@@ -80,6 +80,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('ignored')}}">Ignorierte Netzwerke</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('location')}}">GPX einlesen</a>
+                            </li>
                         </ul>
 
                         <ul class="navbar-nav mr-right">
@@ -124,20 +127,7 @@
 
             <div class="album py-5 bg-light">
                 <div class="container">
-                    @foreach (['danger', 'warning', 'success', 'info'] as $msg)
-                        @if(Session::has('alert-' . $msg))
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p class="alert alert-{{ $msg }}">
-                                        {!! Session::get('alert-' . $msg) !!}
-                                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                                    </p>
-                                    <hr/>
-                                </div>
-                            </div>
-                        @endif
-                        {{ Session::forget('alert-' . $msg) }}
-                    @endforeach
+                    @include('layout.components.alerts')
 
                     @yield('content')
                 </div>
