@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Company;
+use App\IgnoredNetwork;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -19,8 +20,11 @@ class VehicleController extends Controller {
                               ->where('companies.name', 'Stationary')
                               ->select('devices.bssid');
 
+        $hiddenSsids = IgnoredNetwork::select('ssid');
+
         $lastScans = Scan::with(['device'])
                          ->whereNotIn('bssid', $hiddenBssids)
+                         ->whereNotIn('ssid', $hiddenSsids)
                          ->orderBy('created_at', 'desc')->limit(80)->get();
 
         $possibleVehicles = [];

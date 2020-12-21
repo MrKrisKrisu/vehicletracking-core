@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1;
 use App\Device;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\ScanDeviceAuthentification;
+use App\IgnoredNetwork;
 use App\Scan;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -44,6 +45,10 @@ class ScanController extends Controller {
 
         $validated = $validator->validate();
         foreach($validated as $scanElement) {
+
+            if(IgnoredNetwork::isIgnored($scanElement['ssid']))
+                continue;
+
             $scanElement['scanDeviceId'] = ScanDeviceAuthentification::getDevice()->id;
 
             if($scanElement['ssid'] == '')
