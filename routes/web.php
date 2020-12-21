@@ -16,4 +16,5 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])->name('vehicle');
 });
 
-
+Route::get('/company', [VehicleController::class, 'renderCompanies']);
+Route::get('/company/{id}', [VehicleController::class, 'renderCompany'])->name('company');

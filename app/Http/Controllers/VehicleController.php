@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Company;
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use App\Scan;
 use App\Device;
@@ -188,5 +189,17 @@ class VehicleController extends Controller {
         sort($data);
 
         return $data;
+    }
+
+    public function renderCompanies(): Renderable {
+        return view('companies', [
+            'companies' => Company::with(['vehicles'])->where('name', '<>', 'Stationary')->get()
+        ]);
+    }
+
+    public function renderCompany(int $id): Renderable {
+        return view('company', [
+            'company' => Company::with(['vehicles', 'vehicles.devices'])->findOrFail($id)
+        ]);
     }
 }
