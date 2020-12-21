@@ -12,6 +12,7 @@ use App\Scan;
 use App\Device;
 use App\Vehicle;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class VehicleController extends Controller {
 
@@ -22,11 +23,15 @@ class VehicleController extends Controller {
                               ->select('devices.bssid');
 
         $hiddenSsids = IgnoredNetwork::select('ssid');
+        $hiddenBssids2 = Device::where('ignore', 1)
+                               ->select('bssid');
 
         $lastScansQ = Scan::with(['device'])
                           ->whereNotIn('bssid', $hiddenBssids)
+                          ->whereNotIn('bssid', $hiddenBssids2)
                           ->whereNotIn('ssid', $hiddenSsids)
-                          ->orderBy('created_at', 'desc')->limit(80);
+                          ->orderBy('created_at', 'desc')
+                          ->limit(80);
 
         if(isset($request->device))
             $lastScansQ->where('scanDeviceId', $request->device);
@@ -89,21 +94,22 @@ class VehicleController extends Controller {
                         ->orderBy('devices.lastSeen', 'DESC')
                         ->first();
 
-        $count = count(Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
-                             ->where('devices.vehicle_id', null)
-                             ->where(function($query) {
-                                 $query->where('devices.moveVerifyUntil', '<', Carbon::now())
-                                       ->orWhere('devices.moveVerifyUntil', null);
-                             })
-                             ->where('scans.vehicle_name', '<>', null)
-                             ->groupBy('scans.bssid')
-                             ->having(DB::raw('count(*)'), '>', 1)
-                             ->select('devices.*')
-                             ->orderBy('devices.lastSeen', 'DESC')
-                             ->get());
-
         if($device == null)
             abort(204);
+
+        $count = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
+                       ->where('devices.vehicle_id', null)
+                       ->where(function($query) {
+                           $query->where('devices.moveVerifyUntil', '<', Carbon::now())
+                                 ->orWhere('devices.moveVerifyUntil', null);
+                       })
+                       ->where('scans.vehicle_name', '<>', null)
+                       ->groupBy('scans.bssid')
+                       ->having(DB::raw('count(*)'), '>', 1)
+                       ->select('devices.*')
+                       ->orderBy('devices.lastSeen', 'DESC')
+                       ->get()
+                       ->count();
 
         $scans = Scan::where('bssid', $device->bssid)->where('vehicle_name', '<>', null)->get();
 
@@ -211,5 +217,54 @@ class VehicleController extends Controller {
         return view('company', [
             'company' => Company::with(['vehicles', 'vehicles.devices'])->findOrFail($id)
         ]);
+    }
+
+    public function ignoreDevice(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'bssid' => ['required', 'exists:devices,bssid'],
+                                            'ssid'  => ['required', 'exists:devices,ssid'],
+                                            'ban'   => ['required', Rule::in(['bssid', 'ssid'])]
+                                        ]);
+
+        if($validated['ban'] == 'bssid') {
+            Device::where('bssid', $validated['bssid'])->update([
+                                                                    'ignore' => 1
+                                                                ]);
+            return back()->with('alert-success', 'Das Netzwerk wird jetzt ignoriert.');
+        } elseif($validated['ban'] == 'ssid') {
+            IgnoredNetwork::create([
+                                       'ssid' => $validated['ssid']
+                                   ]);
+            return back()->with('alert-success', 'Der Netzwerkname wird jetzt ignoriert.');
+        }
+    }
+
+    public function renderIgnored() {
+        return view('ignored', [
+            'bssid' => Device::where('ignore', 1)->orderBy('updated_at', 'desc')->paginate(),
+            'ssid'  => IgnoredNetwork::orderBy('created_at', 'desc')->paginate()
+        ]);
+    }
+
+    public function unbanSSID(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'ssid' => ['required', 'exists:ignored_networks,ssid']
+                                        ]);
+
+        IgnoredNetwork::find($validated['ssid'])->delete();
+
+        return back();
+    }
+
+    public function unbanBSSID(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'bssid' => ['required', 'exists:devices,bssid']
+                                        ]);
+
+        Device::where('bssid', $validated['bssid'])->update([
+                                                                'ignore' => 0
+                                                            ]);
+
+        return back();
     }
 }
