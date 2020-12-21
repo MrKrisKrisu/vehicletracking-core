@@ -207,22 +207,6 @@ class VehicleController extends Controller
         return self::assign();
     }
 
-    public static function renderPublic($device_id)
-    {
-        $scans = Scan::join('devices', 'scans.bssid', '=', 'devices.bssid')
-                     ->where('scanDeviceId', $device_id)
-                     ->select(
-                         'scans.created_at',
-                         DB::raw('(SELECT vehicle_name FROM `vehicles` WHERE `id` = devices.vehicle_id) as verifiedName'),
-                         DB::raw('(SELECT GROUP_CONCAT(vehicle_name SEPARATOR \',\') FROM `scans` WHERE scans.bssid LIKE devices.bssid AND scans.vehicle_name IS NOT NULL) as possibleVehicles')
-                     )
-                     ->orderBy('created_at', 'desc')
-                     ->limit(100)
-                     ->get();
-
-        return view('public', ['scans' => $scans]);
-    }
-
     public static function getPossibleVehicles(string $bssid)
     {
         $scans = Scan::where('bssid', $bssid)
