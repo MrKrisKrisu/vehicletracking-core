@@ -16,7 +16,7 @@
                         <tbody>
                             @foreach($bssid as $network)
                                 <tr>
-                                    <td>{{$network->ssid}} ({{$network->bssid}})</td>
+                                    <td>{{str_replace("\\x00", "", $network->ssid)}} ({{$network->bssid}})</td>
                                     <td>
                                         <form method="POST" action="{{route('unban.bssid')}}">
                                             @csrf
@@ -48,7 +48,7 @@
                         <tbody>
                             @foreach($ssid as $network)
                                 <tr>
-                                    <td>{{$network->ssid}}</td>
+                                    <td>{{str_replace("\\x00", "", $network->ssid)}}</td>
                                     <td>
                                         <form method="POST" action="{{route('unban.ssid')}}">
                                             @csrf
