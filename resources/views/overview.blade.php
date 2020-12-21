@@ -14,7 +14,7 @@
                             @foreach ($lastScan as $scan)
                                 <tr>
                                     <td>
-                                        {{$scan->ssid}} (ID: {{$scan->scanDeviceId}})<br/><small>
+                                        {{str_replace("\\x00", "", $scan->ssid)}} (ID: {{$scan->scanDeviceId}})<br/><small>
                                             @isset($possibleVehicles[$scan->bssid])
                                                 @foreach($possibleVehicles[$scan->bssid] as $p)
                                                     <small>{{$p}}</small><br/>
