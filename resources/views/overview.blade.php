@@ -26,6 +26,10 @@
                                             @else
                                                 <br/><span style="color: #E70000;">Unverifiziert</span>
                                             @endif
+
+                                            @isset($scan->scanDevice)
+                                                <br /><small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
+                                            @endisset
                                         </small>
                                     </td>
                                     <td style="min-width: 50%;">
