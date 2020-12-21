@@ -5,16 +5,21 @@
         <div class="col-md-12">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
-                    <form action="/" method="post" accept-charset="utf-8">
+                    <form method="post" accept-charset="utf-8">
                         @csrf
                         <input type="text" class="form-control" id="name" placeholder="FzgNr." name="vehicle_name">
+                        <hr/>
+                        @foreach(\App\ScanDevice::all() as $device)
+                            <a href="/?device={{$device->id}}" class="btn btn-sm btn-primary">{{$device->name}}</a>
+                        @endforeach
                         <hr/>
                         <h5 class="card-title">{{__('Last scans')}}</h5>
                         <table class="table">
                             @foreach ($lastScan as $scan)
                                 <tr>
                                     <td>
-                                        {{str_replace("\\x00", "", $scan->ssid)}} (ID: {{$scan->scanDeviceId}})<br/><small>
+                                        {{str_replace("\\x00", "", $scan->ssid)}} (ID: {{$scan->scanDeviceId}}
+                                        )<br/><small>
                                             @isset($possibleVehicles[$scan->bssid])
                                                 @foreach($possibleVehicles[$scan->bssid] as $p)
                                                     <small>{{$p}}</small><br/>
@@ -28,7 +33,8 @@
                                             @endif
 
                                             @isset($scan->scanDevice)
-                                                <br /><small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
+                                                <br/><small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
+                                                </small>
                                             @endisset
                                         </small>
                                     </td>

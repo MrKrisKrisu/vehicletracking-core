@@ -6,6 +6,7 @@ use App\Company;
 use App\IgnoredNetwork;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Scan;
 use App\Device;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class VehicleController extends Controller {
 
-    public static function render() {
+    public function render(Request $request): Renderable {
         $hiddenBssids = Device::join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
                               ->join('companies', 'companies.id', '=', 'vehicles.company_id')
                               ->where('companies.name', 'Stationary')
@@ -22,10 +23,15 @@ class VehicleController extends Controller {
 
         $hiddenSsids = IgnoredNetwork::select('ssid');
 
-        $lastScans = Scan::with(['device'])
-                         ->whereNotIn('bssid', $hiddenBssids)
-                         ->whereNotIn('ssid', $hiddenSsids)
-                         ->orderBy('created_at', 'desc')->limit(80)->get();
+        $lastScansQ = Scan::with(['device'])
+                          ->whereNotIn('bssid', $hiddenBssids)
+                          ->whereNotIn('ssid', $hiddenSsids)
+                          ->orderBy('created_at', 'desc')->limit(80);
+
+        if(isset($request->device))
+            $lastScansQ->where('scanDeviceId', $request->device);
+
+        $lastScans = $lastScansQ->get();
 
         $possibleVehicles = [];
         $bssidList = [];
@@ -56,7 +62,7 @@ class VehicleController extends Controller {
         ]);
     }
 
-    public static function saveVehicle(Request $request) {
+    public function saveVehicle(Request $request): RedirectResponse {
         if(isset($request->scans)) {
             foreach($request->scans as $scanID => $v) {
                 $scan = Scan::where('id', $scanID)->first();
@@ -65,7 +71,7 @@ class VehicleController extends Controller {
             }
         }
 
-        return self::render();
+        return back();
     }
 
     public static function verify() {
