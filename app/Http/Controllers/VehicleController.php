@@ -180,33 +180,6 @@ class VehicleController extends Controller
         );
     }
 
-    public static function assign()
-    {
-        $scansToCheck = DB::select("SELECT * FROM `scans` WHERE `bssid` = (SELECT bssid FROM `scans` WHERE bssid IN (SELECT bssid FROM `devices` WHERE `vehicle_id` IS NULL) AND vehicle_name > 0 AND bssid IN (SELECT DISTINCT bssid FROM `scans` WHERE `vehicle_name` > 0) GROUP BY bssid ORDER BY COUNT(*) DESC LIMIT 1)");
-
-        $bssid = null;
-        foreach ($scansToCheck as $check) {
-            $bssid = $check->bssid;
-            break;
-        }
-
-        return view('assign', ['scansToCheck' => $scansToCheck, 'bssid' => $bssid]);
-    }
-
-    public static function saveAssignee(Request $request)
-    {
-        $vehicle = Vehicle::where([
-                                      'company_id', $request->company_id,
-                                      'vehicle_name', $request->vehicle_name
-                                  ])->first();
-        dd($vehicle);
-        if ($vehicle == null) {
-            dd($vehicle);
-        }
-
-        return self::assign();
-    }
-
     public static function getPossibleVehicles(string $bssid)
     {
         $scans = Scan::where('bssid', $bssid)

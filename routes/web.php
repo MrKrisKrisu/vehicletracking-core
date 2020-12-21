@@ -14,9 +14,6 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/verify', [VehicleController::class, 'saveVerify']);
 
     Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])->name('vehicle');
-
-    Route::get('/assign/', [VehicleController::class, 'assign'])->name('assign');
-    Route::post('/assign/', [VehicleController::class, 'saveAssignee'])->name('saveAssignee');
 });
 
 
