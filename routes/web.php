@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,8 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/location/import', [LocationController::class, 'importLocations'])
          ->name('location.import');
 });
+
+Route::get('/map', [MapController::class, 'renderMap'])->name('map');
 
 Route::get('/company', [VehicleController::class, 'renderCompanies']);
 Route::get('/company/{id}', [VehicleController::class, 'renderCompany'])->name('company');

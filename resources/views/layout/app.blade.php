@@ -83,6 +83,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('location')}}">GPX einlesen</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('map')}}">Karte</a>
+                            </li>
                         </ul>
 
                         <ul class="navbar-nav mr-right">

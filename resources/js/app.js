@@ -11,6 +11,7 @@ require("datatables.net-responsive-bs4");
 
 require("moment");
 require("chart.js");
+require("leaflet");
 
 //window.Vue = require('vue');
 

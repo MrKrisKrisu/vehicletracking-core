@@ -18,3 +18,6 @@ public/css/app.css
 public/fonts/vendor
 public/js/app.js.LICENSE.txt
 storage/debugbar/
+public/images/vendor/leaflet/dist/layers-2x.png
+public/images/vendor/leaflet/dist/layers.png
+public/images/vendor/leaflet/dist/marker-icon.png
