@@ -49,6 +49,9 @@ class ScanController extends Controller {
             if($scanElement['ssid'] == '')
                 $scanElement['ssid'] = null;
 
+            $scanElement['latitude'] = ScanDeviceAuthentification::getDevice()->latitude;
+            $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()->longitude;
+
             Device::updateOrCreate([
                                        'bssid' => $scanElement['bssid']
                                    ], [
