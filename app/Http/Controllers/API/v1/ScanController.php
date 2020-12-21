@@ -46,7 +46,7 @@ class ScanController extends Controller {
         $validated = $validator->validate();
         foreach($validated as $scanElement) {
 
-            if(IgnoredNetwork::isIgnored($scanElement['ssid']))
+            if($scanElement['ssid'] != null && IgnoredNetwork::isIgnored($scanElement['ssid']))
                 continue;
 
             $scanElement['scanDeviceId'] = ScanDeviceAuthentification::getDevice()->id;
