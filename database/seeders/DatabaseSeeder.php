@@ -9,15 +9,13 @@ use Database\Factories\DeviceFactory;
 use Database\Factories\ScanDeviceFactory;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
-{
+class DatabaseSeeder extends Seeder {
     /**
      * Seed the application's database.
      *
      * @return void
      */
-    public function run()
-    {
+    public function run() {
         User::factory()
             ->has(ScanDevice::factory(2), 'scanDevices')
             ->create(['email' => 'dev@dev.de']);

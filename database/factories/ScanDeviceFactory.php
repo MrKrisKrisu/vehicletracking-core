@@ -6,8 +6,7 @@ use App\ScanDevice;
 use App\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ScanDeviceFactory extends Factory
-{
+class ScanDeviceFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -20,8 +19,7 @@ class ScanDeviceFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [
             'user_id'     => User::factory(),
             'token'       => $this->faker->unique()->uuid,

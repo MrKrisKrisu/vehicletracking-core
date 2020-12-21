@@ -5,8 +5,7 @@ namespace Database\Factories;
 use App\Device;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class DeviceFactory extends Factory
-{
+class DeviceFactory extends Factory {
     /**
      * The name of the factory's corresponding model.
      *
@@ -19,8 +18,7 @@ class DeviceFactory extends Factory
      *
      * @return array
      */
-    public function definition()
-    {
+    public function definition() {
         return [
             'bssid' => $this->faker->macAddress,
             'ssid'  => $this->faker->word
