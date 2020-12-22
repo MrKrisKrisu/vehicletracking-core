@@ -5,14 +5,12 @@ namespace App;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ScanDevice extends Model
-{
+class ScanDevice extends Model {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'token', 'name', 'latitude', 'longitude', 'valid_until'];
+    protected $fillable = ['user_id', 'token', 'name', 'notify', 'latitude', 'longitude', 'valid_until'];
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

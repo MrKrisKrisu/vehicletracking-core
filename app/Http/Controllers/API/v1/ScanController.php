@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Device;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\ScanDeviceAuthentification;
 use App\IgnoredNetwork;
 use App\Scan;
@@ -67,10 +68,11 @@ class ScanController extends Controller {
             $scan = Scan::create($scanElement);
             if(isset($scan->device->vehicle)) {
                 $vehicle = $scan->device->vehicle;
-                $verified[$vehicle->id] = [
-                    'company' => $vehicle->company->name,
-                    'vehicle' => $vehicle->vehicle_name
-                ];
+                if($vehicle->company->name != 'Stationary')
+                    $verified[$vehicle->id] = [
+                        'company' => $vehicle->company->name,
+                        'vehicle' => $vehicle->vehicle_name
+                    ];
             } else
                 foreach($scan->device->scans->whereNotNull('vehicle_name')->pluck('vehicle_name') as $possibleRow)
                     foreach(explode(',', $possibleRow) as $possible)
@@ -80,6 +82,19 @@ class ScanController extends Controller {
         }
 
         sort($unverified);
+
+        if(count($verified) > 0) {
+            $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Fahrzeug(e) lokalisiert</b>\r\n\r\n";
+            foreach($verified as $vehicle)
+                $message .= $vehicle['vehicle'] . "\r\n<i>" . $vehicle['company'] . "</i>\r\n---------------\r\n";
+            NotificationController::notifyRaw($message);
+        }
+        if(count($unverified) > 0) {
+            $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Unverifiziertes Fahrzeug lokalisiert</b>\r\n";
+            foreach($unverified as $vehicle)
+                $message .= '- ' . $vehicle . "\r\n";
+            NotificationController::notifyRaw($message);
+        }
 
         return response()->json([
                                     'status' => true,

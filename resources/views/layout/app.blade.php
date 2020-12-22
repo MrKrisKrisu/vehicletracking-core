@@ -86,6 +86,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('map')}}">Karte</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
+                            </li>
                         </ul>
 
                         <ul class="navbar-nav mr-right">

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,10 @@ Route::middleware(['auth'])->group(function() {
 
     Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])
          ->name('vehicle');
+
+    Route::get('/notifications', [NotificationController::class, 'renderNotifications'])
+         ->name('notifications');
+    Route::post('/notifications', [NotificationController::class, 'switchNotifications']);
 
     Route::get('/ignored', [VehicleController::class, 'renderIgnored'])
          ->name('ignored');
