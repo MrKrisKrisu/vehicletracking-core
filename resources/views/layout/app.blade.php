@@ -6,6 +6,12 @@
 
         <title>{{__('Vehicle tracking')}}</title>
 
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
+        <meta name="apple-mobile-web-app-title" content="VehicleTracking">
+        <meta name="application-name" content="VehicleTracking">
+
         <link rel="stylesheet" href="/css/app.css"/>
         <style>
             :root {
