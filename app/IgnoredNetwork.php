@@ -20,7 +20,7 @@ class IgnoredNetwork extends Model {
             self::$cacheContains = IgnoredNetwork::where('contains', 1)->get();
 
         foreach(self::$cacheContains as $con)
-            if(str_contains($ssid, $con->ssid))
+            if(str_contains(strtolower($ssid), strtolower($con->ssid)))
                 return true;
 
         return self::$cacheFull->contains($ssid);
