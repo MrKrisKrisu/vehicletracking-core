@@ -10,11 +10,19 @@ class IgnoredNetwork extends Model {
     protected $keyType    = 'string';
     protected $fillable   = ['ssid'];
 
-    private static $cache;
+    private static $cacheFull;
+    private static $cacheContains;
 
     public static function isIgnored(string $ssid): bool {
-        if(self::$cache == null)
-            self::$cache = IgnoredNetwork::all();
-        return self::$cache->contains($ssid);
+        if(self::$cacheFull == null)
+            self::$cacheFull = IgnoredNetwork::where('contains', 0)->get();
+        if(self::$cacheContains == null)
+            self::$cacheContains = IgnoredNetwork::where('contains', 1)->get();
+
+        foreach(self::$cacheContains as $con)
+            if(str_contains($ssid, $con->ssid))
+                return true;
+
+        return self::$cacheFull->contains($ssid);
     }
 }
