@@ -27,7 +27,7 @@ class VehicleController extends Controller {
         $hiddenBssids2 = Device::where('ignore', 1)
                                ->select('bssid');
 
-        $lastScansQ = Scan::with(['device', 'device.vehicle', 'scanDevice'])
+        $lastScansQ = Scan::with(['device', 'device.vehicle','device.vehicle.company', 'scanDevice'])
                           ->whereNotIn('bssid', $hiddenBssids)
                           ->whereNotIn('bssid', $hiddenBssids2)
                           ->whereNotIn('ssid', $hiddenSsids)
@@ -36,7 +36,7 @@ class VehicleController extends Controller {
         if(isset($request->device))
             $lastScansQ->where('scanDeviceId', $request->device);
 
-        $lastScans = $lastScansQ->paginate(80);
+        $lastScans = $lastScansQ->paginate(80)->onEachSide(0);
 
         $possibleVehicles = [];
         $bssidList = [];

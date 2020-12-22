@@ -10,7 +10,7 @@
                     <input type="text" class="form-control" id="name" placeholder="FzgNr." name="vehicle_name"
                            form="main"/>
                     <hr/>
-                    @foreach(\App\ScanDevice::all() as $device)
+                    @foreach(\App\ScanDevice::where('user_id', auth()->user()->id)->get() as $device)
                         <a href="/?device={{$device->id}}" class="btn btn-sm btn-primary">{{$device->name}}</a>
                     @endforeach
                     <hr/>
@@ -21,23 +21,24 @@
                                 <td>
                                     {{str_replace("\\x00", "", $scan->ssid)}}<br/>
                                     @isset($possibleVehicles[$scan->bssid])
-                                        @foreach($possibleVehicles[$scan->bssid] as $p)
-                                            <small>{{$p}}</small><br/>
-                                        @endforeach
+                                        @if(!isset($scan->device) || !isset($scan->device->vehicle))
+                                            @foreach($possibleVehicles[$scan->bssid] as $p)
+                                                <small>{{$p}}</small><br/>
+                                            @endforeach
+                                        @endif
                                     @endisset
 
                                     @if(isset($scan->device) && isset($scan->device->vehicle))
-                                        <br/><small class="text-success">Verifiziert
-                                            ({{$scan->device->vehicle->vehicle_name}})</small>
+                                        <small class="text-success">Verifiziert: {{$scan->device->vehicle->vehicle_name}},
+                                            {{$scan->device->vehicle->company->name}}</small><br />
                                     @else
-                                        <br/><small class="text-danger">Unverifiziert</small>
+                                        <small class="text-danger">Unverifiziert</small><br/>
                                     @endif
 
                                     @isset($scan->scanDevice)
-                                        <br/><small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
-                                        </small>
+                                        <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
+                                        </small><br/>
                                     @endisset
-                                    <br/>
                                     <form method="POST" action="{{route('ignoreDevice')}}"
                                           id="formIgnore{{$scan->id}}">
                                         @csrf
@@ -61,12 +62,10 @@
                                                form="main">
                                         <label class="form-check-label"><small>{{$scan->vehicle_name}}</small></label>
                                     </div>
-                                    <p>Found: {{$scan->created_at->diffForHumans()}}
-                                        <small>({{$scan->created_at->format('H:i:s')}}
-                                            )</small></p>
-                                    <p>Uploaded: {{$scan->updated_at->diffForHumans()}}
-                                        <small>({{$scan->updated_at->format('H:i:s')}}
-                                            )</small></p>
+                                    <p>
+                                        {{$scan->created_at->diffForHumans()}}
+                                        <small>({{$scan->created_at->format('H:i:s')}})</small>
+                                    </p>
                                 </td>
                             </tr>
                         @endforeach
