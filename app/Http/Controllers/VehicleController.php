@@ -31,13 +31,12 @@ class VehicleController extends Controller {
                           ->whereNotIn('bssid', $hiddenBssids)
                           ->whereNotIn('bssid', $hiddenBssids2)
                           ->whereNotIn('ssid', $hiddenSsids)
-                          ->orderBy('created_at', 'desc')
-                          ->limit(80);
+                          ->orderBy('created_at', 'desc');
 
         if(isset($request->device))
             $lastScansQ->where('scanDeviceId', $request->device);
 
-        $lastScans = $lastScansQ->get();
+        $lastScans = $lastScansQ->paginate(80);
 
         $possibleVehicles = [];
         $bssidList = [];

@@ -71,6 +71,7 @@
                             </tr>
                         @endforeach
                     </table>
+                    {{$lastScan->links()}}
                 </div>
             </div>
         </div>
