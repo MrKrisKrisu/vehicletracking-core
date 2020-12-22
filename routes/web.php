@@ -27,6 +27,8 @@ Route::middleware(['auth'])->group(function() {
          ->name('ignored');
     Route::post('/ignoreDevice', [VehicleController::class, 'ignoreDevice'])
          ->name('ignoreDevice');
+    Route::post('/ignoreDevice/add', [VehicleController::class, 'saveIgnoredNetwork'])
+         ->name('ignoreDevice.add');
     Route::post('/unban/ssid', [VehicleController::class, 'unbanSSID'])
          ->name('unban.ssid');
     Route::post('/unban/bssid', [VehicleController::class, 'unbanBSSID'])

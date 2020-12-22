@@ -267,4 +267,16 @@ class VehicleController extends Controller {
 
         return back();
     }
+
+    public function saveIgnoredNetwork(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'ssid'     => ['required'],
+                                            'contains' => ['nullable']
+                                        ]);
+
+        $validated['contains'] = isset($validated['contains']) && $validated['contains'] == 'on' ? 1 : 0;
+        IgnoredNetwork::create($validated);
+
+        return back();
+    }
 }

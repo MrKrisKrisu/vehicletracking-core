@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class IgnoredNetwork extends Model {
     protected $primaryKey = 'ssid';
     protected $keyType    = 'string';
-    protected $fillable   = ['ssid'];
+    protected $fillable   = ['ssid', 'contains'];
 
     private static $cacheFull;
     private static $cacheContains;
