@@ -48,8 +48,6 @@ class NotificationController extends Controller {
             ]);
         } catch(\Exception | GuzzleException $exception) {
             report($exception);
-            dump($html);
-            dd($exception);
         }
     }
 }
