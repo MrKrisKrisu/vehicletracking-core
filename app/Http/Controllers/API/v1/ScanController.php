@@ -41,7 +41,7 @@ class ScanController extends Controller {
             return response()->json(['status' => false, 'errors' => array_values($validator->errors()->toArray())], 400);
         }
 
-        $verified = [];
+        $verified   = [];
         $unverified = [];
 
         $validated = $validator->validate();
@@ -54,9 +54,11 @@ class ScanController extends Controller {
 
             if($scanElement['ssid'] == '')
                 $scanElement['ssid'] = null;
-
-            $scanElement['latitude'] = ScanDeviceAuthentification::getDevice()->latitude;
-            $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()->longitude;
+            
+            if(ScanDeviceAuthentification::getDevice()->latitude != null)
+                $scanElement['latitude'] = ScanDeviceAuthentification::getDevice()->latitude;
+            if(ScanDeviceAuthentification::getDevice()->longitude != null)
+                $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()->longitude;
 
             Device::updateOrCreate([
                                        'bssid' => $scanElement['bssid']
