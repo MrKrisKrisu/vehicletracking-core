@@ -242,4 +242,9 @@ return [
         'email'   => env('IMPRINT_EMAIL'),
     ],
 
+    'matomo' => [
+        'url' => env('MATOMO_URL'),
+        'id'  => env('MATOMO_ID')
+    ]
+
 ];
