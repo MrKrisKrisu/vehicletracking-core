@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Device;
 use App\Models\Store;
 use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Spatie\Sitemap\SitemapGenerator;
 use Spatie\Sitemap\Tags\Url;
@@ -30,8 +33,8 @@ class MapController extends Controller {
          });
     }
 
-    public function renderSitemap() {
-        $sitemap = SitemapGenerator::create('https://verkehrstracking.de')
+    public function renderSitemap(): Response|Application|ResponseFactory {
+        $sitemap = SitemapGenerator::create(config('app.url'))
                                    ->getSitemap();
 
         $vehicles = Device::where('vehicle_id', '<>', null)->groupBy('vehicle_id')->select('vehicle_id')->pluck('vehicle_id');
