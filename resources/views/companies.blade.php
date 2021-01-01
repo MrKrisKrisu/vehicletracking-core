@@ -1,11 +1,13 @@
 @extends('layout.app')
 
+@section('title') Übersicht der unterstützten Verkehrsunternehmen @endsection
+
 @section('content')
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h2>Unternehmen</h2>
+                    <h2>Verkehrsunternehmen</h2>
                     <table class="table">
                         <tbody>
                             @foreach($companies as $company)

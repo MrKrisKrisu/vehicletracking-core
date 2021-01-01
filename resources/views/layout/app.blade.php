@@ -1,16 +1,20 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 
-        <title>{{__('Vehicle tracking')}}</title>
+        <title>@hasSection('title')@yield('title') - @endif{{__('Vehicletracking')}}</title>
 
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
+        @hasSection('meta-description')
+            <meta name="description" content="@yield('title')"/>
+        @endif
 
-        <meta name="apple-mobile-web-app-title" content="VehicleTracking">
-        <meta name="application-name" content="VehicleTracking">
+        <meta name="mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+        <meta name="apple-mobile-web-app-title" content="VehicleTracking"/>
+        <meta name="application-name" content="VehicleTracking"/>
 
         <link rel="stylesheet" href="/css/app.css"/>
         <style>

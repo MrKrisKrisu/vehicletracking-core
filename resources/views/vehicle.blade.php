@@ -1,5 +1,7 @@
 @extends('layout.app')
 
+@section('title') Fahrzeug {{$vehicle->vehicle_name}} von {{$vehicle->company->name}} @endsection
+
 @section('jumbotron')
     <section class="jumbotron text-center">
         <div class="container">
