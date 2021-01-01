@@ -150,6 +150,7 @@
 
         <footer class="text-muted">
             <div class="container">
+                <a href="{{route('imprint')}}">Impressum</a>
                 <p class="float-right">
                     <a href="#">Back to top</a>
                 </p>

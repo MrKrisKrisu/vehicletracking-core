@@ -37,6 +37,7 @@ Route::middleware(['auth'])->group(function() {
          ->name('location.import');
 });
 
+Route::view('/imprint', 'imprint')->name('imprint');
 Route::get('/map', [MapController::class, 'renderMap'])->name('map');
 
 Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])
