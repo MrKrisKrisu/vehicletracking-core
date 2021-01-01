@@ -186,7 +186,7 @@ class VehicleController extends Controller {
 
         $dateCount = $allScans->sortByDesc('created_at')
                               ->groupBy(function($scan) {
-                                  return $scan->created_at->format('Y-m-d');
+                                  return $scan->created_at->format('Y-m-j');
                               })
                               ->map(function($scans) {
                                   return $scans->count();
