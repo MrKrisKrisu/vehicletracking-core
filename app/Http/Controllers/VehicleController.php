@@ -90,6 +90,8 @@ class VehicleController extends Controller {
                          ->orderBy('devices.lastSeen', 'DESC')
                          ->get()
                          ->filter(function($device) {
+                             if($device->scans->where('vehicle_name', '<>', null)->count() < 2)
+                                 return false;
                              $lastScan = $device->scans->where('vehicle_name', '<>', null)->max('created_at');
                              return $device->moveVerifyUntil == null || ($lastScan != null && $lastScan->isAfter($device->moveVerifyUntil));
                          });
