@@ -78,7 +78,7 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <ul class="navbar-nav mr-auto">
-                            @if(auth()->check())
+                            @auth
                                 <li class="nav-item active">
                                     <a class="nav-link" href="/">Home</a>
                                 </li>
@@ -91,16 +91,16 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{route('location')}}">GPX einlesen</a>
                                 </li>
-                            @endif
+                            @endauth
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('map')}}">Karte</a>
                             </li>
 
-                            @if(auth()->check())
+                            @auth
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
                                 </li>
-                            @endif
+                            @endauth
                         </ul>
 
                         <ul class="navbar-nav mr-right">
