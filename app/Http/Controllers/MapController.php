@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Vehicle;
-use Illuminate\Http\Request;
+use App\Device;
+use App\Models\Store;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Spatie\Sitemap\SitemapGenerator;
+use Spatie\Sitemap\Tags\Url;
 
 class MapController extends Controller {
     public function renderMap() {
@@ -25,5 +28,23 @@ class MapController extends Controller {
          ->map(function($scans) {
              return $scans->sortByDesc('timestamp')->first();
          });
+    }
+
+    public function renderSitemap() {
+        $sitemap = SitemapGenerator::create('https://verkehrstracking.de')
+                                   ->getSitemap();
+
+        $vehicles = Device::where('vehicle_id', '<>', null)->groupBy('vehicle_id')->select('vehicle_id')->pluck('vehicle_id');
+
+        foreach($vehicles as $vehicle) {
+            $sitemap->add(Url::create('/vehicle/' . $vehicle)
+                             ->setLastModificationDate(Carbon::yesterday())
+                             ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                             ->setPriority(0.5));
+        }
+
+        return response($sitemap->render(), 200, [
+            'Content-Type' => 'application/xml'
+        ]);
     }
 }

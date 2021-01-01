@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function() {
 
 Route::view('/imprint', 'imprint')->name('imprint');
 Route::get('/map', [MapController::class, 'renderMap'])->name('map');
+Route::get('/sitemap', [MapController::class, 'renderSitemap']);
 
 Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])
      ->name('vehicle');
