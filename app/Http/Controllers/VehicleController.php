@@ -87,13 +87,15 @@ class VehicleController extends Controller {
                          ->groupBy('scans.bssid')
                          ->having(DB::raw('count(*)'), '>', 1)
                          ->select('devices.*')
-                         ->orderBy('devices.lastSeen', 'DESC')
                          ->get()
                          ->filter(function($device) {
                              if($device->scans->where('vehicle_name', '<>', null)->count() < 2)
                                  return false;
                              $lastScan = $device->scans->where('vehicle_name', '<>', null)->max('created_at');
                              return $device->moveVerifyUntil == null || ($lastScan != null && $lastScan->isAfter($device->moveVerifyUntil));
+                         })
+                         ->sortByDesc(function($device) {
+                             return $device->scans->where('vehicle_name', '<>', null)->max('created_at');
                          });
 
         $count  = $devices->count();
