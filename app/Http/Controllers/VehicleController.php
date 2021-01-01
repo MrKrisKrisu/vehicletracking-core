@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Company;
+use App\Device;
 use App\IgnoredNetwork;
-use App\ScanDevice;
+use App\Scan;
+use App\Vehicle;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Scan;
-use App\Device;
-use App\Vehicle;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -23,11 +22,11 @@ class VehicleController extends Controller {
                               ->where('companies.name', 'Stationary')
                               ->select('devices.bssid');
 
-        $hiddenSsids = IgnoredNetwork::select('ssid');
+        $hiddenSsids   = IgnoredNetwork::select('ssid');
         $hiddenBssids2 = Device::where('ignore', 1)
                                ->select('bssid');
 
-        $lastScansQ = Scan::with(['device', 'device.vehicle','device.vehicle.company', 'scanDevice'])
+        $lastScansQ = Scan::with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
                           ->whereNotIn('bssid', $hiddenBssids)
                           ->whereNotIn('bssid', $hiddenBssids2)
                           ->whereNotIn('ssid', $hiddenSsids)
@@ -39,7 +38,7 @@ class VehicleController extends Controller {
         $lastScans = $lastScansQ->paginate(80)->onEachSide(0);
 
         $possibleVehicles = [];
-        $bssidList = [];
+        $bssidList        = [];
         foreach($lastScans as $scan)
             if(!in_array($scan->bssid, $bssidList))
                 $bssidList[] = $scan->bssid;
@@ -70,7 +69,7 @@ class VehicleController extends Controller {
     public function saveVehicle(Request $request): RedirectResponse {
         if(isset($request->scans)) {
             foreach($request->scans as $scanID => $v) {
-                $scan = Scan::where('id', $scanID)->first();
+                $scan               = Scan::where('id', $scanID)->first();
                 $scan->vehicle_name = $request->vehicle_name;
                 $scan->save();
             }
@@ -129,7 +128,7 @@ class VehicleController extends Controller {
                                                 'modified_vehicle_name' => ['required']
                                             ]);
 
-            $scan = Scan::find($validated['modified_scan_id']);
+            $scan                        = Scan::find($validated['modified_scan_id']);
             $scan->modified_vehicle_name = str_replace("\r\n", ',', $validated['modified_vehicle_name']);
             $scan->update();
 
@@ -144,13 +143,13 @@ class VehicleController extends Controller {
             $vehicle = Vehicle::where('company_id', $validated['company_id'])->where('vehicle_name', $validated['vehicle_name'])->first();
 
             if($vehicle == null) {
-                $vehicle = new Vehicle();
-                $vehicle->company_id = $validated['company_id'];
+                $vehicle               = new Vehicle();
+                $vehicle->company_id   = $validated['company_id'];
                 $vehicle->vehicle_name = $validated['vehicle_name'];
                 $vehicle->save();
             }
 
-            $device = Device::where('bssid', $validated['bssid'])->first();
+            $device             = Device::where('bssid', $validated['bssid'])->first();
             $device->vehicle_id = $vehicle->id;
             $device->update();
 
@@ -159,7 +158,7 @@ class VehicleController extends Controller {
                                                 'bssid' => ['required', 'exists:devices,bssid'],
                                             ]);
 
-            $device = Device::where('bssid', $validated['bssid'])->firstOrFail();
+            $device                  = Device::where('bssid', $validated['bssid'])->firstOrFail();
             $device->moveVerifyUntil = Carbon::now()->addDays(7);
             $device->update();
         }
@@ -167,24 +166,29 @@ class VehicleController extends Controller {
         return self::verify();
     }
 
-    public static function renderVehicle($vehicle_id) {
-        //$vehicle = Vehicle::with('company')->where('id', $vehicle_id)->first();
-        $vehicle = DB::table('vehicles')->where('vehicles.id', '=', $vehicle_id)
-                     ->join('companies', 'vehicles.company_id', '=', 'companies.id')
-                     ->select('vehicles.*', 'companies.name as companyName')
-                     ->first();
-        $occursToday = DB::select("SELECT created_at FROM `scans` WHERE `bssid` IN (SELECT bssid FROM `devices` WHERE `vehicle_id` = :vehicleID) AND DATE(created_at) = DATE(NOW()) ORDER BY `scans`.`created_at` DESC LIMIT 50", ['vehicleID' => $vehicle_id]);
-        $occursYesterday = DB::select("SELECT created_at FROM `scans` WHERE `bssid` IN (SELECT bssid FROM `devices` WHERE `vehicle_id` = :vehicleID) AND DATE(created_at) = DATE(NOW() - INTERVAL 1 DAY) ORDER BY `scans`.`created_at` DESC LIMIT 50", ['vehicleID' => $vehicle_id]);
-        $occursOlder = DB::select("SELECT created_at FROM `scans` WHERE `bssid` IN (SELECT bssid FROM `devices` WHERE `vehicle_id` = :vehicleID) AND DATE(created_at) < DATE(NOW() - INTERVAL 1 DAY) ORDER BY `scans`.`created_at` DESC LIMIT 50", ['vehicleID' => $vehicle_id]);
+    public static function renderVehicle(int $vehicleId, int $page = 1): Renderable {
+        $vehicle = Vehicle::with(['company', 'devices.scans'])->findOrFail($vehicleId);
 
-        return view('vehicle',
-                    [
-                        'vehicle'         => $vehicle,
-                        'occursToday'     => $occursToday,
-                        'occursYesterday' => $occursYesterday,
-                        'occursOlder'     => $occursOlder
-                    ]
-        );
+        $allScans = collect();
+        foreach($vehicle->devices as $device)
+            $allScans = $allScans->merge($device->scans);
+
+        $found = $allScans->groupBy(function($scan) {
+            return $scan->created_at->format('Y-m-d H:i');
+        })->map(function($scans) {
+            return $scans->sortByDesc('latitude')->first();
+        })->sortByDesc('created_at')->forPage($page, 15);
+
+        $lastPosition = $allScans->whereNotNull('latitude')
+                                 ->whereNotNull('longitude')
+                                 ->sortByDesc('created_at')
+                                 ->first();
+
+        return view('vehicle', [
+            'vehicle'      => $vehicle,
+            'found'        => $found,
+            'lastPosition' => $lastPosition
+        ]);
     }
 
     public static function getPossibleVehicles(string $bssid) {

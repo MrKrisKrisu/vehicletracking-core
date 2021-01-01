@@ -16,9 +16,6 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/verify', [VehicleController::class, 'verify']);
     Route::post('/verify', [VehicleController::class, 'saveVerify']);
 
-    Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])
-         ->name('vehicle');
-
     Route::get('/notifications', [NotificationController::class, 'renderNotifications'])
          ->name('notifications');
     Route::post('/notifications', [NotificationController::class, 'switchNotifications']);
@@ -41,6 +38,9 @@ Route::middleware(['auth'])->group(function() {
 });
 
 Route::get('/map', [MapController::class, 'renderMap'])->name('map');
+
+Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])
+     ->name('vehicle');
 
 Route::get('/company', [VehicleController::class, 'renderCompanies']);
 Route::get('/company/{id}', [VehicleController::class, 'renderCompany'])->name('company');
