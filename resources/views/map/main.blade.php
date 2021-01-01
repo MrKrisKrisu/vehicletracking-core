@@ -3,9 +3,15 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
+            <div class="card" style="margin-bottom: 10px;">
+                <div class="card-body">
+                    <small>Die Daten der Sichtungen und Standortinformationen wurden automatisch durch installierte und
+                        mobile Scanner erfasst. Die Genauigkeit der Standortinformationen wurde künstlich auf 111 Meter verschlechtert.</small>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-body">
-                    <h2>Karte</h2>
                     <div id="mapid" style="width: 100%; height: 700px;"></div>
                     <script>
                         $(document).ready(loadMap);
