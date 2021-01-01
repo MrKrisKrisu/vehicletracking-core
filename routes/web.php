@@ -35,6 +35,13 @@ Route::middleware(['auth'])->group(function() {
          ->name('location');
     Route::post('/location/import', [LocationController::class, 'importLocations'])
          ->name('location.import');
+
+    Route::post('/vehicle/create', [VehicleController::class, 'createVehicle'])
+         ->name('vehicle.create');
+    Route::post('/vehicle/assign', [VehicleController::class, 'assignVehicle'])
+         ->name('vehicle.assign');
+    Route::post('/vehicle/assign/skip', [VehicleController::class, 'skipAssignment'])
+         ->name('vehicle.assign.skip');
 });
 
 Route::view('/imprint', 'imprint')->name('imprint');

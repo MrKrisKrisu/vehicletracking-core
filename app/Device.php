@@ -11,9 +11,9 @@ class Device extends Model {
 
     use HasFactory;
 
-    protected $fillable = ['bssid', 'ssid', 'ignore', 'firstSeen', 'lastSeen'];
+    protected $fillable = ['bssid', 'ssid', 'vehicle_id', 'ignore', 'moveVerifyUntil', 'firstSeen', 'lastSeen'];
     protected $hidden   = ['id', 'ssid', 'firstSeen', 'vehicle_id'];
-    protected $dates    = ['firstSeen', 'lastSeen'];
+    protected $dates    = ['moveVerifyUntil', 'firstSeen', 'lastSeen'];
 
     public function scans(): HasMany {
         return $this->hasMany(Scan::class, 'bssid', 'bssid');

@@ -78,49 +78,37 @@ class VehicleController extends Controller {
         return back();
     }
 
-    public static function verify() {
+    public static function verify(): Renderable {
 
-        $device = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
-                        ->where('devices.vehicle_id', null)
-                        ->where(function($query) {
-                            $query->where('devices.moveVerifyUntil', '<', Carbon::now())
-                                  ->orWhere('devices.moveVerifyUntil', null);
-                        })
-                        ->where('scans.vehicle_name', '<>', null)
-                        ->groupBy('scans.bssid')
-                        ->having(DB::raw('count(*)'), '>', 1)
-                        ->select('devices.*')
-                        ->orderBy('devices.lastSeen', 'DESC')
-                        ->first();
+        $devices = Device::with(['scans'])
+                         ->join('scans', 'devices.bssid', '=', 'scans.bssid')
+                         ->where('devices.vehicle_id', null)
+                         ->where('scans.vehicle_name', '<>', null)
+                         ->groupBy('scans.bssid')
+                         ->having(DB::raw('count(*)'), '>', 1)
+                         ->select('devices.*')
+                         ->orderBy('devices.lastSeen', 'DESC')
+                         ->get();
+
+        $count = $devices->count();
+
+        $device = $devices->filter(function($device) {
+            $lastScan = $device->scans->where('vehicle_name', '<>', null)->max('created_at');
+            return $device->moveVerifyUntil == null || ($lastScan != null && $lastScan->isAfter($device->moveVerifyUntil));
+        })
+                          ->first();
 
         if($device == null)
             abort(204);
 
-        $count = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
-                       ->where('devices.vehicle_id', null)
-                       ->where(function($query) {
-                           $query->where('devices.moveVerifyUntil', '<', Carbon::now())
-                                 ->orWhere('devices.moveVerifyUntil', null);
-                       })
-                       ->where('scans.vehicle_name', '<>', null)
-                       ->groupBy('scans.bssid')
-                       ->having(DB::raw('count(*)'), '>', 1)
-                       ->select('devices.*')
-                       ->orderBy('devices.lastSeen', 'DESC')
-                       ->get()
-                       ->count();
-
-        $scans = Scan::where('bssid', $device->bssid)->where('vehicle_name', '<>', null)->get();
-
         return view('todo', [
             'device'    => $device,
             'count'     => $count,
-            'scans'     => $scans,
             'companies' => Company::all()
         ]);
     }
 
-    public static function saveVerify(Request $request) {
+    public static function saveVerify(Request $request): Renderable {
         if(isset($request->modified_vehicle_name)) {
 
             $validated = $request->validate([
@@ -132,35 +120,6 @@ class VehicleController extends Controller {
             $scan->modified_vehicle_name = str_replace("\r\n", ',', $validated['modified_vehicle_name']);
             $scan->update();
 
-        } elseif($request->action == 'save') {
-
-            $validated = $request->validate([
-                                                'company_id'   => ['required', 'integer', 'exists:companies,id'],
-                                                'vehicle_name' => ['required'],
-                                                'bssid'        => ['required', 'exists:devices,bssid'],
-                                            ]);
-
-            $vehicle = Vehicle::where('company_id', $validated['company_id'])->where('vehicle_name', $validated['vehicle_name'])->first();
-
-            if($vehicle == null) {
-                $vehicle               = new Vehicle();
-                $vehicle->company_id   = $validated['company_id'];
-                $vehicle->vehicle_name = $validated['vehicle_name'];
-                $vehicle->save();
-            }
-
-            $device             = Device::where('bssid', $validated['bssid'])->first();
-            $device->vehicle_id = $vehicle->id;
-            $device->update();
-
-        } elseif($request->action == 'notVerifiable') {
-            $validated = $request->validate([
-                                                'bssid' => ['required', 'exists:devices,bssid'],
-                                            ]);
-
-            $device                  = Device::where('bssid', $validated['bssid'])->firstOrFail();
-            $device->moveVerifyUntil = Carbon::now()->addDays(7);
-            $device->update();
         }
 
         return self::verify();
@@ -291,5 +250,42 @@ class VehicleController extends Controller {
         IgnoredNetwork::create($validated);
 
         return back();
+    }
+
+    public function createVehicle(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'company_id'   => ['required', 'exists:companies,id'],
+                                            'vehicle_name' => ['required', 'max:255'],
+                                            'type'         => ['nullable', Rule::in(['bus', 'tram', 'train'])],
+                                        ]);
+
+        Vehicle::create($validated);
+
+        return back()->with('alert-success', 'Fahrzeug wurde erstellt.');
+    }
+
+    public function assignVehicle(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'id'         => ['required', 'exists:devices,id'],
+                                            'vehicle_id' => ['required', 'exists:vehicles,id'],
+                                        ]);
+
+        $validated['moveVerifyUntil'] = null;
+
+        Device::find($validated['id'])->update($validated);
+
+        return back()->with('alert-success', 'Das Gerät wurde dem Fahrzeug zugewiesen.');
+    }
+
+    public function skipAssignment(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'id' => ['required', 'exists:devices,id']
+                                        ]);
+
+        Device::find($validated['id'])->update([
+                                                   'moveVerifyUntil' => Carbon::now()
+                                               ]);
+
+        return back()->with('alert-success', 'Die Zuweisung wurde bis zur nächsten Sichtung aufgeschoben.');
     }
 }

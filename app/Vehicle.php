@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Vehicle extends Model {
 
-    protected $hidden = ['id', 'created_at', 'updated_at'];
+    protected $fillable = ['company_id', 'vehicle_name', 'type'];
+    protected $hidden   = ['id', 'created_at', 'updated_at'];
 
     public function company(): HasOne {
         return $this->hasOne(Company::class, 'id', 'company_id');
