@@ -4,16 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddIndexToScans extends Migration
-{
+class AddIndexToScans extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::table('scans', function (Blueprint $table) {
+    public function up() {
+        Schema::table('scans', function(Blueprint $table) {
+            $table->string('vehicle_name')->change();
+        });
+        Schema::table('scans', function(Blueprint $table) {
             $table->index('vehicle_name');
             $table->index('modified_vehicle_name');
             $table->index('bssid');
@@ -29,9 +30,8 @@ class AddIndexToScans extends Migration
      *
      * @return void
      */
-    public function down()
-    {
-        Schema::table('scans', function (Blueprint $table) {
+    public function down() {
+        Schema::table('scans', function(Blueprint $table) {
             $table->dropIndex(['vehicle_name']);
             $table->dropIndex(['modified_vehicle_name']);
             $table->dropIndex(['bssid']);
