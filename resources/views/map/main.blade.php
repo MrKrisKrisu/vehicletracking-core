@@ -19,7 +19,7 @@
                             }).addTo(map);
 
                             @foreach($positions as $position)
-                            L.marker([{{$position->latitude}}, {{$position->longitude}}])
+                            L.marker([{{round($position->latitude, 3)}}, {{round($position->longitude, 3)}}])
                                 .bindPopup('<b>Fahrzeug <a href="{{route('vehicle', ['vehicle_id' => $position->vehicle_id])}}">{{$position->vehicle_name}}</a></b><br/>{{$position->timestamp}}')
                                 .addTo(map);
                             @endforeach
