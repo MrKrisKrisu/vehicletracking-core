@@ -88,15 +88,14 @@ class VehicleController extends Controller {
                          ->having(DB::raw('count(*)'), '>', 1)
                          ->select('devices.*')
                          ->orderBy('devices.lastSeen', 'DESC')
-                         ->get();
+                         ->get()
+                         ->filter(function($device) {
+                             $lastScan = $device->scans->where('vehicle_name', '<>', null)->max('created_at');
+                             return $device->moveVerifyUntil == null || ($lastScan != null && $lastScan->isAfter($device->moveVerifyUntil));
+                         });
 
         $count = $devices->count();
-
-        $device = $devices->filter(function($device) {
-            $lastScan = $device->scans->where('vehicle_name', '<>', null)->max('created_at');
-            return $device->moveVerifyUntil == null || ($lastScan != null && $lastScan->isAfter($device->moveVerifyUntil));
-        })
-                          ->first();
+        $device = $devices->first();
 
         if($device == null)
             abort(204);
