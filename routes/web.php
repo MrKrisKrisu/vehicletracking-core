@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes(['register' => false]);
 
 Route::middleware(['auth'])->group(function() {
-    Route::get('/', [VehicleController::class, 'render']);
+    Route::get('/', [VehicleController::class, 'render'])->name('dashboard');
     Route::post('/', [VehicleController::class, 'saveVehicle']);
 
     Route::get('/verify', [VehicleController::class, 'verify']);

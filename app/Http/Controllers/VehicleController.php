@@ -78,7 +78,7 @@ class VehicleController extends Controller {
         return back();
     }
 
-    public static function verify(): Renderable {
+    public static function verify(): Renderable|RedirectResponse {
 
         $devices = Device::with(['scans'])
                          ->join('scans', 'devices.bssid', '=', 'scans.bssid')
@@ -102,7 +102,8 @@ class VehicleController extends Controller {
         $device = $devices->first();
 
         if($device == null)
-            abort(204);
+            return redirect()->route('dashboard')
+                             ->with('alert-info', 'Es gibt aktuell keine Geräte zum verifizieren.');
 
         $locationScans = $device->scans->where('latitude', '<>', null)->where('longitude', '<>', null);
 
