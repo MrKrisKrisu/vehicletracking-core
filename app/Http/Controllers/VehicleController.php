@@ -184,10 +184,19 @@ class VehicleController extends Controller {
                                  ->sortByDesc('created_at')
                                  ->first();
 
+        $dateCount = $allScans->sortByDesc('created_at')
+                              ->groupBy(function($scan) {
+                                  return $scan->created_at->format('Y-m-d');
+                              })
+                              ->map(function($scans) {
+                                  return $scans->count();
+                              });
+
         return view('vehicle', [
             'vehicle'      => $vehicle,
             'found'        => $found,
-            'lastPosition' => $lastPosition
+            'lastPosition' => $lastPosition,
+            'dateCount'    => $dateCount
         ]);
     }
 
