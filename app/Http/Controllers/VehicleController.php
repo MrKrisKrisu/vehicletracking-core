@@ -134,6 +134,9 @@ class VehicleController extends Controller {
     public static function renderVehicle(int $vehicleId, int $page = 1): Renderable {
         $vehicle = Vehicle::with(['company', 'devices.scans'])->findOrFail($vehicleId);
 
+        if($vehicle->company->name == 'Stationary')
+            abort(404);
+
         $allScans = collect();
         foreach($vehicle->devices as $device)
             $allScans = $allScans->merge($device->scans);

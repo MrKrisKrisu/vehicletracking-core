@@ -37,7 +37,15 @@ class MapController extends Controller {
         $sitemap = SitemapGenerator::create(config('app.url'))
                                    ->getSitemap();
 
-        $vehicles = Device::where('vehicle_id', '<>', null)->groupBy('vehicle_id')->select('vehicle_id')->pluck('vehicle_id');
+        $vehicles = Device::with(['vehicle.company'])
+                          ->where('vehicle_id', '<>', null)
+                          ->groupBy('vehicle_id')
+                          ->select('vehicle_id')
+                          ->get()
+                          ->filter(function($device) {
+                              return $device->vehicle->company->name != 'Stationary';
+                          })
+                          ->pluck('vehicle_id');
 
         foreach($vehicles as $vehicle) {
             $sitemap->add(Url::create('/vehicle/' . $vehicle)
