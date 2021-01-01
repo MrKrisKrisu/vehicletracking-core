@@ -70,7 +70,12 @@
                                     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
                                 }).addTo(map);
 
-                                L.marker([{{round($lastPosition->latitude, 3)}}, {{round($lastPosition->longitude, 3)}}])
+                                L.marker([{{round($lastPosition->latitude, 3)}}, {{round($lastPosition->longitude, 3)}}], {
+                                    icon: L.icon({
+                                        iconUrl: '/img/icons/{{$vehicle->type ?? 'question'}}.svg',
+                                        iconSize: [40, 40],
+                                    })
+                                })
                                     .bindPopup('Position am {{$lastPosition->created_at->format('d.m.Y H:i')}}')
                                     .addTo(map);
                             }

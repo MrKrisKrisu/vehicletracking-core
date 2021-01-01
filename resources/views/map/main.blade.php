@@ -6,7 +6,8 @@
             <div class="card" style="margin-bottom: 10px;">
                 <div class="card-body">
                     <small>Die Daten der Sichtungen und Standortinformationen wurden automatisch durch installierte und
-                        mobile Scanner erfasst. Die Genauigkeit der Standortinformationen wurde künstlich auf 111 Meter verschlechtert.</small>
+                        mobile Scanner erfasst. Die Genauigkeit der Standortinformationen wurde künstlich auf 111 Meter
+                        verschlechtert.</small>
                 </div>
             </div>
 
@@ -25,7 +26,12 @@
                             }).addTo(map);
 
                             @foreach($positions as $position)
-                            L.marker([{{round($position->latitude, 3)}}, {{round($position->longitude, 3)}}])
+                            L.marker([{{round($position->latitude, 3)}}, {{round($position->longitude, 3)}}], {
+                                icon: L.icon({
+                                    iconUrl: '/img/icons/{{$position->type ?? 'question'}}.svg',
+                                    iconSize: [40, 40],
+                                })
+                            })
                                 .bindPopup('<b>Fahrzeug <a href="{{route('vehicle', ['vehicle_id' => $position->vehicle_id])}}">{{$position->vehicle_name}}</a></b><br/>{{$position->timestamp}}')
                                 .addTo(map);
                             @endforeach

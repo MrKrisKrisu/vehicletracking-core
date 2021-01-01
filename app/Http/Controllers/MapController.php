@@ -21,7 +21,7 @@ class MapController extends Controller {
     }
 
     public static function getVehiclePositions() {
-        return collect(DB::select("SELECT vehicles.id AS vehicle_id,vehicles.company_id,vehicles.vehicle_name,scans.latitude,scans.longitude,MAX(scans.created_at) AS timestamp FROM `scans` 
+        return collect(DB::select("SELECT vehicles.type,vehicles.id AS vehicle_id,vehicles.company_id,vehicles.vehicle_name,scans.latitude,scans.longitude,MAX(scans.created_at) AS timestamp FROM `scans` 
                                         INNER JOIN (SELECT bssid,MAX(created_at) AS created_at FROM `scans` WHERE latitude IS NOT NULL AND longitude IS NOT NULL GROUP BY bssid) n ON scans.bssid = n.bssid AND scans.created_at = n.created_at
                                         INNER JOIN devices ON devices.bssid = scans.bssid
                                         INNER JOIN vehicles ON devices.vehicle_id = vehicles.id
