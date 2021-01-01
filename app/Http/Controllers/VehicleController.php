@@ -94,16 +94,19 @@ class VehicleController extends Controller {
                              return $device->moveVerifyUntil == null || ($lastScan != null && $lastScan->isAfter($device->moveVerifyUntil));
                          });
 
-        $count = $devices->count();
+        $count  = $devices->count();
         $device = $devices->first();
 
         if($device == null)
             abort(204);
 
+        $locationScans = $device->scans->where('latitude', '<>', null)->where('longitude', '<>', null);
+
         return view('todo', [
-            'device'    => $device,
-            'count'     => $count,
-            'companies' => Company::all()
+            'device'        => $device,
+            'count'         => $count,
+            'companies'     => Company::all(),
+            'locationScans' => $locationScans
         ]);
     }
 

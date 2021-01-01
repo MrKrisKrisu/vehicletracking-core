@@ -5,9 +5,24 @@
         <div class="col-md-8">
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">{{__('Device')}}</h5>
-                    <p>BSSID: {{$device->bssid}}</p>
-                    <p>LastSeen: {{$device->lastSeen->isoFormat('DD.MM.YYYY HH:mm')}}</p>
+                    <div class="row">
+                        <div class="col">
+                            <b>SSID</b><br/>
+                            <span>{{$device->ssid}}</span>
+                        </div>
+                        <div class="col">
+                            <b>BSSID</b><br/>
+                            <span>{{$device->bssid}}</span>
+                        </div>
+                        <div class="col">
+                            <b>FirstSeen</b><br/>
+                            <span>{{$device->firstSeen->format('d.m.Y H:i')}}</span>
+                        </div>
+                        <div class="col">
+                            <b>LastSeen</b><br/>
+                            <span>{{$device->lastSeen->format('d.m.Y H:i')}}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card mb-4">
@@ -42,7 +57,23 @@
                                                title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
                                         @endif
                                     </td>
-                                    <td>{{$scan->created_at->isoFormat('DD.MM.YYYY HH:mm')}}</td>
+                                    <td>
+                                        {{$scan->created_at->format('d.m.Y H:i')}}
+                                        @isset($scan->scanDevice)
+                                            <br/>
+                                            <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
+                                        @endisset
+                                        @if($scan->latitude != null && $scan->longitude != null)
+                                            <br/>
+                                            <small>
+                                                <i class="fas fa-location-arrow"></i>
+                                                <a href="https://www.openstreetmap.org/?mlat={{$scan->latitude}}&mlon={{$scan->longitude}}"
+                                                   target="_blank">
+                                                    {{$scan->latitude}}, {{$scan->longitude}}
+                                                </a>
+                                            </small>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -122,5 +153,38 @@
                 </div>
             </div>
         </div>
+
+        @if($locationScans->count() > 0)
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div id="mapid" style="width: 100%; height: 500px;"></div>
+                        <script>
+                            $(document).ready(loadMap);
+
+                            function loadMap() {
+                                let map = L.map('mapid').setView([{{$locationScans->avg('latitude')}}, {{$locationScans->avg('longitude')}}], 13);
+
+                                L.tileLayer('https://osmcache.k118.de/carto/{z}/{x}/{y}.png', {
+                                    maxZoom: 18,
+                                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                                }).addTo(map);
+
+                                @foreach($locationScans as $scan)
+                                L.marker([{{$scan->latitude}}, {{$scan->longitude}}], {
+                                    icon: L.icon({
+                                        iconUrl: '/img/icons/dot_red.svg',
+                                        iconSize: [15, 15],
+                                    })
+                                })
+                                    .bindPopup('Position am {{$scan->created_at->format('d.m.Y H:i')}}')
+                                    .addTo(map);
+                                @endforeach
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
