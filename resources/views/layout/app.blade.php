@@ -78,24 +78,29 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <ul class="navbar-nav mr-auto">
-                            <li class="nav-item active">
-                                <a class="nav-link" href="/">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/verify/">{{ __('Verify') }}</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{route('ignored')}}">Ignorierte Netzwerke</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{route('location')}}">GPX einlesen</a>
-                            </li>
+                            @if(auth()->check())
+                                <li class="nav-item active">
+                                    <a class="nav-link" href="/">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/verify/">{{ __('Verify') }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{route('ignored')}}">Ignorierte Netzwerke</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{route('location')}}">GPX einlesen</a>
+                                </li>
+                            @endif
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('map')}}">Karte</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
-                            </li>
+
+                            @if(auth()->check())
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
+                                </li>
+                            @endif
                         </ul>
 
                         <ul class="navbar-nav mr-right">
