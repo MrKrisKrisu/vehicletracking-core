@@ -44,5 +44,5 @@ Route::get('/sitemap', [MapController::class, 'renderSitemap']);
 Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])
      ->name('vehicle');
 
-Route::get('/company', [VehicleController::class, 'renderCompanies']);
+Route::get('/company', [VehicleController::class, 'renderCompanies'])->name('companies');
 Route::get('/company/{id}', [VehicleController::class, 'renderCompany'])->name('company');

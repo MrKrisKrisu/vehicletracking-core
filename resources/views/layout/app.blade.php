@@ -95,7 +95,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{route('map')}}">Karte</a>
                             </li>
-
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('companies')}}">Verkehrsunternehmen</a>
+                            </li>
                             @auth
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
