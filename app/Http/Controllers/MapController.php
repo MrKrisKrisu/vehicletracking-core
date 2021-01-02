@@ -7,7 +7,9 @@ use App\Models\Store;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Spatie\Sitemap\SitemapGenerator;
 use Spatie\Sitemap\Tags\Url;
@@ -20,7 +22,7 @@ class MapController extends Controller {
         ]);
     }
 
-    public static function getVehiclePositions() {
+    public static function getVehiclePositions(): Collection {
         return collect(DB::select("SELECT vehicles.type,vehicles.id AS vehicle_id,vehicles.company_id,vehicles.vehicle_name,scans.latitude,scans.longitude,MAX(scans.created_at) AS timestamp FROM `scans` 
                                         INNER JOIN (SELECT bssid,MAX(created_at) AS created_at FROM `scans` WHERE latitude IS NOT NULL AND longitude IS NOT NULL GROUP BY bssid) n ON scans.bssid = n.bssid AND scans.created_at = n.created_at
                                         INNER JOIN devices ON devices.bssid = scans.bssid
@@ -39,6 +41,7 @@ class MapController extends Controller {
 
         $vehicles = Device::with(['vehicle.company'])
                           ->where('vehicle_id', '<>', null)
+                          ->whereHas('scans')
                           ->groupBy('vehicle_id')
                           ->select('vehicle_id')
                           ->get()

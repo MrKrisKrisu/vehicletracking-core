@@ -25,7 +25,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{route('vehicle', ['vehicle_id' => $vehicle->id])}}">Anzeigen</a>
+                                        @if($vehicle->devices->count() > 0)
+                                            <a href="{{route('vehicle', ['vehicle_id' => $vehicle->id])}}">Anzeigen</a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

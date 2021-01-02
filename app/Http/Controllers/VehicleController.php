@@ -142,6 +142,9 @@ class VehicleController extends Controller {
         foreach($vehicle->devices as $device)
             $allScans = $allScans->merge($device->scans);
 
+        if($allScans->count() == 0)
+            abort(404);
+
         $found = $allScans->groupBy(function($scan) {
             return $scan->created_at->format('Y-m-d H:i');
         })->map(function($scans) {
