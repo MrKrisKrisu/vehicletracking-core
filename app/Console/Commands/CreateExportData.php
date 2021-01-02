@@ -38,8 +38,8 @@ class CreateExportData extends Command {
 
 
         foreach($companies as $company) {
-            $filename = preg_replace('/[^a-z0-9]+/', '-', strtolower($company->name));
-            $filename = str_replace(['ä', 'ü', 'ö'], ['ae', 'ue', 'oe'], $filename);
+            $filename = str_replace(['ä', 'ü', 'ö'], ['ae', 'ue', 'oe'], strtolower($company->name));
+            $filename = preg_replace('/[^a-z0-9]+/', '-', $filename);
             $fp = fopen($exportPath . 'company_' . $company->id . '_' . $filename . '.csv', 'w+');
             fputcsv($fp, [
                 'bssid',
