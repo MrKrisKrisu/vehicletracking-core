@@ -19,7 +19,7 @@ class CreateExportData extends Command {
         if(!is_dir($exportPath)) {
             Log::error("path is not a directory.");
             dump("path is not a directory.");
-            return;
+            return 1;
         }
 
         $companies = Company::where('id', '<>', 4)->get();
