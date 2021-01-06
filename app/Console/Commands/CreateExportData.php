@@ -8,45 +8,18 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class CreateExportData extends Command
-{
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'ptt:export {path}';
+class CreateExportData extends Command {
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
+    protected $signature   = 'ptt:export {path}';
+    protected $description = 'Export data to csv';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
+    public function handle(): int {
         $exportPath = $this->argument('path');
 
-        if (!is_dir($exportPath)) {
+        if(!is_dir($exportPath)) {
             Log::error("path is not a directory.");
             dump("path is not a directory.");
-            return;
+            return 1;
         }
 
         $companies = Company::where('id', '<>', 4)->get();
@@ -56,7 +29,7 @@ class CreateExportData extends Command
             'id',
             'name',
         ]);
-        foreach ($companies as $company)
+        foreach($companies as $company)
             fputcsv($fp, [
                 'id'   => $company->id,
                 'name' => $company->name,
@@ -64,8 +37,9 @@ class CreateExportData extends Command
         fclose($fp);
 
 
-        foreach ($companies as $company) {
-            $fp = fopen($exportPath . 'company_' . $company->id . '_' . preg_replace('/[^a-z0-9]+/', '-', strtolower($company->name)) . '.csv', 'w+');
+        foreach($companies as $company) {
+            $filename = preg_replace('/[^a-z0-9]+/', '-', strtolower($company->name));
+            $fp = fopen($exportPath . 'company_' . $company->id . '_' . $filename . '.csv', 'w+');
             fputcsv($fp, [
                 'bssid',
                 'vehicle',
@@ -74,7 +48,7 @@ class CreateExportData extends Command
                              ->where('vehicles.company_id', $company->id)
                              ->orderBy('devices.bssid', 'asc')
                              ->get();
-            foreach ($devices as $device) {
+            foreach($devices as $device) {
                 fputcsv($fp, [
                     strtoupper($device->bssid),
                     $device->vehicle_name,
@@ -82,5 +56,7 @@ class CreateExportData extends Command
             }
             fclose($fp);
         }
+
+        return 0;
     }
 }
