@@ -60,6 +60,8 @@ class ScanController extends Controller {
             if(ScanDeviceAuthentification::getDevice()->longitude != null)
                 $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()->longitude;
 
+            $scanElement['bssid'] = strtoupper($scanElement['bssid']);
+
             Device::updateOrCreate([
                                        'bssid' => $scanElement['bssid']
                                    ], [
