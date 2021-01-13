@@ -54,7 +54,7 @@ class ScanController extends Controller {
 
             if($scanElement['ssid'] == '')
                 $scanElement['ssid'] = null;
-            
+
             if(ScanDeviceAuthentification::getDevice()->latitude != null)
                 $scanElement['latitude'] = ScanDeviceAuthentification::getDevice()->latitude;
             if(ScanDeviceAuthentification::getDevice()->longitude != null)
@@ -87,17 +87,19 @@ class ScanController extends Controller {
 
         sort($unverified);
 
-        if(count($verified) > 0) {
-            $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Fahrzeug(e) lokalisiert</b>\r\n\r\n";
-            foreach($verified as $vehicle)
-                $message .= $vehicle['vehicle'] . "\r\n<i>" . $vehicle['company'] . "</i>\r\n---------------\r\n";
-            NotificationController::notifyRaw($message);
-        }
-        if(count($unverified) > 0) {
-            $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Unverifiziertes Fahrzeug lokalisiert</b>\r\n";
-            foreach($unverified as $vehicle)
-                $message .= '- ' . $vehicle . "\r\n";
-            NotificationController::notifyRaw($message);
+        if(ScanDeviceAuthentification::getDevice()->notify) {
+            if(count($verified) > 0) {
+                $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Fahrzeug(e) lokalisiert</b>\r\n\r\n";
+                foreach($verified as $vehicle)
+                    $message .= $vehicle['vehicle'] . "\r\n<i>" . $vehicle['company'] . "</i>\r\n---------------\r\n";
+                NotificationController::notifyRaw($message);
+            }
+            if(count($unverified) > 0) {
+                $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Unverifiziertes Fahrzeug lokalisiert</b>\r\n";
+                foreach($unverified as $vehicle)
+                    $message .= '- ' . $vehicle . "\r\n";
+                NotificationController::notifyRaw($message);
+            }
         }
 
         return response()->json([
