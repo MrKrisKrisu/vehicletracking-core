@@ -8,6 +8,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\ScanDeviceAuthentification;
 use App\IgnoredNetwork;
 use App\Scan;
+use App\ScanDevice;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,7 +42,7 @@ class ScanController extends Controller {
             return response()->json(['status' => false, 'errors' => array_values($validator->errors()->toArray())], 400);
         }
 
-        $verified   = [];
+        $verified = [];
         $unverified = [];
 
         $validated = $validator->validate();
@@ -108,6 +109,43 @@ class ScanController extends Controller {
                                         'verified'   => array_values($verified),
                                         'unverified' => array_values($unverified)
                                     ]
+                                ]);
+    }
+
+    /**
+     * GET: /api/v1/location?token&lat&lon&timestamp&hdop&altitude&speed
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function saveLocation(Request $request): JsonResponse {
+
+        $validated = $request->validate([
+                                            'token'     => ['required', 'exists:scan_devices,token'],
+                                            'lat'       => ['required', 'numeric'],
+                                            'lon'       => ['required', 'numeric'],
+                                            'timestamp' => ['required', 'numeric'],
+                                            'hdop'      => ['nullable', 'numeric'],
+                                            'altitude'  => ['nullable', 'numeric'],
+                                            'speed'     => ['nullable', 'numeric'],
+                                        ]);
+
+        $scanDevice = ScanDevice::where('token', $validated['token'])->firstOrFail();
+
+        $time = Carbon::createFromTimestamp($validated['timestamp']);
+        $count = Scan::where('scanDeviceId', $scanDevice->id)
+                     ->where('latitude', null)
+                     ->where('longitude', null)
+                     ->where('created_at', '>=', $time->clone()->subSeconds(5))
+                     ->where('created_at', '<=', $time->clone()->addSeconds(5))
+                     ->update([
+                                  'latitude'  => $validated['lat'],
+                                  'longitude' => $validated['lon'],
+                              ]);
+
+        return response()->json([
+                                    'success'  => true,
+                                    'affected' => $count
                                 ]);
     }
 
