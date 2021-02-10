@@ -132,7 +132,7 @@ class ScanController extends Controller {
 
         $scanDevice = ScanDevice::where('token', $validated['token'])->firstOrFail();
 
-        $time = Carbon::createFromTimestamp($validated['timestamp']);
+        $time = Carbon::createFromTimestampMs($validated['timestamp']);
         $count = Scan::where('scanDeviceId', $scanDevice->id)
                      ->where('latitude', null)
                      ->where('longitude', null)
