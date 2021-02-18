@@ -63,12 +63,21 @@ class ScanController extends Controller {
 
             $scanElement['bssid'] = strtoupper($scanElement['bssid']);
 
-            Device::updateOrCreate([
-                                       'bssid' => $scanElement['bssid']
-                                   ], [
-                                       'ssid'     => $scanElement['ssid'],
-                                       'lastSeen' => Carbon::now()
-                                   ]);
+            $device = Device::updateOrCreate([
+                                                 'bssid' => $scanElement['bssid']
+                                             ], [
+                                                 'ssid'     => $scanElement['ssid'],
+                                                 'lastSeen' => Carbon::now()
+                                             ]);
+
+            //Check if network contains hide-keyword
+            if($device->wasRecentlyCreated) {
+                $hiddenList = IgnoredNetwork::where('contains', 1)->select('ssid')->get();
+                foreach($hiddenList as $ssid) {
+                    if(str_contains($scanElement['bssid'], $ssid))
+                        $device->update(['ignore' => 1]);
+                }
+            }
 
             $scan = Scan::create($scanElement);
             if(isset($scan->device->vehicle)) {

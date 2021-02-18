@@ -22,15 +22,14 @@ class VehicleController extends Controller {
                               ->where('companies.name', 'Stationary')
                               ->select('devices.bssid');
 
-        $hiddenSsids   = IgnoredNetwork::select('ssid');
-        $hiddenBssids2 = Device::where('ignore', 1)
-                               ->select('bssid');
+        $hiddenSsids = IgnoredNetwork::select('ssid');
 
-        $lastScansQ = Scan::with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
-                          ->whereNotIn('bssid', $hiddenBssids)
-                          ->whereNotIn('bssid', $hiddenBssids2)
-                          ->whereNotIn('ssid', $hiddenSsids)
-                          ->orderBy('created_at', 'desc');
+        $lastScansQ = Scan::join('devices', 'devices.bssid', '=', 'scans.bssid')
+                          ->with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
+                          ->where('devices.ignore', 0)
+                          ->whereNotIn('scans.bssid', $hiddenBssids)
+                          ->whereNotIn('scans.ssid', $hiddenSsids)
+                          ->orderBy('scans.created_at', 'desc');
 
         if(isset($request->device))
             $lastScansQ->where('scanDeviceId', $request->device);
@@ -38,7 +37,7 @@ class VehicleController extends Controller {
         $lastScans = $lastScansQ->paginate(80)->onEachSide(0);
 
         $possibleVehicles = [];
-        $bssidList        = [];
+        $bssidList = [];
         foreach($lastScans as $scan)
             if(!in_array($scan->bssid, $bssidList))
                 $bssidList[] = $scan->bssid;
@@ -69,7 +68,7 @@ class VehicleController extends Controller {
     public function saveVehicle(Request $request): RedirectResponse {
         if(isset($request->scans)) {
             foreach($request->scans as $scanID => $v) {
-                $scan               = Scan::where('id', $scanID)->first();
+                $scan = Scan::where('id', $scanID)->first();
                 $scan->vehicle_name = $request->vehicle_name;
                 $scan->save();
             }
@@ -98,7 +97,7 @@ class VehicleController extends Controller {
                              return $device->scans->where('vehicle_name', '<>', null)->max('created_at');
                          });
 
-        $count  = $devices->count();
+        $count = $devices->count();
         $device = $devices->first();
 
         if($device == null)
@@ -123,7 +122,7 @@ class VehicleController extends Controller {
                                                 'modified_vehicle_name' => ['required']
                                             ]);
 
-            $scan                        = Scan::find($validated['modified_scan_id']);
+            $scan = Scan::find($validated['modified_scan_id']);
             $scan->modified_vehicle_name = str_replace("\r\n", ',', $validated['modified_vehicle_name']);
             $scan->update();
 
