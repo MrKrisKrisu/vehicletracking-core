@@ -74,7 +74,7 @@ class ScanController extends Controller {
             //if($device->wasRecentlyCreated) {
             $hiddenList = IgnoredNetwork::where('contains', 1)->select('ssid')->get()->pluck('ssid');
             foreach($hiddenList as $ssid) {
-                if(str_contains($scanElement['ssid'], $ssid))
+                if(str_contains(strtolower($scanElement['ssid']), strtolower($ssid)))
                     $device->update(['ignore' => 1]);
             }
             //}
