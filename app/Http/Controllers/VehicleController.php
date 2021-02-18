@@ -29,6 +29,7 @@ class VehicleController extends Controller {
                           ->where('devices.ignore', 0)
                           ->whereNotIn('scans.bssid', $hiddenBssids)
                           ->whereNotIn('scans.ssid', $hiddenSsids)
+                          ->select('scans.*')
                           ->orderBy('scans.created_at', 'desc');
 
         if(isset($request->device))
