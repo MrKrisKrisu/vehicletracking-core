@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Device;
 use App\Models\Store;
+use App\Scan;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -60,5 +62,9 @@ class MapController extends Controller {
         return response($sitemap->render(), 200, [
             'Content-Type' => 'application/xml'
         ]);
+    }
+
+    public function renderNetworkMap(): Renderable {
+        return view('map.network');
     }
 }

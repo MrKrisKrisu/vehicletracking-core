@@ -3,7 +3,7 @@
   "type": "project",
   "description": "",
   "require": {
-    "php": "^7.3 || ^8.0",
+    "php": "^8.0",
     "ext-json": "*",
     "doctrine/dbal": "^3.0",
     "fideloper/proxy": "^4.2",

@@ -42,6 +42,9 @@ Route::middleware(['auth'])->group(function() {
          ->name('vehicle.assign');
     Route::post('/vehicle/assign/skip', [VehicleController::class, 'skipAssignment'])
          ->name('vehicle.assign.skip');
+
+    Route::get('/map/networks', [MapController::class, 'renderNetworkMap'])
+         ->name('map.networks');
 });
 
 Route::view('/imprint', 'imprint')->name('imprint');
