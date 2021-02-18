@@ -72,11 +72,11 @@ class ScanController extends Controller {
 
             //Check if network contains hide-keyword
             //if($device->wasRecentlyCreated) {
-                $hiddenList = IgnoredNetwork::where('contains', 1)->select('ssid')->get();
-                foreach($hiddenList as $ssid) {
-                    if(str_contains($scanElement['ssid'], $ssid))
-                        $device->update(['ignore' => 1]);
-                }
+            $hiddenList = IgnoredNetwork::where('contains', 1)->select('ssid')->get()->pluck('ssid');
+            foreach($hiddenList as $ssid) {
+                if(str_contains($scanElement['ssid'], $ssid))
+                    $device->update(['ignore' => 1]);
+            }
             //}
 
             $scan = Scan::create($scanElement);
