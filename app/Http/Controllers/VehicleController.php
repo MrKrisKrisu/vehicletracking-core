@@ -46,7 +46,7 @@ class VehicleController extends Controller {
         $scans = Scan::whereIn('bssid', $bssidList)
                      ->where('vehicle_name', '<>', null)
                      ->groupBy('bssid', 'vehicle_name')
-                     ->select('bssid', 'vehicle_name')
+                     ->select('bssid', 'vehicle_name', 'modified_vehicle_name')
                      ->get();
 
         foreach($scans as $scan) {
