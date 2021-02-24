@@ -29,8 +29,9 @@
                                     @endisset
 
                                     @if(isset($scan->device) && isset($scan->device->vehicle))
-                                        <small class="text-success">Verifiziert: {{$scan->device->vehicle->vehicle_name}},
-                                            {{$scan->device->vehicle->company->name}}</small><br />
+                                        <small class="text-success">Verifiziert:
+                                            {{$scan->device->vehicle->vehicle_name}},
+                                            {{$scan->device->vehicle->company->name}}</small><br/>
                                     @else
                                         <small class="text-danger">Unverifiziert</small><br/>
                                     @endif
@@ -62,10 +63,18 @@
                                                form="main">
                                         <label class="form-check-label"><small>{{$scan->vehicle_name}}</small></label>
                                     </div>
-                                    <p>
+                                    <span>
                                         {{$scan->created_at->diffForHumans()}}
                                         <small>({{$scan->created_at->format('H:i:s')}})</small>
-                                    </p>
+                                    </span><br />
+                                    @isset($scan->latitude)
+                                        <small class="text-info">
+                                            <i class="fas fa-location-arrow"></i>
+                                            {{$scan->latitude}}, {{$scan->longitude}}
+                                        </small>
+                                    @else
+                                        <small class="text-danger"><i class="fas fa-times"></i> kein Standort</small>
+                                    @endisset
                                 </td>
                             </tr>
                         @endforeach
