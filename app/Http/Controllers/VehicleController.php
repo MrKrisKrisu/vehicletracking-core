@@ -35,7 +35,7 @@ class VehicleController extends Controller {
         if(isset($request->device))
             $lastScansQ->where('scanDeviceId', $request->device);
 
-        $lastScans = $lastScansQ->paginate(80)->onEachSide(0);
+        $lastScans = $lastScansQ->simplePaginate(80);
 
         $possibleVehicles = [];
         $bssidList = [];
