@@ -17,7 +17,7 @@
                     <h5 class="card-title">{{__('Last scans')}}</h5>
                     <table class="table">
                         @foreach ($lastScan as $scan)
-                            <tr>
+                            <tr id="scan{{$scan->id}}">
                                 <td>
                                     {{str_replace("\\x00", "", $scan->ssid)}}<br/>
                                     @isset($possibleVehicles[$scan->bssid])
@@ -40,6 +40,8 @@
                                         <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
                                         </small><br/>
                                     @endisset
+
+
                                     <form method="POST" action="{{route('ignoreDevice')}}"
                                           id="formIgnore{{$scan->id}}">
                                         @csrf
@@ -47,6 +49,11 @@
                                                form="formIgnore{{$scan->id}}"/>
                                         <input type="hidden" name="ssid" value="{{$scan->ssid}}"
                                                form="formIgnore{{$scan->id}}"/>
+
+                                        <button class="btn btn-sm btn-primary hideScan" type="button"
+                                                data-id="{{$scan->id}}">
+                                            <i class="fas fa-eye-slash"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-danger" type="submit" name="ban" value="bssid"
                                                 form="formIgnore{{$scan->id}}">
                                             <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
@@ -66,7 +73,7 @@
                                     <span>
                                         {{$scan->created_at->diffForHumans()}}
                                         <small>({{$scan->created_at->format('H:i:s')}})</small>
-                                    </span><br />
+                                    </span><br/>
                                     @isset($scan->latitude)
                                         <small class="text-info">
                                             <i class="fas fa-location-arrow"></i>
@@ -84,4 +91,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $('.hideScan').on('click', hideScan);
+
+        function hideScan() {
+            let hideButton = $(this);
+            let scanId = hideButton.data('id');
+            $.ajax({
+                url: '{{route('scans.update')}}',
+                type: "POST",
+                data: {
+                    id: scanId,
+                    hidden: 1
+                },
+                success: function () {
+                    $('#scan' + scanId).remove();
+                }
+            });
+        }
+    </script>
 @endsection

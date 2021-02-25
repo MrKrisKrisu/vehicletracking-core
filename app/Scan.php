@@ -9,7 +9,11 @@ class Scan extends Model {
 
     protected $fillable = [
         'vehicle_id', 'vehicle_name', 'modified_vehicle_name', 'bssid', 'ssid', 'signal',
-        'quality', 'frequency', 'bitrates', 'encrypted', 'channel', 'scanDeviceId', 'created_at', 'latitude', 'longitude'
+        'quality', 'frequency', 'bitrates', 'encrypted', 'channel', 'scanDeviceId',
+        'created_at', 'latitude', 'longitude', 'hidden'
+    ];
+    protected $casts    = [
+        'hidden' => 'boolean'
     ];
 
     public function device(): BelongsTo {

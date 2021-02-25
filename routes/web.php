@@ -3,6 +3,7 @@
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,10 @@ Route::middleware(['auth'])->group(function() {
 
     Route::get('/map/networks', [MapController::class, 'renderNetworkMap'])
          ->name('map.networks');
+
+    Route::prefix('model')->group(function() {
+        Route::post('/scans/update', [ScanController::class, 'update'])->name('scans.update');
+    });
 });
 
 Route::view('/imprint', 'imprint')->name('imprint');
