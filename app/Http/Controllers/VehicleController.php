@@ -27,6 +27,7 @@ class VehicleController extends Controller {
         $lastScansQ = Scan::join('devices', 'devices.bssid', '=', 'scans.bssid')
                           ->with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
                           ->where('devices.ignore', 0)
+                          ->where('scans.hidden', 0)
                           ->whereNotIn('scans.bssid', $hiddenBssids)
                           ->whereNotIn('scans.ssid', $hiddenSsids)
                           ->select('scans.*')
