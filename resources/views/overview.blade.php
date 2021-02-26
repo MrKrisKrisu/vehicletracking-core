@@ -17,7 +17,8 @@
                     <h5 class="card-title">{{__('Last scans')}}</h5>
                     <table class="table">
                         @foreach ($lastScan as $scan)
-                            <tr id="scan{{$scan->id}}">
+                            <tr id="scan{{$scan->id}}" data-ssid="{{$scan->ssid}}"
+                                data-deviceid="{{$scan->device->id}}">
                                 <td>
                                     {{str_replace("\\x00", "", $scan->ssid)}}<br/>
                                     @isset($possibleVehicles[$scan->bssid])
@@ -41,28 +42,16 @@
                                         </small><br/>
                                     @endisset
 
-
-                                    <form method="POST" action="{{route('ignoreDevice')}}"
-                                          id="formIgnore{{$scan->id}}">
-                                        @csrf
-                                        <input type="hidden" name="bssid" value="{{$scan->bssid}}"
-                                               form="formIgnore{{$scan->id}}"/>
-                                        <input type="hidden" name="ssid" value="{{$scan->ssid}}"
-                                               form="formIgnore{{$scan->id}}"/>
-
-                                        <button class="btn btn-sm btn-primary hideScan" type="button"
-                                                data-id="{{$scan->id}}">
-                                            <i class="fas fa-eye-slash"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" type="submit" name="ban" value="bssid"
-                                                form="formIgnore{{$scan->id}}">
-                                            <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" type="submit" name="ban"
-                                                value="ssid" form="formIgnore{{$scan->id}}">
-                                            <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
-                                        </button>
-                                    </form>
+                                    <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
+                                        <i class="fas fa-eye-slash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary"
+                                            onclick="hideDevice('{{$scan->device->id}}')">
+                                        <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="hideNetwork('{{$scan->ssid}}')">
+                                        <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+                                    </button>
                                 </td>
                                 <td style="min-width: 50%;">
                                     <div class="form-check">
@@ -107,6 +96,36 @@
                 },
                 success: function () {
                     $('#scan' + scanId).remove();
+                }
+            });
+        }
+
+        function hideNetwork(ssid, contains = 0) {
+            $.ajax({
+                url: '{{route('ignoredNetwork.create')}}',
+                type: "POST",
+                data: {
+                    ssid: ssid,
+                    contains: contains
+                },
+                success: function (data) {
+                    console.log(data);
+                    $('*[data-ssid="' + ssid + '"]').remove();
+                }
+            });
+        }
+
+        function hideDevice(id) {
+            $.ajax({
+                url: '{{route('device.update')}}',
+                type: "POST",
+                data: {
+                    id: id,
+                    ignore: 1
+                },
+                success: function (data) {
+                    console.log(data);
+                    $('*[data-deviceid="' + id + '"]').remove();
                 }
             });
         }

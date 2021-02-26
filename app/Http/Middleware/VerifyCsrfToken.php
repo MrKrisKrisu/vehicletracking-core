@@ -11,6 +11,8 @@ class VerifyCsrfToken extends Middleware {
      * @var array
      */
     protected $except = [
-        '/model/scans/update'
+        '/model/scans/update',
+        '/model/ignoredNetwork/create',
+        '/model/device/update',
     ];
 }
