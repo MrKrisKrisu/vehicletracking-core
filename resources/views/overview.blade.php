@@ -49,7 +49,8 @@
                                             onclick="hideDevice('{{$scan->device->id}}')">
                                         <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger" onclick="hideNetwork('{{$scan->ssid}}')">
+                                    <button class="btn btn-sm btn-danger"
+                                            onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
                                         <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
                                     </button>
                                 </td>
