@@ -53,6 +53,8 @@ class ScanController extends Controller {
 
             $scanElement['scanDeviceId'] = ScanDeviceAuthentification::getDevice()->id;
 
+            $scanElement['ssid'] = str_replace("\\x00", "", $scanElement['ssid']);
+
             if($scanElement['ssid'] == '')
                 $scanElement['ssid'] = null;
 
