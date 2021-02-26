@@ -49,10 +49,12 @@
                                             onclick="hideDevice('{{$scan->device->id}}')">
                                         <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger"
-                                            onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
-                                        <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
-                                    </button>
+                                    @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
+                                        <button class="btn btn-sm btn-danger" 
+                                                onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
+                                            <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+                                        </button>
+                                    @endif
                                 </td>
                                 <td style="min-width: 50%;">
                                     <div class="form-check">
