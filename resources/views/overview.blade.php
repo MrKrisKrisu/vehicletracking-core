@@ -50,7 +50,8 @@
                                         <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
                                     </button>
                                     @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
-                                        <button class="btn btn-sm btn-danger" onclick="hideNetwork('{{$scan->ssid}}')">
+                                        <button class="btn btn-sm btn-danger" 
+                                                onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
                                             <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
                                         </button>
                                     @endif
