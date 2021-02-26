@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\IgnoredNetworkController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\NotificationController;
@@ -48,7 +50,12 @@ Route::middleware(['auth'])->group(function() {
          ->name('map.networks');
 
     Route::prefix('model')->group(function() {
-        Route::post('/scans/update', [ScanController::class, 'update'])->name('scans.update');
+        Route::post('/scans/update', [ScanController::class, 'update'])
+             ->name('scans.update');
+        Route::post('/device/update', [DeviceController::class, 'update'])
+             ->name('device.update');
+        Route::post('/ignoredNetwork/create', [IgnoredNetworkController::class, 'create'])
+             ->name('ignoredNetwork.create');
     });
 });
 
