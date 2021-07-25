@@ -28,7 +28,11 @@ class CreateExportData extends Command {
         foreach($companies as $company) {
 
             $slug   = Str::slug($company->name, '_');
-            $export = [];
+            $export = [
+                'company' => [
+                    'name' => $company->name,
+                ]
+            ];
 
             foreach($company->vehicles as $vehicle) {
                 $export['vehicles'][] = [
@@ -39,11 +43,11 @@ class CreateExportData extends Command {
 
             $path = $exportPath . '/' . $slug . '.json';
             echo strtr('Save :count rows to :path' . PHP_EOL, [
-                ':count' => count($export),
+                ':count' => count($export['vehicles']),
                 ':path'  => $path
             ]);
             $fp = fopen($path, 'w+');
-            fputs($fp, json_encode($export));
+            fputs($fp, json_encode($export, JSON_PRETTY_PRINT));
             fclose($fp);
         }
 
