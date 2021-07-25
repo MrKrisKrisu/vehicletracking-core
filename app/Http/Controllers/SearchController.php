@@ -6,6 +6,7 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller {
 
@@ -18,6 +19,11 @@ class SearchController extends Controller {
                                             'query'    => ['required', 'min:3', 'max:32'],
                                             'operator' => ['required', Rule::in(['=', '%.', '.%', '%%'])],
                                         ]);
+
+        Log::info(strtr('Searched for ":query" with :operator', [
+            ':query'    => $validated['query'],
+            ':operator' => $validated['operator'],
+        ]));
 
         $query = DB::table('devices');
         if($validated['operator'] == '=') {
