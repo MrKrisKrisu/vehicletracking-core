@@ -54,6 +54,7 @@ class CreateExportData extends Command {
 
                 $export['vehicles'][] = [
                     'name'          => $vehicle->vehicle_name,
+                    'type'          => $vehicle->type,
                     'bssid'         => $bssids,
                     'last_position' => $lastPos ?? [],
                 ];
