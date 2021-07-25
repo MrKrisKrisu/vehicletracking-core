@@ -46,8 +46,8 @@ class CreateExportData extends Command {
 
                 if($lastPos != null) {
                     $lastPos = [
-                        'latitude'  => $lastPos->latitude,
-                        'longitude' => $lastPos->longitude,
+                        'latitude'  => round($lastPos->latitude, 3),
+                        'longitude' => round($lastPos->longitude, 3),
                         'timestamp' => $lastPos->created_at->setMinute(0)->setSecond(0)->toIso8601String()
                     ];
                 }
