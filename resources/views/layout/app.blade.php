@@ -16,7 +16,7 @@
         <meta name="apple-mobile-web-app-title" content="VehicleTracking"/>
         <meta name="application-name" content="VehicleTracking"/>
 
-        <link rel="stylesheet" href="/css/app.css"/>
+        <link href="{{ mix('css/app.css') }}" rel="stylesheet">
         <style>
             :root {
                 --jumbotron-padding-y: 3rem;
@@ -61,7 +61,7 @@
                 box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
             }
         </style>
-        <script src="/js/app.js"></script>
+        <script src="{{ mix('js/app.js') }}"></script>
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
 
         <script>
