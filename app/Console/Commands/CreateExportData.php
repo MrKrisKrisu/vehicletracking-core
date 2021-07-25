@@ -3,15 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Company;
-use App\Device;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CreateExportData extends Command {
 
     protected $signature   = 'ptt:export {path}';
-    protected $description = 'Export data to csv';
+    protected $description = 'Export data to json';
 
     public function handle(): int {
         $exportPath = $this->argument('path');
@@ -22,38 +21,29 @@ class CreateExportData extends Command {
             return 1;
         }
 
-        $companies = Company::where('id', '<>', 4)->get();
-
-        $fp = fopen($exportPath . 'companies.csv', 'w+');
-        fputcsv($fp, [
-            'id',
-            'name',
-        ]);
-        foreach($companies as $company)
-            fputcsv($fp, [
-                'id'   => $company->id,
-                'name' => $company->name,
-            ]);
-        fclose($fp);
-
+        $companies = Company::with(['vehicles.devices'])
+                            ->where('name', '<>', 'Stationary')
+                            ->get();
 
         foreach($companies as $company) {
-            $filename = preg_replace('/[^a-z0-9]+/', '-', strtolower($company->name));
-            $fp = fopen($exportPath . 'company_' . $company->id . '_' . $filename . '.csv', 'w+');
-            fputcsv($fp, [
-                'bssid',
-                'vehicle',
-            ]);
-            $devices = Device::join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
-                             ->where('vehicles.company_id', $company->id)
-                             ->orderBy('devices.bssid', 'asc')
-                             ->get();
-            foreach($devices as $device) {
-                fputcsv($fp, [
-                    strtoupper($device->bssid),
-                    $device->vehicle_name,
-                ]);
+
+            $slug   = Str::slug($company->name, '_');
+            $export = [];
+
+            foreach($company->vehicles as $vehicle) {
+                $export['vehicles'][] = [
+                    'name'  => $vehicle->vehicle_name,
+                    'bssid' => $vehicle->devices->pluck('bssid')
+                ];
             }
+
+            $path = $exportPath . '/' . $slug . '.json';
+            echo strtr('Save :count rows to :path' . PHP_EOL, [
+                ':count' => count($export),
+                ':path'  => $path
+            ]);
+            $fp = fopen($path, 'w+');
+            fputs($fp, json_encode($export));
             fclose($fp);
         }
 
