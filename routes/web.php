@@ -9,6 +9,7 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SearchController;
 
 Auth::routes(['register' => false]);
 
@@ -62,6 +63,8 @@ Route::middleware(['auth'])->group(function() {
 Route::view('/imprint', 'imprint')->name('imprint');
 Route::get('/map', [MapController::class, 'renderMap'])->name('map');
 Route::get('/sitemap', [MapController::class, 'renderSitemap']);
+Route::get('/search', [SearchController::class, 'render']);
+Route::post('/search', [SearchController::class, 'search'])->name('search.show');
 
 Route::get('/vehicle/{vehicle_id}', [VehicleController::class, 'renderVehicle'])
      ->name('vehicle');
