@@ -6,6 +6,7 @@ use App\Company;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Scan;
 
 class CreateExportData extends Command {
 
@@ -35,9 +36,26 @@ class CreateExportData extends Command {
             ];
 
             foreach($company->vehicles as $vehicle) {
+                $bssids = $vehicle->devices->pluck('bssid');
+
+                $lastPos = Scan::whereIn('bssid', $bssids)
+                               ->whereNotNull('latitude')
+                               ->whereNotNull('longitude')
+                               ->orderByDesc('created_at')
+                               ->first();
+
+                if($lastPos != null) {
+                    $lastPos = [
+                        'latitude'  => $lastPos->latitude,
+                        'longitude' => $lastPos->longitude,
+                        'timestamp' => $lastPos->created_at->setMinute(0)->setSecond(0)->toIso8601String()
+                    ];
+                }
+
                 $export['vehicles'][] = [
-                    'name'  => $vehicle->vehicle_name,
-                    'bssid' => $vehicle->devices->pluck('bssid')
+                    'name'          => $vehicle->vehicle_name,
+                    'bssid'         => $bssids,
+                    'last_position' => $lastPos ?? [],
                 ];
             }
 
