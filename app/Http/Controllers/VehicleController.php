@@ -28,6 +28,7 @@ class VehicleController extends Controller {
                           ->with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
                           ->where('devices.ignore', 0)
                           ->where('scans.hidden', 0)
+                          ->where('scans.created_at', '>', Carbon::now()->subMonths(3)->toIso8601String())
                           ->whereNotIn('scans.bssid', $hiddenBssids)
                           ->whereNotIn('scans.ssid', $hiddenSsids)
                           ->select('scans.*')
@@ -39,7 +40,7 @@ class VehicleController extends Controller {
         $lastScans = $lastScansQ->simplePaginate(80);
 
         $possibleVehicles = [];
-        $bssidList = [];
+        $bssidList        = [];
         foreach($lastScans as $scan)
             if(!in_array($scan->bssid, $bssidList))
                 $bssidList[] = $scan->bssid;
@@ -70,7 +71,7 @@ class VehicleController extends Controller {
     public function saveVehicle(Request $request): RedirectResponse {
         if(isset($request->scans)) {
             foreach($request->scans as $scanID => $v) {
-                $scan = Scan::where('id', $scanID)->first();
+                $scan               = Scan::where('id', $scanID)->first();
                 $scan->vehicle_name = $request->vehicle_name;
                 $scan->save();
             }
@@ -99,7 +100,7 @@ class VehicleController extends Controller {
                              return $device->scans->where('vehicle_name', '<>', null)->max('created_at');
                          });
 
-        $count = $devices->count();
+        $count  = $devices->count();
         $device = $devices->first();
 
         if($device == null)
@@ -124,7 +125,7 @@ class VehicleController extends Controller {
                                                 'modified_vehicle_name' => ['required']
                                             ]);
 
-            $scan = Scan::find($validated['modified_scan_id']);
+            $scan                        = Scan::find($validated['modified_scan_id']);
             $scan->modified_vehicle_name = str_replace("\r\n", ',', $validated['modified_vehicle_name']);
             $scan->update();
 

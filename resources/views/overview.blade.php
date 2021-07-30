@@ -15,70 +15,80 @@
                     @endforeach
                     <hr/>
                     <h5 class="card-title">{{__('Last scans')}}</h5>
-                    <table class="table">
-                        @foreach ($lastScan as $scan)
-                            <tr id="scan{{$scan->id}}" data-ssid="{{$scan->ssid}}"
-                                data-deviceid="{{$scan->device->id}}">
-                                <td>
-                                    {{str_replace("\\x00", "", $scan->ssid)}}<br/>
-                                    @isset($possibleVehicles[$scan->bssid])
-                                        @if(!isset($scan->device) || !isset($scan->device->vehicle))
-                                            @foreach($possibleVehicles[$scan->bssid] as $p)
-                                                <small>{{$p}}</small><br/>
-                                            @endforeach
+
+                    @if($lastScan->count() == 0)
+                        <p class="font-weight-bold text-success">
+                            <i class="fas fa-check"></i> Alles abgearbeitet.
+                        </p>
+                    @else
+
+                        <table class="table">
+                            @foreach ($lastScan as $scan)
+                                <tr id="scan{{$scan->id}}" data-ssid="{{$scan->ssid}}"
+                                    data-deviceid="{{$scan->device->id}}">
+                                    <td>
+                                        {{str_replace("\\x00", "", $scan->ssid)}}<br/>
+                                        @isset($possibleVehicles[$scan->bssid])
+                                            @if(!isset($scan->device) || !isset($scan->device->vehicle))
+                                                @foreach($possibleVehicles[$scan->bssid] as $p)
+                                                    <small>{{$p}}</small><br/>
+                                                @endforeach
+                                            @endif
+                                        @endisset
+
+                                        @if(isset($scan->device) && isset($scan->device->vehicle))
+                                            <small class="text-success">Verifiziert:
+                                                {{$scan->device->vehicle->vehicle_name}},
+                                                {{$scan->device->vehicle->company->name}}</small><br/>
+                                        @else
+                                            <small class="text-danger">Unverifiziert</small><br/>
                                         @endif
-                                    @endisset
 
-                                    @if(isset($scan->device) && isset($scan->device->vehicle))
-                                        <small class="text-success">Verifiziert:
-                                            {{$scan->device->vehicle->vehicle_name}},
-                                            {{$scan->device->vehicle->company->name}}</small><br/>
-                                    @else
-                                        <small class="text-danger">Unverifiziert</small><br/>
-                                    @endif
+                                        @isset($scan->scanDevice)
+                                            <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
+                                            </small><br/>
+                                        @endisset
 
-                                    @isset($scan->scanDevice)
-                                        <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
-                                        </small><br/>
-                                    @endisset
-
-                                    <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
-                                        <i class="fas fa-eye-slash"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-secondary"
-                                            onclick="hideDevice('{{$scan->device->id}}')">
-                                        <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
-                                    </button>
-                                    @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
-                                        <button class="btn btn-sm btn-danger" 
-                                                onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
-                                            <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+                                        <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
+                                            <i class="fas fa-eye-slash"></i>
                                         </button>
-                                    @endif
-                                </td>
-                                <td style="min-width: 50%;">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="scans[{{$scan->id}}]"
-                                               form="main">
-                                        <label class="form-check-label"><small>{{$scan->vehicle_name}}</small></label>
-                                    </div>
-                                    <span>
+                                        <button class="btn btn-sm btn-secondary"
+                                                onclick="hideDevice('{{$scan->device->id}}')">
+                                            <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
+                                        </button>
+                                        @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
+                                            <button class="btn btn-sm btn-danger"
+                                                    onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
+                                                <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                    <td style="min-width: 50%;">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="scans[{{$scan->id}}]"
+                                                   form="main">
+                                            <label class="form-check-label"><small>{{$scan->vehicle_name}}</small></label>
+                                        </div>
+                                        <span>
                                         {{$scan->created_at->diffForHumans()}}
                                         <small>({{$scan->created_at->format('H:i:s')}})</small>
                                     </span><br/>
-                                    @isset($scan->latitude)
-                                        <small class="text-info">
-                                            <i class="fas fa-location-arrow"></i>
-                                            {{$scan->latitude}}, {{$scan->longitude}}
-                                        </small>
-                                    @else
-                                        <small class="text-danger"><i class="fas fa-times"></i> kein Standort</small>
-                                    @endisset
-                                </td>
-                            </tr>
-                        @endforeach
-                    </table>
-                    {{$lastScan->links()}}
+                                        @isset($scan->latitude)
+                                            <small class="text-info">
+                                                <i class="fas fa-location-arrow"></i>
+                                                {{$scan->latitude}}, {{$scan->longitude}}
+                                            </small>
+                                        @else
+                                            <small class="text-danger"><i class="fas fa-times"></i> kein
+                                                Standort</small>
+                                        @endisset
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </table>
+                        {{$lastScan->links()}}
+
+                    @endif
                 </div>
             </div>
         </div>
