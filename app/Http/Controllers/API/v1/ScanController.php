@@ -20,6 +20,7 @@ class ScanController extends Controller {
      * POST: /api/v1/scan
      *
      * @param Request $request
+     *
      * @return JsonResponse
      * @throws ValidationException
      */
@@ -42,26 +43,19 @@ class ScanController extends Controller {
             return response()->json(['status' => false, 'errors' => array_values($validator->errors()->toArray())], 400);
         }
 
-        $verified = [];
+        $verified   = [];
         $unverified = [];
 
         $validated = $validator->validate();
         foreach($validated as $scanElement) {
 
-            //if($scanElement['ssid'] != null && IgnoredNetwork::isIgnored($scanElement['ssid']))
-            //    continue;
-
             $scanElement['scanDeviceId'] = ScanDeviceAuthentification::getDevice()->id;
 
             $scanElement['ssid'] = str_replace("\\x00", "", $scanElement['ssid']);
 
-            if($scanElement['ssid'] == '')
-                $scanElement['ssid'] = null;
-
-            if(ScanDeviceAuthentification::getDevice()->latitude != null)
-                $scanElement['latitude'] = ScanDeviceAuthentification::getDevice()->latitude;
-            if(ScanDeviceAuthentification::getDevice()->longitude != null)
-                $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()->longitude;
+            $scanElement['ssid']      = $scanElement['ssid'] == '' ? null : $scanElement['ssid'];
+            $scanElement['latitude']  = ScanDeviceAuthentification::getDevice()?->latitude ?? null;
+            $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()?->longitude ?? null;
 
             $scanElement['bssid'] = strtoupper($scanElement['bssid']);
 
@@ -71,6 +65,12 @@ class ScanController extends Controller {
                                                  'ssid'     => $scanElement['ssid'],
                                                  'lastSeen' => Carbon::now()
                                              ]);
+
+            if($device->wasRecentlyCreated) {
+                $device->update([
+                                    'ignore' => IgnoredNetwork::where('ssid', $device->ssid)->count() > 0
+                                ]);
+            }
 
             //Check if network contains hide-keyword
             //if($device->wasRecentlyCreated) {
@@ -127,6 +127,7 @@ class ScanController extends Controller {
      * GET: /api/v1/location?token&lat&lon&timestamp&hdop&altitude&speed
      *
      * @param Request $request
+     *
      * @return JsonResponse
      */
     public function saveLocation(Request $request): JsonResponse {
@@ -143,7 +144,7 @@ class ScanController extends Controller {
 
         $scanDevice = ScanDevice::where('token', $validated['token'])->firstOrFail();
 
-        $time = Carbon::createFromTimestampMs($validated['timestamp']);
+        $time  = Carbon::createFromTimestampMs($validated['timestamp']);
         $count = Scan::where('scanDeviceId', $scanDevice->id)
                      ->where('latitude', null)
                      ->where('longitude', null)

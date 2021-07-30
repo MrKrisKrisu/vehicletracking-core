@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Scan;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
+use App\Device;
 
 class AirportImportController extends Controller {
 
@@ -29,6 +30,12 @@ class AirportImportController extends Controller {
             if(!isset($record[' BSS']) || !isset($record[' Time'])) {
                 continue;
             }
+            Device::updateOrCreate([
+                                       'bssid' => $record[' BSS'],
+                                   ], [
+                                       'ssid'     => $record['SSID'] ?? null,
+                                       'lastSeen' => Carbon::parse($validated['date'] . ' ' . $record[' Time'])->toIso8601String(),
+                                   ]);
             Scan::create([
                              'bssid'        => $record[' BSS'],
                              'ssid'         => $record['SSID'] ?? null,
