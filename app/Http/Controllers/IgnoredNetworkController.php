@@ -12,7 +12,7 @@ use App\Scan;
 class IgnoredNetworkController extends Controller {
     public function create(Request $request): JsonResponse {
         $validated = $request->validate([
-                                            'ssid'     => ['required', 'unique:ignored_networks,ssid'],
+                                            'ssid'     => ['required'],
                                             'contains' => ['nullable', 'gte:0', 'lte:1']
                                         ]);
         try {
