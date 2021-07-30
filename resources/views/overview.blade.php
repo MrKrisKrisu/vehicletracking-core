@@ -52,12 +52,12 @@
                                         <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
                                             <i class="fas fa-eye-slash"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-secondary"
+                                        <button class="btn btn-sm btn-secondary hideDevice"
                                                 onclick="hideDevice('{{$scan->device->id}}')">
                                             <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
                                         </button>
                                         @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
-                                            <button class="btn btn-sm btn-danger"
+                                            <button class="btn btn-sm btn-danger hideNetwork"
                                                     onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
                                                 <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
                                             </button>
@@ -113,7 +113,9 @@
             });
         }
 
-        function hideNetwork(ssid, contains = 0) {
+        function hideNetwork(ssid, contains = 0, id = 0) {
+            $('*[data-ssid="' + ssid + '"] .hideNetwork').prop("disabled", true);
+
             $.ajax({
                 url: '{{route('ignoredNetwork.create')}}',
                 type: "POST",
@@ -129,6 +131,8 @@
         }
 
         function hideDevice(id) {
+            $('*[data-deviceid="' + id + '"] .hideDevice').prop("disabled", true);
+
             $.ajax({
                 url: '{{route('device.update')}}',
                 type: "POST",
