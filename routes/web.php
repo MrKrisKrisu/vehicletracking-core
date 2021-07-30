@@ -10,6 +10,7 @@ use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\AirportImportController;
 
 Auth::routes(['register' => false]);
 
@@ -35,10 +36,13 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/unban/bssid', [VehicleController::class, 'unbanBSSID'])
          ->name('unban.bssid');
 
-    Route::get('/location', [LocationController::class, 'renderOverview'])
+    Route::get('/import', [LocationController::class, 'renderOverview'])
          ->name('location');
     Route::post('/location/import', [LocationController::class, 'importLocations'])
          ->name('location.import');
+
+    Route::post('/import/airport', [AirportImportController::class, 'import'])
+         ->name('import.airport');
 
     Route::post('/vehicle/create', [VehicleController::class, 'createVehicle'])
          ->name('vehicle.create');
