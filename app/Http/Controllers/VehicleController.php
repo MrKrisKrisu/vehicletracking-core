@@ -226,7 +226,7 @@ class VehicleController extends Controller {
                 abort(403);
             }
 
-            IgnoredNetwork::create(['ssid' => $validated['ssid']]);
+            IgnoredNetwork::firstOrCreate(['ssid' => $validated['ssid']]);
             Device::where('ssid', $validated['ssid'])
                   ->update(['ignore' => 1]);
             Scan::where('ssid', $validated['ssid'])
