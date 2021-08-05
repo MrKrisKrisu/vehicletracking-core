@@ -12,7 +12,7 @@
                             <label>Scanner</label>
                             <select class="form-control" name="device_id">
                                 <option value="">bitte wählen</option>
-                                @foreach(\App\ScanDevice::all() as $scanDevice)
+                                @foreach(auth()->user()->scanDevices as $scanDevice)
                                     <option value="{{$scanDevice->id}}">{{$scanDevice->name}}</option>
                                 @endforeach
                             </select>

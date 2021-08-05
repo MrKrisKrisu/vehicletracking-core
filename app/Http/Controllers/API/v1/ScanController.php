@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use App\Http\Controllers\IgnoredNetworkController;
 
 class ScanController extends Controller {
     /**
@@ -66,12 +67,7 @@ class ScanController extends Controller {
                                                  'lastSeen' => Carbon::now()
                                              ]);
 
-            //Check if network contains hide-keyword
-            $hiddenList = IgnoredNetwork::where('contains', 1)->select('ssid')->get()->pluck('ssid');
-            foreach($hiddenList as $ssid) {
-                if(str_contains(strtolower($scanElement['ssid']), strtolower($ssid)))
-                    $device->update(['ignore' => 1]);
-            }
+            IgnoredNetworkController::checkIfDeviceShouldBeHidden($device);
 
             $scan = Scan::create($scanElement);
             if(isset($scan->device->vehicle)) {

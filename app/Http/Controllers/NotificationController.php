@@ -9,31 +9,37 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Exception;
 
 class NotificationController extends Controller {
+
     public function renderNotifications(): Renderable {
         return view('notifications', [
-            'scanDevices' => ScanDevice::where('valid_until', null)
-                                       ->orWhere('valid_until', '<=', Carbon::now())
+            'scanDevices' => ScanDevice::where(function($query) {
+                $query->where('valid_until', null)
+                      ->orWhere('valid_until', '<=', Carbon::now());
+            })
+                                       ->where('user_id', auth()->user()->id)
                                        ->get()
         ]);
     }
 
     public function switchNotifications(Request $request): RedirectResponse {
         $validated = $request->validate([
-                                            'id' => ['required', 'exists:scan_devices,id']
+                                            'id' => ['required', 'exists:scan_devices,id', Rule::in(auth()->user()->scanDevices->pluck('id'))]
                                         ]);
 
         $scanDevice = ScanDevice::find($validated['id']);
         if($scanDevice->notify) {
             $scanDevice->update(['notify' => 0]);
-            self::notifyRaw('Benachrichtigungen von Scanner <i>' . $scanDevice->name . '</i> deaktiviert.');
+            $message = 'Benachrichtigungen von Scanner <i>' . $scanDevice->name . '</i> deaktiviert.';
         } else {
             $scanDevice->update(['notify' => 1]);
-            self::notifyRaw('Benachrichtigungen von Scanner <i>' . $scanDevice->name . '</i> aktiviert.');
+            $message = 'Benachrichtigungen von Scanner <i>' . $scanDevice->name . '</i> aktiviert.';
         }
-
-        return back();
+        self::notifyRaw($message);
+        return back()->with('alert-success', $message);
     }
 
     public static function notifyRaw(string $html) {
@@ -46,7 +52,7 @@ class NotificationController extends Controller {
                     'parse_mode' => 'HTML'
                 ]
             ]);
-        } catch(\Exception | GuzzleException $exception) {
+        } catch(Exception | GuzzleException $exception) {
             report($exception);
         }
     }

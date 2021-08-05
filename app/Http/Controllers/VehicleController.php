@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class VehicleController extends Controller {
 
@@ -232,7 +233,7 @@ class VehicleController extends Controller {
         }
     }
 
-    public function renderIgnored() {
+    public function renderIgnored(): View {
         return view('ignored', [
             'bssid' => Device::where('ignore', 1)->orderBy('updated_at', 'desc')->paginate(),
             'ssid'  => IgnoredNetwork::orderBy('created_at', 'desc')->paginate()

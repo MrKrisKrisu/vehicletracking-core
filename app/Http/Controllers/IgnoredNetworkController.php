@@ -6,6 +6,7 @@ use App\IgnoredNetwork;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Device;
 
 class IgnoredNetworkController extends Controller {
 
@@ -28,5 +29,21 @@ class IgnoredNetworkController extends Controller {
         } catch(Exception) {
             return response()->json(['success' => false], 400);
         }
+    }
+
+    private static $hiddenList = null;
+
+    public static function checkIfDeviceShouldBeHidden(Device $device): bool {
+        //Check if network contains hide-keyword
+        if(self::$hiddenList == null) {
+            self::$hiddenList = IgnoredNetwork::where('contains', 1)->select('ssid')->get()->pluck('ssid');
+        }
+        foreach(self::$hiddenList as $ssid) {
+            if(str_contains(strtolower($device->ssid), strtolower($ssid))) {
+                $device->update(['ignore' => 1]);
+                return true;
+            }
+        }
+        return false;
     }
 }

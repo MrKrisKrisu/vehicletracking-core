@@ -30,12 +30,15 @@ class AirportImportController extends Controller {
             if(!isset($record[' BSS']) || !isset($record[' Time'])) {
                 continue;
             }
-            Device::updateOrCreate([
-                                       'bssid' => $record[' BSS'],
-                                   ], [
-                                       'ssid'     => $record['SSID'] ?? null,
-                                       'lastSeen' => Carbon::parse($validated['date'] . ' ' . $record[' Time'])->toIso8601String(),
-                                   ]);
+            $device = Device::updateOrCreate([
+                                                 'bssid' => $record[' BSS'],
+                                             ], [
+                                                 'ssid'     => $record['SSID'] ?? null,
+                                                 'lastSeen' => Carbon::parse($validated['date'] . ' ' . $record[' Time'])->toIso8601String(),
+                                             ]);
+
+            IgnoredNetworkController::checkIfDeviceShouldBeHidden($device);
+            
             Scan::create([
                              'bssid'        => $record[' BSS'],
                              'ssid'         => $record['SSID'] ?? null,

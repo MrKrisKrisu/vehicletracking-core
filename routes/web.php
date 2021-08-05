@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\AirportImportController;
+use App\Http\Controllers\Frontend\User\SettingsController;
 
 Auth::routes(['register' => false]);
 
@@ -62,6 +63,11 @@ Route::middleware(['auth'])->group(function() {
         Route::post('/ignoredNetwork/create', [IgnoredNetworkController::class, 'create'])
              ->name('ignoredNetwork.create');
     });
+
+    Route::get('/settings', [SettingsController::class, 'renderSettings'])
+         ->name('user.settings');
+    Route::post('/settings/password', [SettingsController::class, 'changePassword'])
+         ->name('user.settings.password');
 });
 
 Route::view('/imprint', 'imprint')->name('imprint');
