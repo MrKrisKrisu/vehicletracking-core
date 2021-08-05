@@ -4,38 +4,38 @@ namespace App\Console\Commands;
 
 use App\Company;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Scan;
 
 class CreateExportData extends Command {
 
-    protected $signature   = 'ptt:export {path}';
+    protected $signature   = 'ptt:export';
     protected $description = 'Export data to json';
 
     public function handle(): int {
-        $exportPath = $this->argument('path');
+        $exportPath = public_path() . '/data';
 
-        if(!is_dir($exportPath)) {
-            Log::error("path is not a directory.");
-            dump("path is not a directory.");
-            return 1;
-        }
+        echo strtr('* Export files to :path', [':path' => $exportPath]) . PHP_EOL;
 
         $companies = Company::with(['vehicles.devices'])
                             ->where('name', '<>', 'Stationary')
                             ->get();
 
+        echo strtr('* Found :count companies.', [':count' => $companies->count()]) . PHP_EOL;
+
         foreach($companies as $company) {
 
-            $slug   = Str::slug($company->name, '_');
-            $export = [
+            echo strtr('* Export :name', [':name' => $company->name]) . PHP_EOL;
+
+            $export   = [
                 'company' => [
                     'name' => $company->name,
                 ]
             ];
+            $vehicles = $company->vehicles;
+            echo strtr('** Found :count vehicles', [':count' => $vehicles->count()]) . PHP_EOL;
 
-            foreach($company->vehicles as $vehicle) {
+            foreach($vehicles as $vehicle) {
                 $bssids = $vehicle->devices->pluck('bssid');
 
                 $lastPos = Scan::whereIn('bssid', $bssids)
@@ -60,8 +60,8 @@ class CreateExportData extends Command {
                 ];
             }
 
-            $path = $exportPath . '/' . $slug . '.json';
-            echo strtr('Save :count rows to :path' . PHP_EOL, [
+            $path = $exportPath . '/' . $company->slug . '.json';
+            echo strtr('*** Save :count rows to :path' . PHP_EOL, [
                 ':count' => count($export['vehicles']),
                 ':path'  => $path
             ]);

@@ -27,16 +27,28 @@
                                 attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
                             }).addTo(map);
 
-                            @foreach($positions as $position)
-                            L.marker([{{round($position->latitude, 3)}}, {{round($position->longitude, 3)}}], {
-                                icon: L.icon({
-                                    iconUrl: '/img/icons/{{$position->type ?? 'question'}}.svg',
-                                    iconSize: [40, 40],
-                                })
-                            })
-                                .bindPopup('<b>Fahrzeug <a href="{{route('vehicle', ['vehicle_id' => $position->vehicle_id])}}">{{$position->vehicle_name}}</a></b><br/>{{$position->timestamp}}')
-                                .addTo(map);
+                            @foreach($companies as $company)
+                            $.ajax({
+                                url: "/data/{{$company->slug}}.json",
+                                success: function (data) {
+                                    $.each(data.vehicles, function (k, vehicle) {
+                                        if (vehicle.last_position.length !== 0) {
+                                            L.marker([vehicle.last_position.latitude, vehicle.last_position.longitude], {
+                                                icon: L.icon({
+                                                    iconUrl: '/img/icons/' + vehicle.type + '.svg',
+                                                    iconSize: [40, 40],
+                                                })
+                                            })
+                                                .bindPopup('<b>Fahrzeug <a href="ROUTE TO VEHICLE">' + vehicle.name +
+                                                    '</a></b><br/>' + vehicle.last_position.timestamp
+                                                )
+                                                .addTo(map);
+                                        }
+                                    });
+                                }
+                            });
                             @endforeach
+
                         }
                     </script>
                 </div>

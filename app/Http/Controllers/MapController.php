@@ -13,12 +13,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Spatie\Sitemap\SitemapGenerator;
 use Spatie\Sitemap\Tags\Url;
+use App\Company;
 
 class MapController extends Controller {
     public function renderMap() {
-        $positions = self::getVehiclePositions();
+        //$positions = self::getVehiclePositions();
         return view('map.main', [
-            'positions' => $positions
+            'companies' => Company::all(),
         ]);
     }
 
