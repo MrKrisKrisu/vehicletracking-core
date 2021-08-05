@@ -53,7 +53,7 @@ class ScanController extends Controller {
 
             $scanElement['ssid'] = str_replace("\\x00", "", $scanElement['ssid']);
 
-            $scanElement['ssid']      = $scanElement['ssid'] == '' ? null : $scanElement['ssid'];
+            $scanElement['ssid']      = strlen($scanElement['ssid']) == 0 ? null : $scanElement['ssid'];
             $scanElement['latitude']  = ScanDeviceAuthentification::getDevice()?->latitude ?? null;
             $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()?->longitude ?? null;
 
@@ -66,35 +66,31 @@ class ScanController extends Controller {
                                                  'lastSeen' => Carbon::now()
                                              ]);
 
-            if($device->wasRecentlyCreated) {
-                $device->update([
-                                    'ignore' => IgnoredNetwork::where('ssid', $device->ssid)->count() > 0
-                                ]);
-            }
-
             //Check if network contains hide-keyword
-            //if($device->wasRecentlyCreated) {
             $hiddenList = IgnoredNetwork::where('contains', 1)->select('ssid')->get()->pluck('ssid');
             foreach($hiddenList as $ssid) {
                 if(str_contains(strtolower($scanElement['ssid']), strtolower($ssid)))
                     $device->update(['ignore' => 1]);
             }
-            //}
 
             $scan = Scan::create($scanElement);
             if(isset($scan->device->vehicle)) {
                 $vehicle = $scan->device->vehicle;
-                if($vehicle->company->name != 'Stationary')
+                if($vehicle->company->name != 'Stationary') {
                     $verified[$vehicle->id] = [
                         'company' => $vehicle->company->name,
                         'vehicle' => $vehicle->vehicle_name
                     ];
-            } else
-                foreach($scan->device->scans->whereNotNull('vehicle_name')->pluck('vehicle_name') as $possibleRow)
-                    foreach(explode(',', $possibleRow) as $possible)
-                        if(!in_array($possible, $unverified))
+                }
+            } else {
+                foreach($scan->device->scans->whereNotNull('vehicle_name')->pluck('vehicle_name') as $possibleRow) {
+                    foreach(explode(',', $possibleRow) as $possible) {
+                        if(!in_array($possible, $unverified)) {
                             $unverified[] = $possible;
-
+                        }
+                    }
+                }
+            }
         }
 
         sort($unverified);

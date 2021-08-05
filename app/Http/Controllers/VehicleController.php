@@ -26,24 +26,28 @@ class VehicleController extends Controller {
 
         $lastScansQ = Scan::join('devices', 'devices.bssid', '=', 'scans.bssid')
                           ->with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
+                          ->whereIn('scanDeviceId', auth()->user()->scanDevices->pluck('id'))
                           ->where('devices.ignore', 0)
                           ->where('scans.hidden', 0)
                           ->where('scans.created_at', '>', Carbon::now()->subMonths(3)->toIso8601String())
                           ->whereNotIn('scans.bssid', $hiddenBssids)
-            //->whereNotIn('scans.ssid', $hiddenSsids)
+                          ->whereNotIn('scans.ssid', $hiddenSsids)
                           ->select('scans.*')
-                          ->orderBy('scans.created_at', 'desc');
+                          ->orderByDesc('scans.created_at');
 
-        if(isset($request->device))
+        if(isset($request->device)) {
             $lastScansQ->where('scanDeviceId', $request->device);
+        }
 
         $lastScans = $lastScansQ->simplePaginate(80);
 
         $possibleVehicles = [];
         $bssidList        = [];
-        foreach($lastScans as $scan)
-            if(!in_array($scan->bssid, $bssidList))
+        foreach($lastScans as $scan) {
+            if(!in_array($scan->bssid, $bssidList)) {
                 $bssidList[] = $scan->bssid;
+            }
+        }
 
         $scans = Scan::whereIn('bssid', $bssidList)
                      ->where('vehicle_name', '<>', null)
@@ -216,21 +220,14 @@ class VehicleController extends Controller {
         if($validated['ban'] == 'bssid') {
             Device::where('bssid', $validated['bssid'])
                   ->update(['ignore' => 1]);
-            Scan::where('bssid', $validated['bssid'])
-                ->update(['hidden' => 1]);
-
             return back()->with('alert-success', 'Das Netzwerk wird jetzt ignoriert.');
         } elseif($validated['ban'] == 'ssid') {
 
-            if(in_array(strtolower($validated['ssid']), ['wifi@db', 'fahrgastfernsehen', 'uestra_regiobus_freewlan', 'wfb intern', 'westfalenbahn', 'wifionice', 'enno_wifi'])) {
+            if(in_array(strtolower($validated['ssid']), ['kvv-swlan', 'kvv-wlan', 'wifi@db', 'fahrgastfernsehen', 'uestra_regiobus_freewlan', 'wfb intern', 'westfalenbahn', 'wifionice', 'enno_wifi'])) {
                 abort(403);
             }
 
             IgnoredNetwork::firstOrCreate(['ssid' => $validated['ssid']]);
-            Device::where('ssid', $validated['ssid'])
-                  ->update(['ignore' => 1]);
-            Scan::where('ssid', $validated['ssid'])
-                ->update(['hidden' => 1]);
             return back()->with('alert-success', 'Der Netzwerkname wird jetzt ignoriert.');
         }
     }
