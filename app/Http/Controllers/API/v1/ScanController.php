@@ -6,7 +6,6 @@ use App\Device;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\ScanDeviceAuthentification;
-use App\IgnoredNetwork;
 use App\Scan;
 use App\ScanDevice;
 use Carbon\Carbon;
@@ -38,6 +37,7 @@ class ScanController extends Controller {
             '*.channel'      => ['nullable', 'numeric'],
             '*.latitude'     => ['nullable', 'numeric'],
             '*.longitude'    => ['nullable', 'numeric'],
+            '*.created_at'   => ['nullable', 'date'],
         ]);
 
         if($validator->fails()) {
