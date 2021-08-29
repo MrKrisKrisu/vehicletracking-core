@@ -48,7 +48,7 @@
                                             <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
                                             </small><br/>
                                         @endisset
-
+<div class="btn-group">
                                         <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
                                             <i class="fas fa-eye-slash"></i>
                                         </button>
@@ -62,6 +62,7 @@
                                                 <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
                                             </button>
                                         @endif
+                                        </div>
                                     </td>
                                     <td style="min-width: 50%;">
                                         <div class="form-check">
