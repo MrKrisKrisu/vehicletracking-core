@@ -48,20 +48,21 @@
                                             <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}
                                             </small><br/>
                                         @endisset
-<div class="btn-group">
-                                        <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
-                                            <i class="fas fa-eye-slash"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-secondary hideDevice"
-                                                onclick="hideDevice('{{$scan->device->id}}')">
-                                            <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
-                                        </button>
-                                        @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
-                                            <button class="btn btn-sm btn-danger hideNetwork"
-                                                    onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
-                                                <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
+                                                <i class="fas fa-eye-slash"></i>
                                             </button>
-                                        @endif
+                                            <button class="btn btn-sm btn-secondary hideDevice"
+                                                    onclick="hideDevice('{{$scan->device->id}}')">
+                                                <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
+                                            </button>
+                                            @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
+                                                <button class="btn btn-sm btn-danger hideNetwork"
+                                                        onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
+                                                    <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                     <td style="min-width: 50%;">
