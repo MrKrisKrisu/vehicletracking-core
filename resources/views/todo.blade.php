@@ -138,6 +138,15 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>Fahrzeugtyp</label>
+                            <select class="form-control" name="type" required>
+                                <option value="">bitte wählen</option>
+                                <option value="bus">Bus</option>
+                                <option value="tram">Straßen-/Stadtbahn</option>
+                                <option value="train">Eisenbahn</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Bezeichnung</label>
                             <input type="text" class="form-control" placeholder="Vehicle name" required
                                    name="vehicle_name">
