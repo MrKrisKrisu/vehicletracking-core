@@ -327,12 +327,18 @@ class VehicleController extends Controller {
     public function hideAll(Request $request): RedirectResponse {
         $validated = $request->validate([
                                             'scanDeviceId' => ['required', 'exists:scan_devices,id'],
+                                            'onlyWithName' => ['nullable'],
                                         ]);
 
-        Scan::where('scanDeviceId', $validated['scanDeviceId'])
-            ->where('hidden', '0')
-            ->update(['hidden' => 1]);
+        $query = Scan::where('scanDeviceId', $validated['scanDeviceId'])
+                     ->where('hidden', '0');
 
-        return back()->with('alert-success', 'Alles als erledigt markiert.');
+        if(isset($validated['onlyWithName'])) {
+            $query->whereNotNull('vehicle_name');
+        }
+
+        $rows = $query->update(['hidden' => 1]);
+
+        return back()->with('alert-success', $rows . ' Scans als erledigt markiert.');
     }
 }

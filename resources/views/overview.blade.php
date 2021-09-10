@@ -111,6 +111,9 @@
                                 @csrf
                                 <input type="hidden" name="scanDeviceId" value="{{request()->device}}"/>
                                 <button type="submit" class="btn btn-sm btn-secondary">Alle verstecken</button>
+                                <button type="submit" class="btn btn-sm btn-secondary" name="onlyWithName" value="1">
+                                    Gefundene verstecken
+                                </button>
                             </form>
                         @endif
                     @endif
