@@ -329,7 +329,9 @@ class VehicleController extends Controller {
                                             'scanDeviceId' => ['required', 'exists:scan_devices,id'],
                                         ]);
 
-        Scan::where('scanDeviceId', $validated['scanDeviceId'])->update(['hidden' => 1]);
+        Scan::where('scanDeviceId', $validated['scanDeviceId'])
+            ->where('hidden', '0')
+            ->update(['hidden' => 1]);
 
         return back()->with('alert-success', 'Alles als erledigt markiert.');
     }
