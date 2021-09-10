@@ -28,13 +28,22 @@ class VehicleController extends Controller {
         $lastScansQ = Scan::join('devices', 'devices.bssid', '=', 'scans.bssid')
                           ->with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
                           ->whereIn('scanDeviceId', auth()->user()->scanDevices->pluck('id'))
-                          ->where('devices.ignore', 0)
-                          ->where('scans.hidden', 0)
                           ->where('scans.created_at', '>', Carbon::now()->subMonths(3)->toIso8601String())
-                          ->whereNotIn('scans.bssid', $hiddenBssids)
-                          ->whereNotIn('scans.ssid', $hiddenSsids)
                           ->select('scans.*')
                           ->orderByDesc('scans.created_at');
+
+        if((session()->get('show-verified') ?? '0') == '0') {
+            $lastScansQ->whereNull('devices.vehicle_id');
+        }
+
+        if((session()->get('show-hidden') ?? '0') != '1') {
+            $lastScansQ->where('scans.hidden', 0);
+        }
+
+        if((session()->get('show-ignored') ?? '0') != '1') {
+            $lastScansQ->whereNotIn('scans.bssid', $hiddenBssids)
+                       ->whereNotIn('scans.ssid', $hiddenSsids);
+        }
 
         if(isset($request->device)) {
             $lastScansQ->where('scanDeviceId', $request->device);

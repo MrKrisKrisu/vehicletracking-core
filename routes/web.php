@@ -1,17 +1,17 @@
 <?php
 
+use App\Http\Controllers\AirportImportController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\Frontend\User\SettingsController;
 use App\Http\Controllers\IgnoredNetworkController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\AirportImportController;
-use App\Http\Controllers\Frontend\User\SettingsController;
 
 Auth::routes(['register' => false]);
 
@@ -68,6 +68,8 @@ Route::middleware(['auth'])->group(function() {
          ->name('user.settings');
     Route::post('/settings/password', [SettingsController::class, 'changePassword'])
          ->name('user.settings.password');
+
+    Route::post('/save-to-session', [SettingsController::class, 'saveToSession'])->name('save-to-session');
 });
 
 Route::view('/imprint', 'imprint')->name('imprint');

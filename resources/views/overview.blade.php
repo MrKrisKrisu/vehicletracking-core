@@ -14,6 +14,22 @@
                         <a href="/?device={{$device->id}}" class="btn btn-sm btn-primary">{{$device->name}}</a>
                     @endforeach
                     <hr/>
+                    <form method="POST" action="{{route('save-to-session')}}">
+                        @csrf
+                        <button class="btn btn-sm {{session()->get('show-verified') == '1' ? 'btn-success' : 'btn-danger'}}"
+                                name="show-verified" value="{{session()->get('show-verified') == '1' ? '0' : '1'}}">
+                            verifizierte
+                        </button>
+                        <button class="btn btn-sm {{session()->get('show-hidden') == '1' ? 'btn-success' : 'btn-danger'}}"
+                                name="show-hidden" value="{{session()->get('show-hidden') == '1' ? '0' : '1'}}">
+                            versteckte
+                        </button>
+                        <button class="btn btn-sm {{session()->get('show-ignored') == '1' ? 'btn-success' : 'btn-danger'}}"
+                                name="show-ignored" value="{{session()->get('show-ignored') == '1' ? '0' : '1'}}">
+                            ignorierte
+                        </button>
+                    </form>
+                    <hr/>
                     <h5 class="card-title">{{__('Last scans')}}</h5>
 
                     @if($lastScan->count() == 0)
