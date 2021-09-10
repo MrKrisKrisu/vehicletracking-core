@@ -18,12 +18,7 @@ use Illuminate\View\View;
 class VehicleController extends Controller {
 
     public function render(Request $request): Renderable {
-        $hiddenBssids = Device::join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
-                              ->join('companies', 'companies.id', '=', 'vehicles.company_id')
-                              ->where('companies.name', 'Stationary')
-                              ->select('devices.bssid');
 
-        $hiddenSsids = IgnoredNetwork::select('ssid');
 
         $lastScansQ = Scan::join('devices', 'devices.bssid', '=', 'scans.bssid')
                           ->with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
@@ -32,15 +27,22 @@ class VehicleController extends Controller {
                           ->select('scans.*')
                           ->orderByDesc('scans.created_at');
 
-        if((session()->get('show-verified') ?? '0') == '0') {
+        if(session()->get('show-verified', '0') == '0') {
             $lastScansQ->whereNull('devices.vehicle_id');
         }
 
-        if((session()->get('show-hidden') ?? '0') != '1') {
+        if(session()->get('show-hidden', '0') != '1') {
             $lastScansQ->where('scans.hidden', 0);
         }
 
-        if((session()->get('show-ignored') ?? '0') != '1') {
+        if(session()->get('show-ignored', '0') != '1') {
+            $hiddenBssids = Device::join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
+                                  ->join('companies', 'companies.id', '=', 'vehicles.company_id')
+                                  ->where('companies.name', 'Stationary')
+                                  ->select('devices.bssid');
+
+            $hiddenSsids = IgnoredNetwork::select('ssid');
+
             $lastScansQ->whereNotIn('scans.bssid', $hiddenBssids)
                        ->whereNotIn('scans.ssid', $hiddenSsids);
         }
