@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function() {
          ->name('user.settings.password');
 
     Route::post('/save-to-session', [SettingsController::class, 'saveToSession'])->name('save-to-session');
+    Route::post('/hideAll', [VehicleController::class, 'hideAll'])->name('hide-all');
 });
 
 Route::view('/imprint', 'imprint')->name('imprint');

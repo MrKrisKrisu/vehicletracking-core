@@ -320,4 +320,14 @@ class VehicleController extends Controller {
 
         return back()->with('alert-success', 'Die Zuweisung wurde bis zur nächsten Sichtung aufgeschoben.');
     }
+
+    public function hideAll(Request $request): RedirectResponse {
+        $validated = $request->validate([
+                                            'scanDeviceId' => ['required', 'exists:scan_devices,id'],
+                                        ]);
+
+        Scan::where('scanDeviceId', $validated['scanDeviceId'])->update(['hidden' => 1]);
+
+        return back()->with('alert-success', 'Alles als erledigt markiert.');
+    }
 }

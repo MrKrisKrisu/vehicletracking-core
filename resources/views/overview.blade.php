@@ -37,7 +37,6 @@
                             <i class="fas fa-check"></i> Alles abgearbeitet.
                         </p>
                     @else
-
                         <table class="table">
                             @foreach ($lastScan as $scan)
                                 <tr id="scan{{$scan->id}}" data-ssid="{{$scan->ssid}}"
@@ -106,6 +105,14 @@
                         </table>
                         {{$lastScan->links()}}
 
+                        @if(isset(request()->device))
+                            <hr/>
+                            <form method="POST" action="{{route('hide-all')}}">
+                                @csrf
+                                <input type="hidden" name="scanDeviceId" value="{{request()->device}}"/>
+                                <button type="submit" class="btn btn-sm btn-secondary">Alle verstecken</button>
+                            </form>
+                        @endif
                     @endif
                 </div>
             </div>
