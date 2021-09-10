@@ -44,7 +44,8 @@ class VehicleController extends Controller {
             $hiddenSsids = IgnoredNetwork::select('ssid');
 
             $lastScansQ->whereNotIn('scans.bssid', $hiddenBssids)
-                       ->whereNotIn('scans.ssid', $hiddenSsids);
+                       ->whereNotIn('scans.ssid', $hiddenSsids)
+                       ->where('devices.ignore', '0');
         }
 
         if(isset($request->device)) {
