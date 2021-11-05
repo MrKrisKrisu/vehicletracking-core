@@ -8,6 +8,7 @@ use App\IgnoredNetwork;
 use App\Scan;
 use App\Vehicle;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -98,20 +99,22 @@ class VehicleController extends Controller {
     }
 
     public static function verify(): View|RedirectResponse {
+        $deviceIds = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
+                           ->whereNull('devices.vehicle_id')
+                           ->whereNotNull('scans.vehicle_name')
+                           ->groupBy(['devices.id'])
+                           ->select('devices.id')
+                           ->having(DB::raw('COUNT(*)'), '>', 1);
 
         $devices = Device::with(['scans'])
-                         ->join('scans', 'devices.bssid', '=', 'scans.bssid')
-                         ->where('devices.vehicle_id', null)
-                         ->where('scans.vehicle_name', '<>', null)
-                         ->groupBy('devices.id')
-                         ->having(DB::raw('count(*)'), '>', 1)
-                         ->select('devices.*')
+                         ->whereIn('id', $deviceIds)
                          ->get()
                          ->filter(function($device) {
-                             if($device->scans->where('vehicle_name', '<>', null)->count() < 2)
+                             if($device->scans->where('vehicle_name', '<>', null)->count() < 2) {
                                  return false;
+                             }
                              $lastScan = $device->scans->where('vehicle_name', '<>', null)->max('created_at');
-                             return $device->moveVerifyUntil == null || ($lastScan != null && $lastScan->isAfter($device->moveVerifyUntil));
+                             return $device->moveVerifyUntil === null || ($lastScan !== null && $lastScan->isAfter($device->moveVerifyUntil));
                          })
                          ->sortByDesc(function($device) {
                              return $device->scans->where('vehicle_name', '<>', null)->max('created_at');
@@ -120,7 +123,7 @@ class VehicleController extends Controller {
         $count  = $devices->count();
         $device = $devices->first();
 
-        if($device == null) {
+        if($device === null) {
             return redirect()->route('dashboard')
                              ->with('alert-info', 'Es gibt aktuell keine Geräte zum verifizieren.');
         }
@@ -155,8 +158,9 @@ class VehicleController extends Controller {
     public static function renderVehicle(int $vehicleId, int $page = 1): Renderable {
         $vehicle = Vehicle::with(['company', 'devices.scans'])->findOrFail($vehicleId);
 
-        if($vehicle->company->name == 'Stationary')
+        if($vehicle->company->name === 'Stationary') {
             abort(404);
+        }
 
         $allScans = collect();
         foreach($vehicle->devices as $device)
@@ -224,6 +228,9 @@ class VehicleController extends Controller {
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function ignoreDevice(Request $request): RedirectResponse {
         $validated = $request->validate([
                                             'bssid' => ['required', 'exists:devices,bssid'],
@@ -231,11 +238,13 @@ class VehicleController extends Controller {
                                             'ban'   => ['required', Rule::in(['bssid', 'ssid'])]
                                         ]);
 
-        if($validated['ban'] == 'bssid') {
+        if($validated['ban'] === 'bssid') {
             Device::where('bssid', $validated['bssid'])
                   ->update(['ignore' => 1]);
             return back()->with('alert-success', 'Das Netzwerk wird jetzt ignoriert.');
-        } elseif($validated['ban'] == 'ssid') {
+        }
+
+        if($validated['ban'] === 'ssid') {
 
             if(in_array(strtolower($validated['ssid']), ['kvv-swlan', 'kvv-wlan', 'wifi@db', 'fahrgastfernsehen', 'uestra_regiobus_freewlan', 'wfb intern', 'westfalenbahn', 'wifionice', 'enno_wifi'])) {
                 abort(403);
@@ -244,6 +253,7 @@ class VehicleController extends Controller {
             IgnoredNetwork::firstOrCreate(['ssid' => $validated['ssid']]);
             return back()->with('alert-success', 'Der Netzwerkname wird jetzt ignoriert.');
         }
+        throw new Exception();
     }
 
     public function renderIgnored(): View {
@@ -281,7 +291,7 @@ class VehicleController extends Controller {
                                             'contains' => ['nullable']
                                         ]);
 
-        $validated['contains'] = isset($validated['contains']) && $validated['contains'] == 'on' ? 1 : 0;
+        $validated['contains'] = isset($validated['contains']) && $validated['contains'] === 'on' ? 1 : 0;
         IgnoredNetwork::create($validated);
 
         return back();
@@ -308,8 +318,10 @@ class VehicleController extends Controller {
         $validated['moveVerifyUntil'] = null;
 
         Device::find($validated['id'])->update($validated);
+        $vehicle = Vehicle::find($validated['vehicle_id']);
 
-        return back()->with('alert-success', 'Das Gerät wurde dem Fahrzeug zugewiesen.');
+        return back()->with('alert-success', 'Der AP wurde dem Fahrzeug zugewiesen.')
+                     ->with('last_vehicle', $vehicle);
     }
 
     public function skipAssignment(Request $request): RedirectResponse {
