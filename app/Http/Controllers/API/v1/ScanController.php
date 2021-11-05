@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Device;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\IgnoredNetworkController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\ScanDeviceAuthentification;
 use App\Scan;
@@ -13,7 +14,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use App\Http\Controllers\IgnoredNetworkController;
 
 class ScanController extends Controller {
     /**
@@ -54,10 +54,13 @@ class ScanController extends Controller {
 
             $scanElement['ssid'] = str_replace("\\x00", "", $scanElement['ssid']);
 
-            $scanElement['ssid']      = strlen($scanElement['ssid']) == 0 ? null : $scanElement['ssid'];
-            $scanElement['latitude']  = ScanDeviceAuthentification::getDevice()?->latitude ?? null;
-            $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()?->longitude ?? null;
-
+            $scanElement['ssid'] = strlen($scanElement['ssid']) == 0 ? null : $scanElement['ssid'];
+            if(!isset($scanElement['latitude'])) {
+                $scanElement['latitude'] = ScanDeviceAuthentification::getDevice()?->latitude ?? null;
+            }
+            if(!isset($scanElement['longitude'])) {
+                $scanElement['longitude'] = ScanDeviceAuthentification::getDevice()?->longitude ?? null;
+            }
             $scanElement['bssid'] = strtoupper($scanElement['bssid']);
 
             $device = Device::updateOrCreate([
@@ -72,7 +75,7 @@ class ScanController extends Controller {
             $scan = Scan::create($scanElement);
             if(isset($scan->device->vehicle)) {
                 $vehicle = $scan->device->vehicle;
-                if($vehicle->company->name != 'Stationary') {
+                if($vehicle->company->name !== 'Stationary') {
                     $verified[$vehicle->id] = [
                         'company' => $vehicle->company->name,
                         'vehicle' => $vehicle->vehicle_name
