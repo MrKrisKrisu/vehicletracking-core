@@ -7,7 +7,8 @@
         <div class="col-md-12">
             <div class="card" style="margin-bottom: 10px;">
                 <div class="card-body">
-                    <small>Die Daten der Sichtungen und Standortinformationen wurden automatisch durch installierte und
+                    <small>Die Daten der Lokalisierungen und Standortinformationen wurden automatisch durch installierte
+                        und
                         mobile Scanner erfasst. Die Genauigkeit der Standortinformationen wurde künstlich auf 111 Meter
                         verschlechtert.</small>
                 </div>
@@ -39,7 +40,7 @@
                                                     iconSize: [40, 40],
                                                 })
                                             })
-                                                .bindPopup('<b>Fahrzeug <a href="ROUTE TO VEHICLE">' + vehicle.name +
+                                                .bindPopup('<b>Fahrzeug <a href="/vehicle/' + vehicle.id + '">' + vehicle.name +
                                                     '</a></b><br/>' + vehicle.last_position.timestamp
                                                 )
                                                 .addTo(map);

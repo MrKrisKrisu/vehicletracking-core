@@ -333,7 +333,7 @@ class VehicleController extends Controller {
                                                    'moveVerifyUntil' => Carbon::now()
                                                ]);
 
-        return back()->with('alert-success', 'Die Zuweisung wurde bis zur nächsten Sichtung aufgeschoben.');
+        return back()->with('alert-success', 'Die Zuweisung wurde bis zur nächsten Lokalisierung aufgeschoben.');
     }
 
     public function hideAll(Request $request): RedirectResponse {

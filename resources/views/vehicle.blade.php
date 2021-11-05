@@ -16,7 +16,7 @@
         <div class="col-md-12">
             <div class="card" style="margin-bottom: 10px;">
                 <div class="card-body">
-                    <small>Die Daten der Sichtungen und Standortinformationen wurden automatisch durch installierte und
+                    <small>Die Daten der Lokalisierungen und Standortinformationen wurden automatisch durch installierte und
                         mobile Scanner erfasst. Die Genauigkeit der Standortinformationen wurde künstlich auf 111 Meter
                         verschlechtert.</small>
                 </div>
@@ -25,7 +25,7 @@
         <div class="col-md-6">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Letzte Sichtungen</h5>
+                    <h5 class="card-title">Letzte Lokalisierungen</h5>
                     <div class="d-flex justify-content-between align-items-center">
                         <table class="table">
                             <thead>
@@ -96,7 +96,7 @@
         <div class="col-md-12">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
-                    <h5 class="card-title">Sichtungen nach Tag</h5>
+                    <h5 class="card-title">Lokalisierungen nach Tag</h5>
 
                     <table class="table table-sm text-center">
                         <thead>
