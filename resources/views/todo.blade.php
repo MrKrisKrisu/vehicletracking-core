@@ -63,7 +63,7 @@
                                             <br/>
                                             <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
                                         @endisset
-                                        @if($scan->latitude != null && $scan->longitude != null)
+                                        @if($scan->latitude !== null && $scan->longitude !== null)
                                             <br/>
                                             <small>
                                                 <i class="fas fa-location-arrow"></i>
@@ -71,6 +71,13 @@
                                                    target="_blank">
                                                     {{$scan->latitude}}, {{$scan->longitude}}
                                                 </a>
+                                            </small>
+                                        @endif
+                                        @if($scan?->speed !== null)
+                                            <br/>
+                                            <small>
+                                                <i class="fas fa-tachometer-alt"></i>
+                                                {{$scan->speed}} km/h
                                             </small>
                                         @endif
                                     </td>
