@@ -3,25 +3,18 @@
 namespace Database\Factories;
 
 use App\Device;
+use App\Vehicle;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DeviceFactory extends Factory {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
+
     protected $model = Device::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition() {
+    public function definition(): array {
         return [
-            'bssid' => $this->faker->macAddress,
-            'ssid'  => $this->faker->word
+            'bssid'      => $this->faker->macAddress,
+            'ssid'       => $this->faker->word,
+            'vehicle_id' => $this->faker->boolean ? Vehicle::inRandomOrder()->first()->id : null,
         ];
     }
 }

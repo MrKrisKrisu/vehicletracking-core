@@ -2,11 +2,15 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Vehicle extends Model {
+
+    use HasFactory;
 
     protected $fillable = [
         'company_id', 'vehicle_name', 'type',
@@ -30,6 +34,18 @@ class Vehicle extends Model {
 
     public function devices(): HasMany {
         return $this->hasMany(Device::class, 'vehicle_id', 'id');
+    }
+
+    public function uicType(): BelongsTo {
+        return $this->belongsTo(UicType::class, 'uic_type_code', 'id');
+    }
+
+    public function uicCountry(): BelongsTo {
+        return $this->belongsTo(UicCountry::class, 'uic_country_code', 'id');
+    }
+
+    public function uicSeries(): BelongsTo {
+        return $this->belongsTo(UicSeries::class, 'uic_series_number', 'id');
     }
 
     public function getUicAttribute(): string {

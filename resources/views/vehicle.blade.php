@@ -65,6 +65,28 @@
         </div>
 
         <div class="col-md-6">
+            @if($vehicle->hasUic)
+                <div class="card mb-4 box-shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Fahrzeuginformationen</h5>
+                        <table class="table">
+                            <tr>
+                                <td class="font-weight-bold">Bauart</td>
+                                <td>{{$vehicle->uic_type_code}} {{$vehicle->uicType?->description}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-bold">Land</td>
+                                <td>{{$vehicle->uic_country_code}} {{$vehicle->uicCountry?->description}}</td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-bold">Baureihe</td>
+                                <td>{{$vehicle->uic_series_number}} {{$vehicle->uicSeries?->description}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
                     <h5 class="card-title">Letzter bekannter Standort</h5>
