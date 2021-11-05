@@ -37,7 +37,7 @@ class ScanController extends Controller {
             '*.channel'            => ['nullable', 'numeric'],
             '*.latitude'           => ['nullable', 'numeric'],
             '*.longitude'          => ['nullable', 'numeric'],
-            '*.speed'              => ['nullable', 'numeric', 'gte:0', 'lte:500'],
+            '*.speed'              => ['nullable', 'numeric'],
             '*.connectivity_state' => ['nullable', 'max:255'],
             '*.created_at'         => ['nullable', 'date'],
         ]);
