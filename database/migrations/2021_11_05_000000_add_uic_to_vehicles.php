@@ -8,7 +8,7 @@ class AddUicToVehicles extends Migration {
 
     public function up(): void {
         Schema::table('vehicles', function(Blueprint $table) {
-            $table->unsignedTinyInteger('uic_operator_id')->nullable()->after('type');
+            $table->string('uic_operator_id', 10)->nullable()->after('type');
             $table->unsignedTinyInteger('uic_check_number')->nullable()->after('type');
             $table->unsignedSmallInteger('uic_order_number')->nullable()->after('type');
             $table->unsignedSmallInteger('uic_series_number')->nullable()->after('type');
