@@ -26,18 +26,20 @@ class ScanController extends Controller {
      */
     public function scan(Request $request): JsonResponse {
         $validator = Validator::make($request->all(), [
-            '*.vehicle_name' => ['nullable', 'max:255'],
-            '*.bssid'        => ['required', 'regex:/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/'],
-            '*.ssid'         => ['nullable', 'max:255'],
-            '*.signal'       => ['nullable', 'numeric'],
-            '*.quality'      => ['nullable'],
-            '*.frequency'    => ['nullable', 'numeric'],
-            '*.bitrates'     => ['nullable', 'numeric'],
-            '*.encrypted'    => ['nullable', 'boolean'],
-            '*.channel'      => ['nullable', 'numeric'],
-            '*.latitude'     => ['nullable', 'numeric'],
-            '*.longitude'    => ['nullable', 'numeric'],
-            '*.created_at'   => ['nullable', 'date'],
+            '*.vehicle_name'       => ['nullable', 'max:255'],
+            '*.bssid'              => ['required', 'regex:/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/'],
+            '*.ssid'               => ['nullable', 'max:255'],
+            '*.signal'             => ['nullable', 'numeric'],
+            '*.quality'            => ['nullable'],
+            '*.frequency'          => ['nullable', 'numeric'],
+            '*.bitrates'           => ['nullable', 'numeric'],
+            '*.encrypted'          => ['nullable', 'boolean'],
+            '*.channel'            => ['nullable', 'numeric'],
+            '*.latitude'           => ['nullable', 'numeric'],
+            '*.longitude'          => ['nullable', 'numeric'],
+            '*.speed'              => ['nullable', 'numeric', 'gte:0', 'lte:500'],
+            '*.connectivity_state' => ['nullable', 'max:255'],
+            '*.created_at'         => ['nullable', 'date'],
         ]);
 
         if($validator->fails()) {
