@@ -98,6 +98,9 @@
                                 @foreach(\App\Vehicle::with(['company'])->get()->sortBy(['company.name', 'vehicle_name']) as $vehicle)
                                     <option value="{{$vehicle->id}}">
                                         {{$vehicle->company->name}} // {{$vehicle->vehicle_name}}
+                                        @if($vehicle->hasUic)
+                                            ({{$vehicle->uic}})
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>

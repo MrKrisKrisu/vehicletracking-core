@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Company;
-use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use App\Scan;
+use Illuminate\Console\Command;
 
 class CreateExportData extends Command {
 
@@ -44,7 +43,7 @@ class CreateExportData extends Command {
                                ->orderByDesc('created_at')
                                ->first();
 
-                if($lastPos != null) {
+                if($lastPos !== null) {
                     $lastPos = [
                         'latitude'  => round($lastPos->latitude, 3),
                         'longitude' => round($lastPos->longitude, 3),
@@ -52,12 +51,17 @@ class CreateExportData extends Command {
                     ];
                 }
 
-                $export['vehicles'][] = [
+                $vehicleExport = [
                     'name'          => $vehicle->vehicle_name,
                     'type'          => $vehicle->type,
                     'bssid'         => $bssids,
                     'last_position' => $lastPos ?? [],
                 ];
+
+                if($vehicle->hasUic) {
+                    $vehicleExport['uic'] = $vehicle->uic;
+                }
+                $export['vehicles'][] = $vehicleExport;
             }
 
             $path = $exportPath . '/' . $company->slug . '.json';

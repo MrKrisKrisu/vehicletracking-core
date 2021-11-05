@@ -5,7 +5,12 @@
 @section('jumbotron')
     <section class="jumbotron text-center">
         <div class="container">
-            <h1 class="jumbotron-heading">Fahrzeug "{{$vehicle->vehicle_name}}"</h1>
+            <h1 class="jumbotron-heading">
+                Fahrzeug "{{$vehicle->vehicle_name}}"
+                @if($vehicle->hasUic)
+                    <br/><small>{{$vehicle->uic}}</small>
+                @endif
+            </h1>
             <p class="lead text-muted"><i>{{$vehicle->company->name}}</i></p>
         </div>
     </section>
@@ -16,9 +21,11 @@
         <div class="col-md-12">
             <div class="card" style="margin-bottom: 10px;">
                 <div class="card-body">
-                    <small>Die Daten der Lokalisierungen und Standortinformationen wurden automatisch durch installierte und
-                        mobile Scanner erfasst. Die Genauigkeit der Standortinformationen wurde künstlich auf 111 Meter
-                        verschlechtert.</small>
+                    <small>
+                        Die Daten der Lokalisierungen und Standortinformationen wurden automatisch durch installierte
+                        und mobile Scanner erfasst. Die Genauigkeit der Standortinformationen wurde künstlich auf 111
+                        Meter verschlechtert.
+                    </small>
                 </div>
             </div>
         </div>
