@@ -113,6 +113,13 @@
                         <button type="submit" form="formSkip" class="btn btn-danger">
                             Aufschieben
                         </button>
+                        @if(session()->has('lastVehicle'))
+                            <hr/>
+                            <button type="submit" name="vehicle_id" value="{{session()->get('lastVehicle')->id}}"
+                                    class="btn btn-sm btn-primary btn-block">
+                                {{session()->get('lastVehicle')->vehicle_name}}
+                            </button>
+                        @endif
                     </form>
 
                     <form method="POST" id="formSkip" action="{{route('vehicle.assign.skip')}}">

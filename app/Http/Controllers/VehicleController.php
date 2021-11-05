@@ -321,7 +321,7 @@ class VehicleController extends Controller {
         $vehicle = Vehicle::find($validated['vehicle_id']);
 
         return back()->with('alert-success', 'Der AP wurde dem Fahrzeug zugewiesen.')
-                     ->with('last_vehicle', $vehicle);
+                     ->with('lastVehicle', $vehicle);
     }
 
     public function skipAssignment(Request $request): RedirectResponse {
