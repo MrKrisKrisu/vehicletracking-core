@@ -8,7 +8,7 @@
                     <div class="row">
                         <div class="col">
                             <b>SSID</b><br/>
-                            <span>{{$device->ssid}}</span>
+                            <span>{{stripcslashes($device->ssid)}}</span>
                         </div>
                         <div class="col">
                             <b>BSSID</b><br/>
@@ -41,7 +41,13 @@
                             <tbody>
                                 @foreach($device->scans->where('vehicle_name', '<>', null) as $scan)
                                     <tr>
-                                        <td><small>{{$scan->ssid}}</small></td>
+                                        <td>
+                                            @if($device->ssid !== $scan->ssid)
+                                                <small>{{stripcslashes($scan->ssid)}}</small>
+                                            @else
+                                                <small><i class="fas fa-long-arrow-alt-up text-secondary"></i></small>
+                                            @endif
+                                        </td>
                                         <td>
                                             <form method="POST">
                                                 @csrf
@@ -101,8 +107,6 @@
                         <input type="hidden" name="id" value="{{$device->id}}"/>
 
                         <div class="form-group">
-                            <label>Bezeichnung</label>
-
                             <select name="vehicle_id" id="vehicleList" class="form-control" required>
                                 <option value="">bitte wählen</option>
                                 @foreach(\App\Vehicle::with(['company'])->get()->sortBy(['company.name', 'vehicle_name']) as $vehicle)

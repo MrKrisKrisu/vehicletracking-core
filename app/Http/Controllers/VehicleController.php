@@ -95,7 +95,7 @@ class VehicleController extends Controller {
             }
         }
 
-        return back();
+        return back()->with('query', $request->vehicle_name);
     }
 
     public static function verify(): View|RedirectResponse {

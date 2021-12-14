@@ -8,7 +8,7 @@
                     <form method="post" accept-charset="utf-8" id="main">@csrf</form>
 
                     <input type="text" class="form-control" id="name" placeholder="FzgNr." name="vehicle_name"
-                           form="main"/>
+                           form="main" @if(session()->has('query')) value="{{session()->get('query')}}" @endif/>
                     <hr/>
 
                     <button type="button" onclick="$('.scan-check').prop('checked', true)"
@@ -35,7 +35,6 @@
                         </button>
                     </form>
                     <hr/>
-                    <h5 class="card-title">{{__('Last scans')}}</h5>
 
                     @if($lastScan->count() === 0)
                         <p class="font-weight-bold text-success">
@@ -48,7 +47,7 @@
                                     <tr id="scan{{$scan->id}}" data-ssid="{{$scan->ssid}}"
                                         data-deviceid="{{$scan->device->id}}">
                                         <td>
-                                            {{str_replace("\\x00", "", $scan->ssid)}}<br/>
+                                            {{stripcslashes($scan->ssid)}}<br/>
                                             @isset($possibleVehicles[$scan->bssid])
                                                 @if(!isset($scan->device) || !isset($scan->device->vehicle))
                                                     @foreach($possibleVehicles[$scan->bssid] as $p)
