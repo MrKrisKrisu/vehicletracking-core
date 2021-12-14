@@ -102,7 +102,7 @@
         <main role="main">
             @yield('jumbotron')
 
-            <div class="album py-5 bg-light">
+            <div class="album py-2 bg-light">
                 <div class="container">
                     @include('layout.components.alerts')
 
