@@ -17,7 +17,7 @@ Auth::routes(['register' => false]);
 
 Route::middleware(['auth'])->group(function() {
     Route::get('/', [VehicleController::class, 'render'])->name('dashboard');
-    Route::post('/', [VehicleController::class, 'saveVehicle']);
+    Route::post('/scans/assign', [VehicleController::class, 'saveVehicle'])->name('scans.assign');
 
     Route::get('/verify', [VehicleController::class, 'verify']);
     Route::post('/verify', [VehicleController::class, 'saveVerify']);

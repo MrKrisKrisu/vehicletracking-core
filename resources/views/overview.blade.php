@@ -5,7 +5,7 @@
         <div class="col-md-12">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
-                    <form method="post" accept-charset="utf-8" id="main">@csrf</form>
+                    <form method="post" accept-charset="utf-8" id="main" action="{{route('scans.assign')}}">@csrf</form>
 
                     <input type="text" class="form-control" id="name" placeholder="FzgNr." name="vehicle_name"
                            form="main" @if(session()->has('query')) value="{{session()->get('query')}}" @endif/>
