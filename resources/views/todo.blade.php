@@ -107,7 +107,7 @@
                         <input type="hidden" name="id" value="{{$device->id}}"/>
 
                         <div class="form-group">
-                            <select name="vehicle_id" id="vehicleList" class="form-control" required>
+                            <select name="vehicle_id" id="vehicleList" class="form-control">
                                 <option value="">bitte wählen</option>
                                 @foreach(\App\Vehicle::with(['company'])->get()->sortBy(['company.name', 'vehicle_name']) as $vehicle)
                                     <option value="{{$vehicle->id}}">
