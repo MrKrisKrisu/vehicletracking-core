@@ -99,29 +99,32 @@ class VehicleController extends Controller {
     }
 
     public static function verify(): View|RedirectResponse {
-        $deviceIds = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
-                           ->whereNull('devices.vehicle_id')
-                           ->whereNotNull('scans.vehicle_name')
-                           ->groupBy(['devices.id'])
-                           ->select('devices.id')
-                           ->having(DB::raw('COUNT(*)'), '>', 1);
+        $devices = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
+                         ->whereNull('devices.vehicle_id')
+                         ->whereNotNull('scans.vehicle_name')
+                         ->groupBy([
+                                       'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
+                                       'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
+                                       'devices.created_at', 'devices.updated_at',
+                                   ])
+                         ->having(DB::raw('COUNT(*)'), '>', 2)
+                         ->select([
+                                      'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
+                                      'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
+                                      'devices.created_at', 'devices.updated_at',
+                                      DB::raw('MAX(scans.created_at) AS lastScan'),
 
-        $devices = Device::with(['scans'])
-                         ->whereIn('id', $deviceIds)
+                                  ])
+                         ->orderByDesc(DB::raw('MAX(scans.created_at)'))
                          ->get()
                          ->filter(function($device) {
-                             if($device->scans->where('vehicle_name', '<>', null)->count() < 2) {
-                                 return false;
-                             }
-                             $lastScan = $device->scans->where('vehicle_name', '<>', null)->max('created_at');
-                             return $device->moveVerifyUntil === null || ($lastScan !== null && $lastScan->isAfter($device->moveVerifyUntil));
-                         })
-                         ->sortByDesc(function($device) {
-                             return $device->scans->where('vehicle_name', '<>', null)->max('created_at');
+                             return $device->moveVerifyUntil === null ||
+                                    ($device->lastScan !== null && Carbon::parse($device->lastScan)->isAfter($device->moveVerifyUntil));
                          });
 
         $count  = $devices->count();
         $device = $devices->first();
+        $device->load(['scans.scanDevice']);
 
         if($device === null) {
             return redirect()->route('dashboard')
