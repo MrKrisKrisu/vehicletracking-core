@@ -28,63 +28,66 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">{{__('Scans')}}</h5>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>SSID</th>
-                                <th>Erfassung</th>
-                                <th></th>
-                                <th>Scantime</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($device->scans->where('vehicle_name', '<>', null) as $scan)
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td><small>{{$scan->ssid}}</small></td>
-                                    <td>
-                                        <form method="POST">
-                                            @csrf
-                                            <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
-                                            <textarea type="text" class="form-control"
-                                                      rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
-                                                      name="modified_vehicle_name">{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
-                                            <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i></button>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        @if($scan->modified_vehicle_name != NULL)
-                                            <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
-                                               title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{$scan->created_at->format('d.m.Y H:i')}}
-                                        @isset($scan->scanDevice)
-                                            <br/>
-                                            <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
-                                        @endisset
-                                        @if($scan->latitude !== null && $scan->longitude !== null)
-                                            <br/>
-                                            <small>
-                                                <i class="fas fa-location-arrow"></i>
-                                                <a href="https://www.openstreetmap.org/?mlat={{$scan->latitude}}&mlon={{$scan->longitude}}"
-                                                   target="_blank">
-                                                    {{$scan->latitude}}, {{$scan->longitude}}
-                                                </a>
-                                            </small>
-                                        @endif
-                                        @if($scan?->speed !== null)
-                                            <br/>
-                                            <small>
-                                                <i class="fas fa-tachometer-alt"></i>
-                                                {{$scan->speed}} km/h
-                                            </small>
-                                        @endif
-                                    </td>
+                                    <th>SSID</th>
+                                    <th>Erfassung</th>
+                                    <th></th>
+                                    <th>Scantime</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($device->scans->where('vehicle_name', '<>', null) as $scan)
+                                    <tr>
+                                        <td><small>{{$scan->ssid}}</small></td>
+                                        <td>
+                                            <form method="POST">
+                                                @csrf
+                                                <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
+                                                <textarea type="text" class="form-control"
+                                                          rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
+                                                          name="modified_vehicle_name">{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
+                                                <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            @if($scan->modified_vehicle_name !== null)
+                                                <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
+                                                   title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{$scan->created_at->format('d.m.Y H:i')}}
+                                            @isset($scan->scanDevice)
+                                                <br/>
+                                                <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
+                                            @endisset
+                                            @if($scan->latitude !== null && $scan->longitude !== null)
+                                                <br/>
+                                                <small>
+                                                    <i class="fas fa-location-arrow"></i>
+                                                    <a href="https://www.openstreetmap.org/?mlat={{$scan->latitude}}&mlon={{$scan->longitude}}"
+                                                       target="_blank">
+                                                        {{$scan->latitude}}, {{$scan->longitude}}
+                                                    </a>
+                                                </small>
+                                            @endif
+                                            @if($scan?->speed !== null)
+                                                <br/>
+                                                <small>
+                                                    <i class="fas fa-tachometer-alt"></i>
+                                                    {{$scan->speed}} km/h
+                                                </small>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,7 +103,7 @@
                         <div class="form-group">
                             <label>Bezeichnung</label>
 
-                            <select name="vehicle_id" id="vehicleList" class="form-control">
+                            <select name="vehicle_id" id="vehicleList" class="form-control" required>
                                 <option value="">bitte wählen</option>
                                 @foreach(\App\Vehicle::with(['company'])->get()->sortBy(['company.name', 'vehicle_name']) as $vehicle)
                                     <option value="{{$vehicle->id}}">
@@ -117,16 +120,19 @@
                                 });
                             </script>
                         </div>
-                        <button type="submit" name="action" value="save" class="btn btn-primary">
+                        <button type="submit" name="action" value="save" class="btn btn-sm btn-primary">
+                            <i class="far fa-save"></i>
                             Speichern
                         </button>
-                        <button type="submit" form="formSkip" class="btn btn-danger">
+                        <button type="submit" form="formSkip" class="btn btn-sm btn-danger">
+                            <i class="far fa-clock"></i>
                             Aufschieben
                         </button>
                         @if(session()->has('lastVehicle'))
                             <hr/>
                             <button type="submit" name="vehicle_id" value="{{session()->get('lastVehicle')->id}}"
                                     class="btn btn-sm btn-primary btn-block">
+                                <i class="fas fa-subway"></i>
                                 {{session()->get('lastVehicle')->vehicle_name}}
                             </button>
                         @endif
@@ -168,7 +174,10 @@
                             <input type="text" class="form-control" placeholder="Vehicle name" required
                                    name="vehicle_name">
                         </div>
-                        <button type="submit" class="btn btn-primary">Erstellen</button>
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="far fa-save"></i>
+                            Speichern
+                        </button>
                     </form>
                 </div>
             </div>
