@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-md-6">
-            <div class="card">
+            <div class="card mb-2">
                 <div class="card-body">
                     <h3>Airport Utility Export importieren</h3>
                     <form method="POST" action="{{route('import.airport')}}" enctype="multipart/form-data">
@@ -14,7 +14,7 @@
                                    required class="form-control"/>
                         </div>
                         <div class="form-group">
-                            <label>Was? <small>lieber zu viele Infos, als zu wenige</small></label>
+                            <label>Was? <small>mehrere Fahrzeuge durch Komma trennen</small></label>
                             <input type="text" name="vehicle_name" placeholder="9101, 427 041, etc."
                                    required class="form-control"/>
                         </div>
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card">
+            <div class="card mb-2">
                 <div class="card-body">
                     <h3>GPX importieren</h3>
                     <form method="POST" action="{{route('location.import')}}" enctype="multipart/form-data">
