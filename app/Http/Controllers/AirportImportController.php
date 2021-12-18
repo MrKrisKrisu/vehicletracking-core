@@ -47,6 +47,10 @@ class AirportImportController extends Controller {
                                                  'lastSeen' => Carbon::parse($validated['date'] . ' ' . $record[' Time'])->toIso8601String(),
                                              ]);
 
+            if($device->blocked) {
+                continue;
+            }
+
             IgnoredNetworkController::checkIfDeviceShouldBeHidden($device);
 
             $scan = Scan::create([

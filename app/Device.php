@@ -14,6 +14,9 @@ class Device extends Model {
     protected $fillable = ['bssid', 'ssid', 'vehicle_id', 'ignore', 'moveVerifyUntil', 'firstSeen', 'lastSeen'];
     protected $hidden   = ['id', 'ssid', 'firstSeen', 'vehicle_id'];
     protected $dates    = ['moveVerifyUntil', 'firstSeen', 'lastSeen'];
+    protected $casts    = [
+        'blocked' => 'boolean',
+    ];
 
     public function scans(): HasMany {
         return $this->hasMany(Scan::class, 'bssid', 'bssid');

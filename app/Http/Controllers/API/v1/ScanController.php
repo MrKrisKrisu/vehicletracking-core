@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class ScanController extends Controller {
+
     /**
      * POST: /api/v1/scan
      *
@@ -51,7 +52,6 @@ class ScanController extends Controller {
 
         $validated = $validator->validate();
         foreach($validated as $scanElement) {
-
             $scanElement['scanDeviceId'] = ScanDeviceAuthentification::getDevice()->id;
 
             $scanElement['ssid'] = str_replace("\\x00", "", $scanElement['ssid']);
@@ -69,8 +69,12 @@ class ScanController extends Controller {
                                                  'bssid' => $scanElement['bssid']
                                              ], [
                                                  'ssid'     => $scanElement['ssid'],
-                                                 'lastSeen' => Carbon::now()
+                                                 'lastSeen' => Carbon::now()->toIso8601String()
                                              ]);
+
+            if($device->blocked) {
+                continue;
+            }
 
             IgnoredNetworkController::checkIfDeviceShouldBeHidden($device);
 
