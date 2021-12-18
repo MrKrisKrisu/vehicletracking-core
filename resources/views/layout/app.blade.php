@@ -36,7 +36,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="/">Home</a>
                                 </li>
-                                @if(auth()->user() === 1)
+                                @if(auth()->user()->id === 1)
                                     <li class="nav-item">
                                         <a class="nav-link" href="/verify/">Zuordnung</a>
                                     </li>
@@ -55,7 +55,7 @@
                                 <a class="nav-link" href="{{route('companies')}}">Verkehrsunternehmen</a>
                             </li>
                             @auth
-                                @if(auth()->user() === 1)
+                                @if(auth()->user()->id === 1)
                                     <li class="nav-item">
                                         <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
                                     </li>
