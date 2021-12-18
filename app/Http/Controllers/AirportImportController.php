@@ -14,12 +14,18 @@ use App\Device;
 class AirportImportController extends Controller {
 
     public function import(Request $request): RedirectResponse {
+        $this->authorize('create', Scan::class);
+
         $validated = $request->validate([
-                                            'date' => ['required', 'date'],
-                                            'file' => ['required', 'file']
+                                            'date'         => ['required', 'date'],
+                                            'location'     => ['required', 'string'],
+                                            'vehicle_name' => ['required', 'string'],
+                                            'file'         => ['required', 'file'],
                                         ]);
 
         $scanDevice = self::getScanDevice();
+
+        $vehicleName = $validated['location'] . ',' . $validated['vehicle_name'];
 
         $content = $validated['file']->get();
         $csv     = Reader::createFromString($content);
@@ -38,9 +44,10 @@ class AirportImportController extends Controller {
                                              ]);
 
             IgnoredNetworkController::checkIfDeviceShouldBeHidden($device);
-            
+
             Scan::create([
                              'bssid'        => $record[' BSS'],
+                             'vehicle_name' => $vehicleName,
                              'ssid'         => $record['SSID'] ?? null,
                              'signal'       => $record[' RSSI'] ?? null,
                              'channel'      => $record[' Channel'] ?? null,

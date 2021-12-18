@@ -6,15 +6,18 @@ use App\ScanDevice;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Exception;
+use Illuminate\View\View;
 
 class NotificationController extends Controller {
 
-    public function renderNotifications(): Renderable {
+    public function renderNotifications(): View {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         return view('notifications', [
             'scanDevices' => ScanDevice::where(function($query) {
                 $query->where('valid_until', null)
@@ -26,6 +29,9 @@ class NotificationController extends Controller {
     }
 
     public function switchNotifications(Request $request): RedirectResponse {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         $validated = $request->validate([
                                             'id' => ['required', 'exists:scan_devices,id', Rule::in(auth()->user()->scanDevices->pluck('id'))]
                                         ]);
@@ -42,7 +48,7 @@ class NotificationController extends Controller {
         return back()->with('alert-success', $message);
     }
 
-    public static function notifyRaw(string $html) {
+    public static function notifyRaw(string $html): void {
         try {
             $client = new Client();
             $client->post('https://api.telegram.org/' . config('app.telegram.token') . '/sendMessage', [
@@ -52,7 +58,7 @@ class NotificationController extends Controller {
                     'parse_mode' => 'HTML'
                 ]
             ]);
-        } catch(Exception | GuzzleException $exception) {
+        } catch(Exception|GuzzleException $exception) {
             report($exception);
         }
     }

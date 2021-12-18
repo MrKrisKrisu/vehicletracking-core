@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ScanController extends Controller {
+
     public function update(Request $request): JsonResponse {
         $validated = $request->validate([
                                             'id'     => ['required', 'exists:scans,id'],
@@ -14,6 +15,7 @@ class ScanController extends Controller {
                                         ]);
 
         $scan = Scan::find($validated['id']);
+        $this->authorize('update', $scan);
         $scan->update($validated);
 
         return response()->json(['success' => true]);

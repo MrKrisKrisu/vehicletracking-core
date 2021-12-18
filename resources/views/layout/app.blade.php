@@ -36,12 +36,14 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="/">Home</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="/verify/">Zuordnung</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{route('ignored')}}">Ausschluß</a>
-                                </li>
+                                @if(auth()->user() === 1)
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/verify/">Zuordnung</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{route('ignored')}}">Ausschluß</a>
+                                    </li>
+                                @endif
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{route('location')}}">Import</a>
                                 </li>
@@ -53,9 +55,11 @@
                                 <a class="nav-link" href="{{route('companies')}}">Verkehrsunternehmen</a>
                             </li>
                             @auth
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
-                                </li>
+                                @if(auth()->user() === 1)
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
+                                    </li>
+                                @endif
                             @endauth
                         </ul>
 

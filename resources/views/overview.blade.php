@@ -73,15 +73,18 @@
                                                 <button class="btn btn-sm btn-primary hideScan" data-id="{{$scan->id}}">
                                                     <i class="fas fa-eye-slash"></i>
                                                 </button>
-                                                <button class="btn btn-sm btn-secondary hideDevice"
-                                                        onclick="hideDevice('{{$scan->device->id}}')">
-                                                    <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
-                                                </button>
-                                                @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
-                                                    <button class="btn btn-sm btn-danger hideNetwork"
-                                                            onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
-                                                        <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+
+                                                @if(auth()->user()->id === 1)
+                                                    <button class="btn btn-sm btn-secondary hideDevice"
+                                                            onclick="hideDevice('{{$scan->device->id}}')">
+                                                        <i class="fas fa-ban"></i> <i class="fas fa-code"></i>
                                                     </button>
+                                                    @if(strlen(str_replace("\\x00", "", $scan->ssid)) > 0)
+                                                        <button class="btn btn-sm btn-danger hideNetwork"
+                                                                onclick="hideNetwork('{{str_replace("'","\\'",$scan->ssid)}}')">
+                                                            <i class="fas fa-ban"></i> <i class="fas fa-tag"></i>
+                                                        </button>
+                                                    @endif
                                                 @endif
                                             </div>
                                         </td>

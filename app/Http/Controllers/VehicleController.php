@@ -18,9 +18,7 @@ use Illuminate\View\View;
 
 class VehicleController extends Controller {
 
-    public function render(Request $request): Renderable {
-
-
+    public function render(Request $request): View {
         $lastScansQ = Scan::join('devices', 'devices.bssid', '=', 'scans.bssid')
                           ->with(['device', 'device.vehicle', 'device.vehicle.company', 'scanDevice'])
                           ->whereIn('scanDeviceId', auth()->user()->scanDevices->pluck('id'))
@@ -89,9 +87,9 @@ class VehicleController extends Controller {
     public function saveVehicle(Request $request): RedirectResponse {
         if(isset($request->scans)) {
             foreach($request->scans as $scanID => $v) {
-                $scan               = Scan::where('id', $scanID)->first();
-                $scan->vehicle_name = $request->vehicle_name;
-                $scan->save();
+                $scan = Scan::find($scanID);
+                $this->authorize('update', $scan);
+                $scan->update(['vehicle_name' => $request->vehicle_name]);
             }
         }
 
@@ -99,6 +97,9 @@ class VehicleController extends Controller {
     }
 
     public static function verify(): View|RedirectResponse {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         $devices = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
                          ->whereNull('devices.vehicle_id')
                          ->whereNotNull('scans.vehicle_name')
@@ -124,12 +125,13 @@ class VehicleController extends Controller {
 
         $count  = $devices->count();
         $device = $devices->first();
-        $device->load(['scans.scanDevice']);
 
         if($device === null) {
             return redirect()->route('dashboard')
                              ->with('alert-info', 'Es gibt aktuell keine Geräte zum verifizieren.');
         }
+
+        $device->load(['scans.scanDevice']);
 
         $locationScans = $device->scans->where('latitude', '<>', null)->where('longitude', '<>', null);
 
@@ -141,7 +143,11 @@ class VehicleController extends Controller {
         ]);
     }
 
-    public static function saveVerify(Request $request): Renderable {
+    public function saveVerify(Request $request): Renderable {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
+
         if(isset($request->modified_vehicle_name)) {
 
             $validated = $request->validate([
@@ -149,10 +155,9 @@ class VehicleController extends Controller {
                                                 'modified_vehicle_name' => ['required']
                                             ]);
 
-            $scan                        = Scan::find($validated['modified_scan_id']);
-            $scan->modified_vehicle_name = str_replace("\r\n", ',', $validated['modified_vehicle_name']);
-            $scan->update();
-
+            $scan = Scan::find($validated['modified_scan_id']);
+            $this->authorize('update', $scan);
+            $scan->update(['modified_vehicle_name' => str_replace("\r\n", ',', $validated['modified_vehicle_name'])]);
         }
 
         return self::verify();
@@ -166,11 +171,13 @@ class VehicleController extends Controller {
         }
 
         $allScans = collect();
-        foreach($vehicle->devices as $device)
+        foreach($vehicle->devices as $device) {
             $allScans = $allScans->merge($device->scans);
+        }
 
-        if($allScans->count() == 0)
+        if($allScans->count() === 0) {
             abort(404);
+        }
 
         $found = $allScans->groupBy(function($scan) {
             return $scan->created_at->format('Y-m-d H:i');
@@ -219,13 +226,13 @@ class VehicleController extends Controller {
         return $data;
     }
 
-    public function renderCompanies(): Renderable {
+    public function renderCompanies(): View {
         return view('companies', [
             'companies' => Company::with(['vehicles'])->where('name', '<>', 'Stationary')->get()
         ]);
     }
 
-    public function renderCompany(int $id): Renderable {
+    public function renderCompany(int $id): View {
         return view('company', [
             'company' => Company::with(['vehicles', 'vehicles.devices'])->findOrFail($id)
         ]);
@@ -235,6 +242,9 @@ class VehicleController extends Controller {
      * @throws Exception
      */
     public function ignoreDevice(Request $request): RedirectResponse {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         $validated = $request->validate([
                                             'bssid' => ['required', 'exists:devices,bssid'],
                                             'ssid'  => ['required', 'exists:devices,ssid'],
@@ -260,6 +270,9 @@ class VehicleController extends Controller {
     }
 
     public function renderIgnored(): View {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         return view('ignored', [
             'bssid' => Device::where('ignore', 1)->orderBy('updated_at', 'desc')->paginate(),
             'ssid'  => IgnoredNetwork::orderBy('created_at', 'desc')->paginate()
@@ -267,6 +280,9 @@ class VehicleController extends Controller {
     }
 
     public function unbanSSID(Request $request): RedirectResponse {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         $validated = $request->validate([
                                             'ssid' => ['required', 'exists:ignored_networks,ssid']
                                         ]);
@@ -277,6 +293,9 @@ class VehicleController extends Controller {
     }
 
     public function unbanBSSID(Request $request): RedirectResponse {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         $validated = $request->validate([
                                             'bssid' => ['required', 'exists:devices,bssid']
                                         ]);
@@ -289,6 +308,9 @@ class VehicleController extends Controller {
     }
 
     public function saveIgnoredNetwork(Request $request): RedirectResponse {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         $validated = $request->validate([
                                             'ssid'     => ['required'],
                                             'contains' => ['nullable']

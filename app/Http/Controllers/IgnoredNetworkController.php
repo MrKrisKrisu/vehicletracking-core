@@ -11,6 +11,9 @@ use App\Device;
 class IgnoredNetworkController extends Controller {
 
     public function create(Request $request): JsonResponse {
+        if(auth()->user()->id !== 1) {
+            abort(403);
+        }
         $validated = $request->validate([
                                             'ssid'     => ['required'],
                                             'contains' => ['nullable', 'gte:0', 'lte:1']

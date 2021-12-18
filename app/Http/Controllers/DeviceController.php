@@ -15,6 +15,7 @@ class DeviceController extends Controller {
                                         ]);
 
         $device = Device::find($validated['id']);
+        $this->authorize('update', $device);
         $device->update($validated);
 
         return response()->json(['success' => true]);
