@@ -96,32 +96,40 @@ class VehicleController extends Controller {
         return back()->with('query', $request->vehicle_name);
     }
 
-    public static function verify(): View|RedirectResponse {
+    public static function verify(Request $request): View|RedirectResponse {
         if(auth()->user()->id !== 1) {
             abort(403);
         }
-        $devices = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
-                         ->whereNull('devices.vehicle_id')
-                         ->whereNotNull('scans.vehicle_name')
-                         ->groupBy([
+
+        $validated = $request->validate(['query' => ['nullable', 'string', 'max:32']]);
+
+        $devicesQ = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
+                          ->whereNull('devices.vehicle_id')
+                          ->whereNotNull('scans.vehicle_name')
+                          ->groupBy([
+                                        'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
+                                        'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
+                                        'devices.created_at', 'devices.updated_at',
+                                    ])
+                          ->having(DB::raw('COUNT(*)'), '>', 2)
+                          ->select([
                                        'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
                                        'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
                                        'devices.created_at', 'devices.updated_at',
-                                   ])
-                         ->having(DB::raw('COUNT(*)'), '>', 2)
-                         ->select([
-                                      'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
-                                      'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
-                                      'devices.created_at', 'devices.updated_at',
-                                      DB::raw('MAX(scans.created_at) AS lastScan'),
+                                       DB::raw('MAX(scans.created_at) AS lastScan'),
 
-                                  ])
-                         ->orderByDesc(DB::raw('MAX(scans.created_at)'))
-                         ->get()
-                         ->filter(function($device) {
-                             return $device->moveVerifyUntil === null ||
-                                    ($device->lastScan !== null && Carbon::parse($device->lastScan)->isAfter($device->moveVerifyUntil));
-                         });
+                                   ])
+                          ->orderByDesc(DB::raw('MAX(scans.created_at)'));
+
+        if(isset($validated['query'])) {
+            $devicesQ->where('devices.ssid', 'like', '%' . $validated['query'] . '%');
+        }
+
+        $devices = $devicesQ->get()
+                            ->filter(function($device) {
+                                return $device->moveVerifyUntil === null ||
+                                       ($device->lastScan !== null && Carbon::parse($device->lastScan)->isAfter($device->moveVerifyUntil));
+                            });
 
         $count  = $devices->count();
         $device = $devices->first();
