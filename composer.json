@@ -17,6 +17,7 @@
     "spatie/laravel-sitemap": "^5.9"
   },
   "require-dev": {
+    "roave/security-advisories": "dev-latest",
     "barryvdh/laravel-debugbar": "^3.3",
     "facade/ignition": "^2.3.6",
     "fakerphp/faker": "^1.12",
