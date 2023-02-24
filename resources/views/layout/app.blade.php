@@ -26,12 +26,12 @@
             <nav class="navbar navbar-expand-md navbar-dark bg-dark">
                 <div class="container">
                     <a class="navbar-brand" href="/">{{__('Vehicle tracking')}}</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
-                        <ul class="navbar-nav mr-auto">
+                        <ul class="navbar-nav me-auto">
                             @auth
                                 <li class="nav-item">
                                     <a class="nav-link" href="/">Home</a>
@@ -63,7 +63,7 @@
                             @endauth
                         </ul>
 
-                        <ul class="navbar-nav mr-right">
+                        <ul class="navbar-nav me-right">
                             @guest
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
@@ -75,8 +75,7 @@
                                 @endif
                             @else
                                 <li class="nav-item dropdown">
-                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         {{ Auth::user()->name }} <span class="caret"></span>
                                     </a>
 
@@ -119,7 +118,7 @@
         <footer class="text-muted">
             <div class="container">
                 <a href="{{route('imprint')}}">Impressum</a>
-                <p class="float-right">
+                <p class="float-end">
                     <a href="#">Back to top</a>
                 </p>
             </div>

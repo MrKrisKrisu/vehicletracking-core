@@ -15,7 +15,7 @@
                             <option value="%%">enthält</option>
                         </select>
 
-                        <input type="text" class="form-control mt-2 mr-sm-2" id="inlineFormInputName2"
+                        <input type="text" class="form-control mt-2 me-sm-2" id="inlineFormInputName2"
                                name="query" placeholder="Suchbegriff"/>
 
                         <button type="submit" class="btn btn-primary mt-2">Suchen</button>

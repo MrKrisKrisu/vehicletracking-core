@@ -12,7 +12,7 @@
                     <hr/>
 
                     <button type="button" onclick="$('.scan-check').prop('checked', true)"
-                            class="btn btn-secondary btn-sm float-right">
+                            class="btn btn-secondary btn-sm float-end">
                         <i class="far fa-check-square"></i>
                     </button>
                     @foreach(\App\ScanDevice::where('user_id', auth()->user()->id)->get() as $device)
@@ -37,7 +37,7 @@
                     <hr/>
 
                     @if($lastScan->count() === 0)
-                        <p class="font-weight-bold text-success">
+                        <p class="fw-bold text-success">
                             <i class="fas fa-check"></i> Alles abgearbeitet.
                         </p>
                     @else
