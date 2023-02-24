@@ -124,14 +124,17 @@
                                 });
                             </script>
                         </div>
-                        <button type="submit" name="action" value="save" class="btn btn-sm btn-primary">
-                            <i class="far fa-save"></i>
-                            Speichern
-                        </button>
-                        <button type="submit" form="formSkip" class="btn btn-sm btn-danger">
-                            <i class="far fa-clock"></i>
-                            Aufschieben
-                        </button>
+
+                        <div class="btn-group mt-2">
+                            <button type="submit" name="action" value="save" class="btn btn-sm btn-success">
+                                <i class="far fa-save"></i>
+                                Speichern
+                            </button>
+                            <button type="submit" form="formSkip" class="btn btn-sm btn-secondary">
+                                <i class="far fa-clock"></i>
+                                Aufschieben
+                            </button>
+                        </div>
                         @if(session()->has('lastVehicle'))
                             <hr/>
                             <div class="d-grid">
