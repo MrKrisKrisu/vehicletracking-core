@@ -8,7 +8,7 @@
                     <h5 class="card-title">Passwort ändern</h5>
                     <form method="POST" action="{{route('user.settings.password')}}">
                         @csrf
-                        <div class="form-group row">
+                        <div class="row">
                             <label for="password"
                                    class="col-md-4 col-form-label text-md-right">Aktuelles Passwort</label>
 
@@ -18,7 +18,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
+                        <div class="row">
                             <label for="password"
                                    class="col-md-4 col-form-label text-md-right">Neues Passwort</label>
 
@@ -28,7 +28,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row">
+                        <div class="row">
                             <label for="password"
                                    class="col-md-4 col-form-label text-md-right">Neues Passwort wiederholen</label>
 

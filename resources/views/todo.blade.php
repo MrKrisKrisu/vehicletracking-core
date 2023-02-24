@@ -31,66 +31,66 @@
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
-                                <tr>
-                                    <th>SSID</th>
-                                    <th>Erfassung</th>
-                                    <th></th>
-                                    <th>Scantime</th>
-                                </tr>
+                            <tr>
+                                <th>SSID</th>
+                                <th>Erfassung</th>
+                                <th></th>
+                                <th>Scantime</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                @foreach($device->scans->where('vehicle_name', '<>', null) as $scan)
-                                    <tr>
-                                        <td>
-                                            @if($device->ssid !== $scan->ssid)
-                                                <small>{{stripcslashes($scan->ssid)}}</small>
-                                            @else
-                                                <small><i class="fas fa-long-arrow-alt-up text-secondary"></i></small>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <form method="POST">
-                                                @csrf
-                                                <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
-                                                <textarea type="text" class="form-control"
-                                                          rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
-                                                          name="modified_vehicle_name">{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
-                                                <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                        <td>
-                                            @if($scan->modified_vehicle_name !== null)
-                                                <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
-                                                   title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            {{$scan->created_at->format('d.m.Y H:i')}}
-                                            @isset($scan->scanDevice)
-                                                <br/>
-                                                <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
-                                            @endisset
-                                            @if($scan->latitude !== null && $scan->longitude !== null)
-                                                <br/>
-                                                <small>
-                                                    <i class="fas fa-location-arrow"></i>
-                                                    <a href="https://www.openstreetmap.org/?mlat={{$scan->latitude}}&mlon={{$scan->longitude}}"
-                                                       target="_blank">
-                                                        {{$scan->latitude}}, {{$scan->longitude}}
-                                                    </a>
-                                                </small>
-                                            @endif
-                                            @if($scan?->speed !== null)
-                                                <br/>
-                                                <small>
-                                                    <i class="fas fa-tachometer-alt"></i>
-                                                    {{$scan->speed}} km/h
-                                                </small>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
+                            @foreach($device->scans->where('vehicle_name', '<>', null) as $scan)
+                                <tr>
+                                    <td>
+                                        @if($device->ssid !== $scan->ssid)
+                                            <small>{{stripcslashes($scan->ssid)}}</small>
+                                        @else
+                                            <small><i class="fas fa-long-arrow-alt-up text-secondary"></i></small>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <form method="POST">
+                                            @csrf
+                                            <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
+                                            <textarea type="text" class="form-control"
+                                                      rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
+                                                      name="modified_vehicle_name">{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
+                                            <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        @if($scan->modified_vehicle_name !== null)
+                                            <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
+                                               title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{$scan->created_at->format('d.m.Y H:i')}}
+                                        @isset($scan->scanDevice)
+                                            <br/>
+                                            <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
+                                        @endisset
+                                        @if($scan->latitude !== null && $scan->longitude !== null)
+                                            <br/>
+                                            <small>
+                                                <i class="fas fa-location-arrow"></i>
+                                                <a href="https://www.openstreetmap.org/?mlat={{$scan->latitude}}&mlon={{$scan->longitude}}"
+                                                   target="_blank">
+                                                    {{$scan->latitude}}, {{$scan->longitude}}
+                                                </a>
+                                            </small>
+                                        @endif
+                                        @if($scan?->speed !== null)
+                                            <br/>
+                                            <small>
+                                                <i class="fas fa-tachometer-alt"></i>
+                                                {{$scan->speed}} km/h
+                                            </small>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -106,7 +106,7 @@
                         @csrf
                         <input type="hidden" name="id" value="{{$device->id}}"/>
 
-                        <div class="form-group">
+                        <div>
                             <select name="vehicle_id" id="vehicleList" class="form-control">
                                 <option value="">bitte wählen</option>
                                 @foreach(\App\Vehicle::with(['company'])->get()->sortBy(['company.name', 'vehicle_name']) as $vehicle)
@@ -134,11 +134,13 @@
                         </button>
                         @if(session()->has('lastVehicle'))
                             <hr/>
-                            <button type="submit" name="vehicle_id" value="{{session()->get('lastVehicle')->id}}"
-                                    class="btn btn-sm btn-primary btn-block">
-                                <i class="fas fa-subway"></i>
-                                {{session()->get('lastVehicle')->vehicle_name}}
-                            </button>
+                            <div class="d-grid">
+                                <button type="submit" name="vehicle_id" value="{{session()->get('lastVehicle')->id}}"
+                                        class="btn btn-sm btn-primary">
+                                    <i class="fas fa-subway"></i>
+                                    {{session()->get('lastVehicle')->vehicle_name}}
+                                </button>
+                            </div>
                         @endif
                     </form>
 
@@ -155,7 +157,7 @@
                     <form method="POST" action="{{route('vehicle.create')}}">
                         @csrf
 
-                        <div class="form-group">
+                        <div>
                             <label>Unternehmen bzw. Kategorie</label>
                             <select class="form-control" name="company_id" required>
                                 <option value="">bitte wählen</option>
@@ -164,7 +166,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div>
                             <label>Fahrzeugtyp</label>
                             <select class="form-control" name="type" required>
                                 <option value="">bitte wählen</option>
@@ -173,7 +175,7 @@
                                 <option value="train">Eisenbahn</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div>
                             <label>Bezeichnung</label>
                             <input type="text" class="form-control" placeholder="Vehicle name" required
                                    name="vehicle_name">

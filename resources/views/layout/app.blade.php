@@ -31,7 +31,7 @@
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
-                        <ul class="navbar-nav mr-auto">
+                        <ul class="navbar-nav me-auto">
                             @auth
                                 <li class="nav-item">
                                     <a class="nav-link" href="/">Home</a>
@@ -63,7 +63,7 @@
                             @endauth
                         </ul>
 
-                        <ul class="navbar-nav mr-right">
+                        <ul class="navbar-nav me-right">
                             @guest
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
@@ -119,7 +119,7 @@
         <footer class="text-muted">
             <div class="container">
                 <a href="{{route('imprint')}}">Impressum</a>
-                <p class="float-right">
+                <p class="float-end">
                     <a href="#">Back to top</a>
                 </p>
             </div>
