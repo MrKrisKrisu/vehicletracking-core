@@ -52,9 +52,9 @@
                                     <td>{{str_replace("\\x00", "", $network->ssid)}}</td>
                                     <td>
                                         @if($network->contains)
-                                            <span class="badge badge-sm badge-success">contains</span>
+                                            <span class="badge badge-sm bg-success">contains</span>
                                         @else
-                                            <span class="badge badge-sm badge-primary">1:1</span>
+                                            <span class="badge badge-sm bg-primary">1:1</span>
                                         @endif
                                     </td>
                                     <td>
@@ -75,11 +75,11 @@
                     <h3>Hinzufügen</h3>
                     <form method="POST" action="{{route('ignoreDevice.add')}}">
                         @csrf
-                        <div class="form-group">
+                        <div>
                             <label>SSID(-Teil)</label>
                             <input type="text" name="ssid" class="form-control" required/>
                         </div>
-                        <div class="form-group">
+                        <div>
                             <input type="checkbox" name="contains"/>
                             <label>Nur Teil?</label>
                         </div>

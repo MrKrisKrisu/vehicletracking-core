@@ -71,15 +71,15 @@
                         <h5 class="card-title">Fahrzeuginformationen</h5>
                         <table class="table">
                             <tr>
-                                <td class="font-weight-bold">Bauart</td>
+                                <td class="fw-bold">Bauart</td>
                                 <td>{{$vehicle->uic_type_code}} {{$vehicle->uicType?->description}}</td>
                             </tr>
                             <tr>
-                                <td class="font-weight-bold">Land</td>
+                                <td class="fw-bold">Land</td>
                                 <td>{{$vehicle->uic_country_code}} {{$vehicle->uicCountry?->description}}</td>
                             </tr>
                             <tr>
-                                <td class="font-weight-bold">Baureihe</td>
+                                <td class="fw-bold">Baureihe</td>
                                 <td>{{$vehicle->uic_series_number}} {{$vehicle->uicSeries?->description}}</td>
                             </tr>
                         </table>
@@ -130,7 +130,7 @@
                     <table class="table table-sm text-center">
                         <thead>
                             <tr>
-                                <th class="text-right">Monat</th>
+                                <th class="text-end">Monat</th>
                                 @for($day = 1; $day <= 31; $day++)
                                     <th>{{$day}}</th>
                                 @endfor
@@ -138,10 +138,10 @@
                         </thead>
                         @for($month = \Carbon\Carbon::now()->firstOfMonth(); $month->isAfter(\Carbon\Carbon::parse('-12 months')); $month->subMonth())
                             <tr>
-                                <td class="text-right">{{$month->isoFormat('MMMM YY')}}</td>
+                                <td class="text-end">{{$month->isoFormat('MMMM YY')}}</td>
                                 @for($day = 1; $day <= $month->daysInMonth; $day++)
                                     @isset($dateCount[$month->format('Y-m-') . $day])
-                                        <td class="text-success table-warning font-weight-bold">
+                                        <td class="text-success table-warning fw-bold">
                                             {{$dateCount[$month->format('Y-m-') . $day]}}
                                         </td>
                                     @else
