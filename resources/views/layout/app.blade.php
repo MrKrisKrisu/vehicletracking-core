@@ -4,7 +4,7 @@
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 
-        <title>@hasSection('title')@yield('title') - @endif{{__('Vehicletracking')}}</title>
+        <title>@hasSection('title')@yield('title') - @endif PublicTransportTracker</title>
 
         @hasSection('meta-description')
             <meta name="description" content="@yield('title')"/>
@@ -25,7 +25,9 @@
         <header>
             <nav class="navbar navbar-expand-md bg-black">
                 <div class="container">
-                    <a class="navbar-brand" href="/">{{__('Vehicle tracking')}}</a>
+                    <a class="navbar-brand" href="/">
+                        PublicTransportTracker
+                    </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>

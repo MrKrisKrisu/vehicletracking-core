@@ -38,29 +38,32 @@
                         @else
                             <p>Es wurden {{$data->count()}} Netzwerke gefunden.</p>
                         @endif
-                        <hr/>
-                        <div id="map" style="width: 100%; height: 700px;"></div>
-                        <script>
-                            $(document).ready(loadMap);
 
-                            function loadMap() {
-                                let map = createMap('map', false);
-                                let featureGroup = L.featureGroup().addTo(map);
+                        @if($data->count() > 0)
+                            <hr/>
+                            <div id="map" style="width: 100%; height: 700px;"></div>
+                            <script>
+                                $(document).ready(loadMap);
 
-                                let icon = new L.Icon.Default({
-                                    iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
-                                    shadowUrl: '/images/vendor/leaflet/dist/marker-shadow.png',
-                                });
+                                function loadMap() {
+                                    let map = createMap('map', false);
+                                    let featureGroup = L.featureGroup().addTo(map);
 
-                                @foreach($data as $network)
-                                L.marker([{{round($network->latitudeAvg, 3)}}, {{round($network->longitudeAvg, 3)}}], {icon: icon})
-                                    .bindPopup('<b>SSID: {{$network->ssid}}</b>@if($network->radiusMeter > 100)<br />Mehrfach gesichtet im Radius von {{$network->radiusMeter}}m.@endif')
-                                    .addTo(featureGroup);
-                                @endforeach
+                                    let icon = new L.Icon.Default({
+                                        iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
+                                        shadowUrl: '/images/vendor/leaflet/dist/marker-shadow.png',
+                                    });
 
-                                map.fitBounds(featureGroup.getBounds());
-                            }
-                        </script>
+                                    @foreach($data as $network)
+                                    L.marker([{{round($network->latitudeAvg, 3)}}, {{round($network->longitudeAvg, 3)}}], {icon: icon})
+                                        .bindPopup('<b>SSID: {{$network->ssid}}</b>@if($network->radiusMeter > 100)<br />Mehrfach gesichtet im Radius von {{$network->radiusMeter}}m.@endif')
+                                        .addTo(featureGroup);
+                                    @endforeach
+
+                                    map.fitBounds(featureGroup.getBounds());
+                                }
+                            </script>
+                        @endif
                     </div>
                 </div>
             </div>
