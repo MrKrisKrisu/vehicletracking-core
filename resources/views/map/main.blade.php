@@ -1,6 +1,8 @@
 @extends('layout.app')
 
-@section('title') Karte @endsection
+@section('title')
+    Karte
+@endsection
 
 @section('content')
     <div class="row">
@@ -30,11 +32,8 @@
                                 success: function (data) {
                                     $.each(data.vehicles, function (k, vehicle) {
                                         if (vehicle.last_position.length !== 0) {
-                                            L.marker([vehicle.last_position.latitude, vehicle.last_position.longitude], {
-                                                icon: L.icon({
-                                                    iconUrl: '/img/icons/' + vehicle.type + '.svg',
-                                                    iconSize: [40, 40],
-                                                })
+                                            L.circleMarker([vehicle.last_position.latitude, vehicle.last_position.longitude], {
+                                                color: '#000'
                                             })
                                                 .bindPopup('<b>Fahrzeug <a href="/vehicle/' + vehicle.id + '">' + vehicle.name +
                                                     '</a></b><br/>' + vehicle.last_position.timestamp

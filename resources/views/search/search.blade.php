@@ -49,13 +49,8 @@
                                     let map = createMap('map', false);
                                     let featureGroup = L.featureGroup().addTo(map);
 
-                                    let icon = new L.Icon.Default({
-                                        iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
-                                        shadowUrl: '/images/vendor/leaflet/dist/marker-shadow.png',
-                                    });
-
                                     @foreach($data as $network)
-                                    L.marker([{{round($network->latitudeAvg, 3)}}, {{round($network->longitudeAvg, 3)}}], {icon: icon})
+                                    L.marker([{{round($network->latitudeAvg, 3)}}, {{round($network->longitudeAvg, 3)}}], {icon: defaultIcon})
                                         .bindPopup('<b>SSID: {{$network->ssid}}</b>@if($network->radiusMeter > 100)<br />Mehrfach gesichtet im Radius von {{$network->radiusMeter}}m.@endif')
                                         .addTo(featureGroup);
                                     @endforeach

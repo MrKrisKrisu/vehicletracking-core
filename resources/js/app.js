@@ -22,18 +22,23 @@ $.ajaxSetup({
 window.createMap = function (containerId = 'map', ormLayer = true) {
     let map = L.map(containerId).setView([52.37707, 9.73811], 13);
 
-    let Stadia_AlidadeSmoothDark = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-        maxZoom: 20,
-        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>'
+    let OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     let OpenRailwayMap = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a>'
+        attribution: '<a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a>'
     });
 
-    Stadia_AlidadeSmoothDark.addTo(map);
+    OpenStreetMap_DE.addTo(map);
     if (ormLayer) {
         OpenRailwayMap.addTo(map);
     }
     return map;
 }
+
+window.defaultIcon = new L.Icon.Default({
+    iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
+    shadowUrl: '/images/vendor/leaflet/dist/marker-shadow.png',
+});

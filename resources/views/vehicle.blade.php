@@ -1,6 +1,8 @@
 @extends('layout.app')
 
-@section('title') Fahrzeug {{$vehicle->vehicle_name}} von {{$vehicle->company->name}} @endsection
+@section('title')
+    Fahrzeug {{$vehicle->vehicle_name}} von {{$vehicle->company->name}}
+@endsection
 
 @section('jumbotron')
     <section class="jumbotron text-center">
@@ -36,27 +38,27 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <table class="table">
                             <thead>
-                                <tr>
-                                    <th>Zeitpunkt</th>
-                                    <th>GPS-Koordinaten</th>
-                                </tr>
+                            <tr>
+                                <th>Zeitpunkt</th>
+                                <th>GPS-Koordinaten</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                @foreach($found as $scan)
-                                    <tr>
-                                        <td>{{$scan->created_at->format('d.m.Y H:i')}}</td>
-                                        <td>
-                                            @isset($scan->latitude)
-                                                <a href="https://www.openstreetmap.org/?mlat={{round($scan->latitude, 3)}}&mlon={{round($scan->longitude, 3)}}"
-                                                   target="osm">
-                                                    {{round($scan->latitude, 3)}}, {{round($scan->longitude, 3)}}
-                                                </a>
-                                            @else
-                                                <span class="text-danger">nicht bekannt</span>
-                                            @endisset
-                                        </td>
-                                    </tr>
-                                @endforeach
+                            @foreach($found as $scan)
+                                <tr>
+                                    <td>{{$scan->created_at->format('d.m.Y H:i')}}</td>
+                                    <td>
+                                        @isset($scan->latitude)
+                                            <a href="https://www.openstreetmap.org/?mlat={{round($scan->latitude, 3)}}&mlon={{round($scan->longitude, 3)}}"
+                                               target="osm">
+                                                {{round($scan->latitude, 3)}}, {{round($scan->longitude, 3)}}
+                                            </a>
+                                        @else
+                                            <span class="text-danger">nicht bekannt</span>
+                                        @endisset
+                                    </td>
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -91,20 +93,16 @@
                 <div class="card-body">
                     <h5 class="card-title">Letzter bekannter Standort</h5>
                     @isset($lastPosition)
-                        <div id="map" style="width: 100%; height: 200px;"></div>
+                        <div id="map" style="width: 100%; height: 300px;"></div>
                         <script>
                             $(document).ready(loadMap);
 
                             function loadMap() {
-
                                 let map = createMap();
                                 map.setView([{{round($lastPosition->latitude, 3)}}, {{round($lastPosition->longitude, 3)}}], 13);
 
                                 L.marker([{{round($lastPosition->latitude, 3)}}, {{round($lastPosition->longitude, 3)}}], {
-                                    icon: L.icon({
-                                        iconUrl: '/img/icons/{{$vehicle->type ?? 'question'}}.svg',
-                                        iconSize: [40, 40],
-                                    })
+                                    icon: defaultIcon,
                                 })
                                     .bindPopup('Position am {{$lastPosition->created_at->format('d.m.Y H:i')}}')
                                     .addTo(map);
@@ -126,12 +124,12 @@
 
                     <table class="table table-sm text-center">
                         <thead>
-                            <tr>
-                                <th class="text-end">Monat</th>
-                                @for($day = 1; $day <= 31; $day++)
-                                    <th>{{$day}}</th>
-                                @endfor
-                            </tr>
+                        <tr>
+                            <th class="text-end">Monat</th>
+                            @for($day = 1; $day <= 31; $day++)
+                                <th>{{$day}}</th>
+                            @endfor
+                        </tr>
                         </thead>
                         @for($month = \Carbon\Carbon::now()->firstOfMonth(); $month->isAfter(\Carbon\Carbon::parse('-12 months')); $month->subMonth())
                             <tr>
@@ -142,12 +140,12 @@
                                             {{$dateCount[$month->format('Y-m-') . $day]}}
                                         </td>
                                     @else
-                                        <td class="text-muted table-secondary">0</td>
+                                        <td class="text-muted table-secondary bg-dark">0</td>
                                     @endisset
                                 @endfor
 
                                 @for($day = $day; $day <= 31; $day++)
-                                    <td class="table-secondary text-muted">-</td>
+                                    <td class="table-secondary text-muted bg-dark">-</td>
                                 @endfor
                             </tr>
                         @endfor
