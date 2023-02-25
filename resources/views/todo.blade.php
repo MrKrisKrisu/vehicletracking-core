@@ -202,17 +202,13 @@
             <div class="col-md-12">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <div id="mapid" style="width: 100%; height: 500px;"></div>
+                        <div id="map" style="width: 100%; height: 500px;"></div>
                         <script>
                             $(document).ready(loadMap);
 
                             function loadMap() {
-                                let map = L.map('mapid').setView([{{$locationScans->avg('latitude')}}, {{$locationScans->avg('longitude')}}], 13);
-
-                                L.tileLayer('https://osmcache.k118.de/carto/{z}/{x}/{y}.png', {
-                                    maxZoom: 18,
-                                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-                                }).addTo(map);
+                                let map = createMap();
+                                let featureGroup = L.featureGroup().addTo(map);
 
                                 @foreach($locationScans as $scan)
                                 L.marker([{{$scan->latitude}}, {{$scan->longitude}}], {
@@ -222,8 +218,10 @@
                                     })
                                 })
                                     .bindPopup('Position am {{$scan->created_at->format('d.m.Y H:i')}}')
-                                    .addTo(map);
+                                    .addTo(featureGroup);
                                 @endforeach
+
+                                map.fitBounds(featureGroup.getBounds());
                             }
                         </script>
                     </div>

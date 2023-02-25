@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class SearchController extends Controller {
 
@@ -26,22 +26,23 @@ class SearchController extends Controller {
         ]));
 
         $query = DB::table('devices');
-        if($validated['operator'] == '=') {
-            $query->where('devices.ssid', $validated['query']);
-        } elseif($validated['operator'] == '%.') {
-            $query->where('devices.ssid', 'LIKE', '%' . $validated['query']);
-        } elseif($validated['operator'] == '.%') {
-            $query->where('devices.ssid', 'LIKE', $validated['query'] . '%');
-        } elseif($validated['operator'] == '%%') {
-            $query->where('devices.ssid', 'LIKE', '%' . $validated['query'] . '%');
-        } else {
-            abort(403);
+
+        $column = str_contains($validated['query'], ':') ? 'devices.bssid' : 'devices.ssid';
+
+        if($validated['operator'] === '=') {
+            $query->where($column, $validated['query']);
+        } elseif($validated['operator'] === '%.') {
+            $query->where($column, 'LIKE', '%' . $validated['query']);
+        } elseif($validated['operator'] === '.%') {
+            $query->where($column, 'LIKE', $validated['query'] . '%');
+        } elseif($validated['operator'] === '%%') {
+            $query->where($column, 'LIKE', '%' . $validated['query'] . '%');
         }
 
         $query->join('scans', 'scans.bssid', '=', 'devices.bssid')
               ->whereNotNull('scans.latitude')
               ->whereNotNull('scans.longitude')
-              ->groupBy('devices.bssid')
+              ->groupBy(['devices.id', 'devices.bssid', 'devices.ssid'])
               ->limit(5000)
               ->select([
                            'devices.id',
@@ -56,16 +57,16 @@ class SearchController extends Controller {
 
         $data = $query->get()->map(function($row) {
             $row->radiusMeter = self::calculateDistanceBetweenCoordinates(
-                    latitudeA: $row->latitudeMin,
+                    latitudeA:  $row->latitudeMin,
                     longitudeA: $row->longitudeMin,
-                    latitudeB: $row->latitudeMax,
+                    latitudeB:  $row->latitudeMax,
                     longitudeB: $row->longitudeMax
                 ) * 1000 / 2;
             return $row;
         });
 
         return view('search.search', [
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
@@ -74,7 +75,7 @@ class SearchController extends Controller {
         float $longitudeA,
         float $latitudeB,
         float $longitudeB,
-        int $decimals = 3
+        int   $decimals = 3
     ): float {
         if($longitudeA === $longitudeB && $latitudeA === $latitudeB) {
             return 0.0;

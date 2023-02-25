@@ -21,9 +21,9 @@
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     </head>
 
-    <body>
+    <body data-bs-theme="dark">
         <header>
-            <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+            <nav class="navbar navbar-expand-md bg-black">
                 <div class="container">
                     <a class="navbar-brand" href="/">{{__('Vehicle tracking')}}</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
@@ -105,7 +105,7 @@
         <main role="main">
             @yield('jumbotron')
 
-            <div class="album py-2 bg-light">
+            <div class="album py-2">
                 <div class="container">
                     @include('layout.components.alerts')
 

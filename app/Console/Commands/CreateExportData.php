@@ -29,7 +29,7 @@ class CreateExportData extends Command {
             $export   = [
                 'company' => [
                     'name' => $company->name,
-                ]
+                ],
             ];
             $vehicles = $company->vehicles;
             echo strtr('** Found :count vehicles', [':count' => $vehicles->count()]) . PHP_EOL;
@@ -47,11 +47,12 @@ class CreateExportData extends Command {
                     $lastPos = [
                         'latitude'  => round($lastPos->latitude, 3),
                         'longitude' => round($lastPos->longitude, 3),
-                        'timestamp' => $lastPos->created_at->setMinute(0)->setSecond(0)->toIso8601String()
+                        'timestamp' => $lastPos->created_at->setMinute(0)->setSecond(0)->toIso8601String(),
                     ];
                 }
 
                 $vehicleExport = [
+                    'id'            => $vehicle->id,
                     'name'          => $vehicle->vehicle_name,
                     'type'          => $vehicle->type,
                     'bssid'         => $bssids,
@@ -67,7 +68,7 @@ class CreateExportData extends Command {
             $path = $exportPath . '/' . $company->slug . '.json';
             echo strtr('*** Save :count rows to :path' . PHP_EOL, [
                 ':count' => count($export['vehicles']),
-                ':path'  => $path
+                ':path'  => $path,
             ]);
             $fp = fopen($path, 'w+');
             fputs($fp, json_encode($export, JSON_PRETTY_PRINT));

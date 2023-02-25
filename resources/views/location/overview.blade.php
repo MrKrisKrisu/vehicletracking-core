@@ -5,7 +5,8 @@
         <div class="col-md-6">
             <div class="card mb-2">
                 <div class="card-body">
-                    <h3>Airport Utility Export importieren</h3>
+                    <h2 class="fs-5">Airport Utility Export importieren</h2>
+
                     <form method="POST" action="{{route('import.airport')}}" enctype="multipart/form-data">
                         @csrf
                         <div class="">
@@ -34,22 +35,22 @@
         <div class="col-md-6">
             <div class="card mb-2">
                 <div class="card-body">
-                    <h3>GPX importieren</h3>
+                    <h2 class="fs-5">GPX importieren</h2>
+
                     <form method="POST" action="{{route('location.import')}}" enctype="multipart/form-data">
                         @csrf
-                        <div class="">
-                            <label>Scanner</label>
+                        <div class="form-floating mb-2">
                             <select class="form-control" name="device_id">
                                 <option value="">bitte wählen</option>
                                 @foreach(auth()->user()->scanDevices as $scanDevice)
                                     <option value="{{$scanDevice->id}}">{{$scanDevice->name}}</option>
                                 @endforeach
                             </select>
+                            <label>Scanner</label>
                         </div>
 
-                        <div class="">
-                            <input name="file" type="file" class="form-control">
-                        </div>
+                        <input name="file" type="file" class="form-control mb-2">
+
                         <button class="btn btn-primary" type="submit">Importieren</button>
                     </form>
                 </div>

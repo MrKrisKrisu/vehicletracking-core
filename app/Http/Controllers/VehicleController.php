@@ -68,19 +68,21 @@ class VehicleController extends Controller {
                      ->get();
 
         foreach($scans as $scan) {
-            if(!isset($possibleVehicles[$scan->bssid]))
+            if(!isset($possibleVehicles[$scan->bssid])) {
                 $possibleVehicles[$scan->bssid] = [];
+            }
 
             $scanPos = $scan->possibleVehiclesRaw();
             foreach($scanPos as $p) {
-                if(!in_array($p, $possibleVehicles[$scan->bssid]))
+                if(!in_array($p, $possibleVehicles[$scan->bssid])) {
                     $possibleVehicles[$scan->bssid][] = $p;
+                }
             }
         }
 
         return view('overview', [
             'lastScan'         => $lastScans,
-            'possibleVehicles' => $possibleVehicles
+            'possibleVehicles' => $possibleVehicles,
         ]);
     }
 
@@ -147,7 +149,7 @@ class VehicleController extends Controller {
             'device'        => $device,
             'count'         => $count,
             'companies'     => Company::all(),
-            'locationScans' => $locationScans
+            'locationScans' => $locationScans,
         ]);
     }
 
@@ -160,7 +162,7 @@ class VehicleController extends Controller {
 
             $validated = $request->validate([
                                                 'modified_scan_id'      => ['required', 'integer', 'exists:scans,id'],
-                                                'modified_vehicle_name' => ['required']
+                                                'modified_vehicle_name' => ['required'],
                                             ]);
 
             $scan = Scan::find($validated['modified_scan_id']);
@@ -210,7 +212,7 @@ class VehicleController extends Controller {
             'vehicle'      => $vehicle,
             'found'        => $found,
             'lastPosition' => $lastPosition,
-            'dateCount'    => $dateCount
+            'dateCount'    => $dateCount,
         ]);
     }
 
@@ -225,8 +227,9 @@ class VehicleController extends Controller {
         foreach($scans as $scan) {
             $scanPos = $scan->possibleVehiclesRaw();
             foreach($scanPos as $p) {
-                if(!in_array($p, $data))
+                if(!in_array($p, $data)) {
                     $data[] = $p;
+                }
             }
         }
         sort($data);
@@ -236,13 +239,18 @@ class VehicleController extends Controller {
 
     public function renderCompanies(): View {
         return view('companies', [
-            'companies' => Company::with(['vehicles'])->where('name', '<>', 'Stationary')->get()
+            'companies' => Company::with(['vehicles'])
+                                  ->where('name', '<>', 'Stationary')
+                                  ->get()
+                                  ->sortByDesc(function($company) {
+                                      return $company->vehicles->count();
+                                  }),
         ]);
     }
 
     public function renderCompany(int $id): View {
         return view('company', [
-            'company' => Company::with(['vehicles', 'vehicles.devices'])->findOrFail($id)
+            'company' => Company::with(['vehicles', 'vehicles.devices'])->findOrFail($id),
         ]);
     }
 
@@ -256,7 +264,7 @@ class VehicleController extends Controller {
         $validated = $request->validate([
                                             'bssid' => ['required', 'exists:devices,bssid'],
                                             'ssid'  => ['required', 'exists:devices,ssid'],
-                                            'ban'   => ['required', Rule::in(['bssid', 'ssid'])]
+                                            'ban'   => ['required', Rule::in(['bssid', 'ssid'])],
                                         ]);
 
         if($validated['ban'] === 'bssid') {
@@ -283,7 +291,7 @@ class VehicleController extends Controller {
         }
         return view('ignored', [
             'bssid' => Device::where('ignore', 1)->orderBy('updated_at', 'desc')->paginate(),
-            'ssid'  => IgnoredNetwork::orderBy('created_at', 'desc')->paginate()
+            'ssid'  => IgnoredNetwork::orderBy('created_at', 'desc')->paginate(),
         ]);
     }
 
@@ -292,7 +300,7 @@ class VehicleController extends Controller {
             abort(403);
         }
         $validated = $request->validate([
-                                            'ssid' => ['required', 'exists:ignored_networks,ssid']
+                                            'ssid' => ['required', 'exists:ignored_networks,ssid'],
                                         ]);
 
         IgnoredNetwork::find($validated['ssid'])->delete();
@@ -305,11 +313,11 @@ class VehicleController extends Controller {
             abort(403);
         }
         $validated = $request->validate([
-                                            'bssid' => ['required', 'exists:devices,bssid']
+                                            'bssid' => ['required', 'exists:devices,bssid'],
                                         ]);
 
         Device::where('bssid', $validated['bssid'])->update([
-                                                                'ignore' => 0
+                                                                'ignore' => 0,
                                                             ]);
 
         return back();
@@ -321,7 +329,7 @@ class VehicleController extends Controller {
         }
         $validated = $request->validate([
                                             'ssid'     => ['required'],
-                                            'contains' => ['nullable']
+                                            'contains' => ['nullable'],
                                         ]);
 
         $validated['contains'] = isset($validated['contains']) && $validated['contains'] === 'on' ? 1 : 0;
@@ -360,11 +368,11 @@ class VehicleController extends Controller {
 
     public function skipAssignment(Request $request): RedirectResponse {
         $validated = $request->validate([
-                                            'id' => ['required', 'exists:devices,id']
+                                            'id' => ['required', 'exists:devices,id'],
                                         ]);
 
         Device::find($validated['id'])->update([
-                                                   'moveVerifyUntil' => Carbon::now()
+                                                   'moveVerifyUntil' => Carbon::now(),
                                                ]);
 
         return back()->with('alert-success', 'Die Zuweisung wurde bis zur nächsten Lokalisierung aufgeschoben.');

@@ -91,17 +91,14 @@
                 <div class="card-body">
                     <h5 class="card-title">Letzter bekannter Standort</h5>
                     @isset($lastPosition)
-                        <div id="mapid" style="width: 100%; height: 200px;"></div>
+                        <div id="map" style="width: 100%; height: 200px;"></div>
                         <script>
                             $(document).ready(loadMap);
 
                             function loadMap() {
-                                let map = L.map('mapid').setView([{{round($lastPosition->latitude, 3)}}, {{round($lastPosition->longitude, 3)}}], 13);
 
-                                L.tileLayer('https://osmcache.k118.de/carto/{z}/{x}/{y}.png', {
-                                    maxZoom: 18,
-                                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-                                }).addTo(map);
+                                let map = createMap();
+                                map.setView([{{round($lastPosition->latitude, 3)}}, {{round($lastPosition->longitude, 3)}}], 13);
 
                                 L.marker([{{round($lastPosition->latitude, 3)}}, {{round($lastPosition->longitude, 3)}}], {
                                     icon: L.icon({

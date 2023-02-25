@@ -16,17 +16,13 @@
 
             <div class="card">
                 <div class="card-body">
-                    <div id="mapid" style="width: 100%; height: 700px;"></div>
+                    <div id="map" style="width: 100%; height: 700px;"></div>
                     <script>
                         $(document).ready(loadMap);
 
                         function loadMap() {
-                            let map = L.map('mapid').setView([52.37707, 9.73811], 13);
-
-                            L.tileLayer('https://osmcache.k118.de/carto/{z}/{x}/{y}.png', {
-                                maxZoom: 18,
-                                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-                            }).addTo(map);
+                            let map = createMap();
+                            let featureGroup = L.featureGroup().addTo(map);
 
                             @foreach($companies as $company)
                             $.ajax({
@@ -43,7 +39,9 @@
                                                 .bindPopup('<b>Fahrzeug <a href="/vehicle/' + vehicle.id + '">' + vehicle.name +
                                                     '</a></b><br/>' + vehicle.last_position.timestamp
                                                 )
-                                                .addTo(map);
+                                                .addTo(featureGroup);
+
+                                            map.fitBounds(featureGroup.getBounds());
                                         }
                                     });
                                 }

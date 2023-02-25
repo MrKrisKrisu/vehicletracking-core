@@ -7,15 +7,11 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div id="mapid" style="width: 100%; height: 700px;"></div>
+                    <div id="map" style="width: 100%; height: 700px;"></div>
                     <script>
-                        var map = L.map('mapid').setView([52.37707, 9.73811], 19);
+                        let map = createMap();
+                        let featureGroup = L.featureGroup().addTo(map);
                         var markers = [];
-
-                        L.tileLayer('https://osmcache.k118.de/carto/{z}/{x}/{y}.png', {
-                            maxZoom: 18,
-                            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-                        }).addTo(map);
 
                         map.on('dragend', loadMap);
                         map.on('zoomend', loadMap);
@@ -33,7 +29,7 @@
                                         if (network.id in markers) return;
                                         markers[network.id] = L.circleMarker([network.lat, network.lon], {
                                             color: '#3388ff'
-                                        }).addTo(map);
+                                        }).addTo(featureGroup);
                                     });
                                 }
                             });

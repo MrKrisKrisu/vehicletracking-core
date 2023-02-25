@@ -16,7 +16,7 @@
                         </select>
 
                         <input type="text" class="form-control mt-2 me-sm-2" id="inlineFormInputName2"
-                               name="query" placeholder="Suchbegriff"/>
+                               name="query" placeholder="Suchbegriff [SSID oder BSSID]"/>
 
                         <button type="submit" class="btn btn-primary mt-2">Suchen</button>
                     </form>
@@ -28,31 +28,37 @@
             <div class="col-md-9">
                 <div class="card">
                     <div class="card-body">
-                        <h1 class="h5">Suchergebnisse</h1>
-                        @if($data->count() == 5000)
-                            <p class="text-danger">Es werden maximal 5000 Ergebnisse angezeigt. Bitte Suche
-                                spezifizieren.</p>
+                        <h1 class="fs-5">Suchergebnisse</h1>
+
+                        @if($data->count() >= 5000)
+                            <p class="text-danger">
+                                Es werden maximal 5000 Ergebnisse angezeigt.
+                                Bitte Suche spezifizieren.
+                            </p>
                         @else
                             <p>Es wurden {{$data->count()}} Netzwerke gefunden.</p>
                         @endif
                         <hr/>
-                        <div id="mapid" style="width: 100%; height: 700px;"></div>
+                        <div id="map" style="width: 100%; height: 700px;"></div>
                         <script>
                             $(document).ready(loadMap);
 
                             function loadMap() {
-                                let map = L.map('mapid').setView([52.37707, 9.73811], 13);
+                                let map = createMap('map', false);
+                                let featureGroup = L.featureGroup().addTo(map);
 
-                                L.tileLayer('https://osmcache.k118.de/carto/{z}/{x}/{y}.png', {
-                                    maxZoom: 18,
-                                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-                                }).addTo(map);
+                                let icon = new L.Icon.Default({
+                                    iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
+                                    shadowUrl: '/images/vendor/leaflet/dist/marker-shadow.png',
+                                });
 
                                 @foreach($data as $network)
-                                L.marker([{{round($network->latitudeAvg, 3)}}, {{round($network->longitudeAvg, 3)}}])
+                                L.marker([{{round($network->latitudeAvg, 3)}}, {{round($network->longitudeAvg, 3)}}], {icon: icon})
                                     .bindPopup('<b>SSID: {{$network->ssid}}</b>@if($network->radiusMeter > 100)<br />Mehrfach gesichtet im Radius von {{$network->radiusMeter}}m.@endif')
-                                    .addTo(map);
+                                    .addTo(featureGroup);
                                 @endforeach
+
+                                map.fitBounds(featureGroup.getBounds());
                             }
                         </script>
                     </div>
