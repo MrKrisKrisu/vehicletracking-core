@@ -9,24 +9,39 @@
 
                     <form method="POST" action="{{route('import.airport')}}" enctype="multipart/form-data">
                         @csrf
-                        <div class="">
-                            <label>Datum</label>
+                        <div class="form-floating mb-2">
                             <input type="date" name="date" value="{{\Carbon\Carbon::today()->toDateString()}}"
                                    required class="form-control"/>
+                            <label>Datum</label>
                         </div>
-                        <div class="">
-                            <label>Was? <small>mehrere Fahrzeuge durch Komma trennen</small></label>
+                        <div class="form-floating mb-2">
                             <input type="text" name="vehicle_name" placeholder="9101, 427 041, etc."
                                    required class="form-control"/>
+                            <label>Was? <small>mehrere Fahrzeuge durch Komma trennen</small></label>
                         </div>
-                        <div class="">
-                            <label>Aufnahmeort</label>
+                        <div class="form-floating mb-2">
                             <input type="text" name="location" placeholder="Hannover Hbf, Haltenhoffstraße, etc."
                                    required class="form-control"/>
+                            <label>Aufnahmeort (Text)</label>
                         </div>
-                        <div class="">
-                            <input name="file" type="file" class="form-control">
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" name="latitude" placeholder="Latitude"/>
+                                    <label>Latitude</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" name="longitude" placeholder="Longitude"/>
+                                    <label>Longitude</label>
+                                </div>
+                            </div>
                         </div>
+
+                        <input name="file" type="file" class="form-control mb-2">
+
                         <button class="btn btn-primary" type="submit">Importieren</button>
                     </form>
                 </div>

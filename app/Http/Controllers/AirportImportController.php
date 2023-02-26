@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use League\Csv\Reader;
-use App\ScanDevice;
-use Illuminate\Support\Facades\DB;
+use App\Device;
 use App\Scan;
+use App\ScanDevice;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use App\Device;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use League\Csv\Reader;
 
 class AirportImportController extends Controller {
 
@@ -20,6 +20,8 @@ class AirportImportController extends Controller {
                                             'date'         => ['required', 'date'],
                                             'location'     => ['required', 'string'],
                                             'vehicle_name' => ['required', 'string'],
+                                            'latitude'     => ['nullable', 'numeric'],
+                                            'longitude'    => ['nullable', 'numeric'],
                                             'file'         => ['required', 'file'],
                                         ]);
 
@@ -33,6 +35,7 @@ class AirportImportController extends Controller {
         $csv->setDelimiter(',');
         $ok = 0;
 
+        $bssids        = collect();
         $foundVehicles = collect();
         foreach($csv->getRecords() as $record) {
             if(!isset($record[' BSS']) || !isset($record[' Time'])) {
@@ -51,6 +54,10 @@ class AirportImportController extends Controller {
                 continue;
             }
 
+            if($bssids->contains($record[' BSS'])) {
+                continue; //skip duplicates
+            }
+            $bssids->push($record[' BSS']);
             IgnoredNetworkController::checkIfDeviceShouldBeHidden($device);
 
             $scan = Scan::create([
@@ -59,6 +66,8 @@ class AirportImportController extends Controller {
                                      'ssid'         => $record['SSID'] ?? null,
                                      'signal'       => $record[' RSSI'] ?? null,
                                      'channel'      => $record[' Channel'] ?? null,
+                                     'latitude'     => $validated['latitude'] ?? null,
+                                     'longitude'    => $validated['longitude'] ?? null,
                                      'scanDeviceId' => $scanDevice->id,
                                      'created_at'   => $date,
                                      'updated_at'   => $date,
