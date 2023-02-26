@@ -7,7 +7,6 @@ use App\Http\Controllers\Frontend\User\SettingsController;
 use App\Http\Controllers\IgnoredNetworkController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MapController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VehicleController;
