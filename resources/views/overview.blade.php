@@ -16,7 +16,7 @@
                         <i class="far fa-check-square"></i>
                     </button>
                     @foreach(\App\ScanDevice::where('user_id', auth()->user()->id)->get() as $device)
-                        <a href="/?device={{$device->id}}" class="btn btn-sm btn-primary">{{$device->name}}</a>
+                        <a href="?device={{$device->id}}" class="btn btn-sm btn-primary">{{$device->name}}</a>
                     @endforeach
                     <hr/>
                     <form method="POST" action="{{route('save-to-session')}}">
