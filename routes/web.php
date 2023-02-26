@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AirportImportController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\Frontend\User\DashboardController;
 use App\Http\Controllers\Frontend\User\SettingsController;
 use App\Http\Controllers\IgnoredNetworkController;
 use App\Http\Controllers\LocationController;
@@ -15,52 +16,62 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes(['register' => false]);
 
+Route::view('/', 'user.home')
+     ->name('user.home');
+
 Route::middleware(['auth'])->group(function() {
-    Route::get('/', [VehicleController::class, 'render'])->name('dashboard');
-    Route::post('/scans/assign', [VehicleController::class, 'saveVehicle'])->name('scans.assign');
+    Route::get('/dashboard', [DashboardController::class, 'renderDashboard'])
+         ->name('user.dashboard');
 
-    Route::get('/verify', [VehicleController::class, 'verify']);
+    Route::prefix('admin')->middleware(['admin'])->group(function() {
+        Route::get('/', [VehicleController::class, 'render'])
+             ->name('admin.dashboard');
+        Route::post('/scans/assign', [VehicleController::class, 'saveVehicle'])
+             ->name('scans.assign');
 
-    Route::get('/notifications', [NotificationController::class, 'renderNotifications'])
-         ->name('notifications');
-    Route::post('/notifications', [NotificationController::class, 'switchNotifications']);
+        Route::get('/verify', [VehicleController::class, 'verify'])
+             ->name('admin.verify');
 
-    Route::get('/ignored', [VehicleController::class, 'renderIgnored'])
-         ->name('ignored');
-    Route::post('/ignoreDevice', [VehicleController::class, 'ignoreDevice'])
-         ->name('ignoreDevice');
-    Route::post('/ignoreDevice/add', [VehicleController::class, 'saveIgnoredNetwork'])
-         ->name('ignoreDevice.add');
-    Route::post('/unban/ssid', [VehicleController::class, 'unbanSSID'])
-         ->name('unban.ssid');
-    Route::post('/unban/bssid', [VehicleController::class, 'unbanBSSID'])
-         ->name('unban.bssid');
+        Route::get('/ignored', [VehicleController::class, 'renderIgnored'])
+             ->name('admin.ignored');
+        Route::post('/ignoreDevice', [VehicleController::class, 'ignoreDevice'])
+             ->name('ignoreDevice');
+        Route::post('/ignoreDevice/add', [VehicleController::class, 'saveIgnoredNetwork'])
+             ->name('ignoreDevice.add');
+        Route::post('/unban/ssid', [VehicleController::class, 'unbanSSID'])
+             ->name('unban.ssid');
+        Route::post('/unban/bssid', [VehicleController::class, 'unbanBSSID'])
+             ->name('unban.bssid');
 
-    Route::get('/import', [LocationController::class, 'renderOverview'])
-         ->name('location');
-    Route::post('/location/import', [LocationController::class, 'importLocations'])
-         ->name('location.import');
+        Route::get('/import', [LocationController::class, 'renderOverview'])
+             ->name('admin.location');
+        Route::post('/location/import', [LocationController::class, 'importLocations'])
+             ->name('location.import');
 
-    Route::post('/import/airport', [AirportImportController::class, 'import'])
-         ->name('import.airport');
+        Route::post('/import/airport', [AirportImportController::class, 'import'])
+             ->name('import.airport');
 
-    Route::post('/vehicle/create', [VehicleController::class, 'createVehicle'])
-         ->name('vehicle.create');
-    Route::post('/vehicle/assign', [VehicleController::class, 'assignVehicle'])
-         ->name('vehicle.assign');
-    Route::post('/vehicle/assign/skip', [VehicleController::class, 'skipAssignment'])
-         ->name('vehicle.assign.skip');
+        Route::post('/vehicle/create', [VehicleController::class, 'createVehicle'])
+             ->name('vehicle.create');
+        Route::post('/vehicle/assign', [VehicleController::class, 'assignVehicle'])
+             ->name('vehicle.assign');
+        Route::post('/vehicle/assign/skip', [VehicleController::class, 'skipAssignment'])
+             ->name('vehicle.assign.skip');
 
-    Route::get('/map/networks', [MapController::class, 'renderNetworkMap'])
-         ->name('map.networks');
+        Route::get('/map/networks', [MapController::class, 'renderNetworkMap'])
+             ->name('map.networks');
 
-    Route::prefix('model')->group(function() {
-        Route::post('/scans/update', [ScanController::class, 'update'])
-             ->name('scans.update');
-        Route::post('/device/update', [DeviceController::class, 'update'])
-             ->name('device.update');
-        Route::post('/ignoredNetwork/create', [IgnoredNetworkController::class, 'create'])
-             ->name('ignoredNetwork.create');
+        Route::prefix('model')->group(function() {
+            Route::post('/scans/update', [ScanController::class, 'update'])
+                 ->name('scans.update');
+            Route::post('/device/update', [DeviceController::class, 'update'])
+                 ->name('device.update');
+            Route::post('/ignoredNetwork/create', [IgnoredNetworkController::class, 'create'])
+                 ->name('ignoredNetwork.create');
+        });
+
+        Route::post('/save-to-session', [SettingsController::class, 'saveToSession'])->name('save-to-session');
+        Route::post('/hideAll', [VehicleController::class, 'hideAll'])->name('hide-all');
     });
 
     Route::get('/settings', [SettingsController::class, 'renderSettings'])
@@ -68,12 +79,10 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/settings/password', [SettingsController::class, 'changePassword'])
          ->name('user.settings.password');
 
-    Route::post('/save-to-session', [SettingsController::class, 'saveToSession'])->name('save-to-session');
-    Route::post('/hideAll', [VehicleController::class, 'hideAll'])->name('hide-all');
+    Route::get('/map', [MapController::class, 'renderMap'])->name('map');
 });
 
 Route::view('/imprint', 'imprint')->name('imprint');
-Route::get('/map', [MapController::class, 'renderMap'])->name('map');
 Route::get('/sitemap', [MapController::class, 'renderSitemap']);
 Route::get('/search', [SearchController::class, 'render']);
 Route::post('/search', [SearchController::class, 'search'])->name('search.show');

@@ -4,7 +4,12 @@
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 
-        <title>@hasSection('title')@yield('title') - @endif PublicTransportTracker</title>
+        <title>
+            @hasSection('title')
+                @yield('title') -
+            @endif
+            {{config('app.name')}}
+        </title>
 
         @hasSection('meta-description')
             <meta name="description" content="@yield('title')"/>
@@ -14,8 +19,8 @@
         <meta name="mobile-web-app-capable" content="yes"/>
         <meta name="apple-mobile-web-app-capable" content="yes"/>
 
-        <meta name="apple-mobile-web-app-title" content="VehicleTracking"/>
-        <meta name="application-name" content="VehicleTracking"/>
+        <meta name="apple-mobile-web-app-title" content="{{config('app.name')}}"/>
+        <meta name="application-name" content="{{config('app.name')}}"/>
 
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
         <script src="{{ mix('js/app.js') }}"></script>
@@ -27,43 +32,39 @@
             <nav class="navbar navbar-expand-md bg-black">
                 <div class="container">
                     <a class="navbar-brand" href="/">
-                        PublicTransportTracker
+                        {{config('app.name')}}
                     </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarCollapse"
                             aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{route('user.home')}}">
+                                    <i class="fa-solid fa-house-chimney"></i>
+                                    Startseite
+                                </a>
+                            </li>
                             @auth
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/">Home</a>
+                                    <a class="nav-link" href="{{route('user.dashboard')}}">
+                                        <i class="fa-solid fa-ranking-star"></i>
+                                        Meine Übersicht
+                                    </a>
                                 </li>
-                                @if(auth()->user()->id === 1)
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="/verify/">Zuordnung</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{route('ignored')}}">Ausschluß</a>
-                                    </li>
-                                @endif
+                            @endauth
+                            @auth
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{route('location')}}">Import</a>
+                                    <a class="nav-link" href="{{route('map')}}">Karte</a>
                                 </li>
                             @endauth
                             <li class="nav-item">
-                                <a class="nav-link" href="{{route('map')}}">Karte</a>
+                                <a class="nav-link" href="{{route('companies')}}">
+                                    Verkehrsunternehmen
+                                </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{route('companies')}}">Verkehrsunternehmen</a>
-                            </li>
-                            @auth
-                                @if(auth()->user()->id === 1)
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{route('notifications')}}">Benachrichtigungen</a>
-                                    </li>
-                                @endif
-                            @endauth
                         </ul>
 
                         <ul class="navbar-nav me-right">
@@ -77,19 +78,42 @@
                                     </li>
                                 @endif
                             @else
+                                @admin
                                 <li class="nav-item dropdown">
-                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        {{ Auth::user()->name }} <span class="caret"></span>
+                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-solid fa-toolbox"></i>
+                                        Administration
+                                        <span class="caret"></span>
+                                    </a>
+
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="{{route('admin.dashboard')}}">Dashboard</a>
+                                        <a class="dropdown-item" href="{{route('admin.verify')}}">Zuordnung</a>
+                                        <a class="dropdown-item" href="{{route('admin.ignored')}}">Ausschluß</a>
+                                        <a class="dropdown-item" href="{{route('admin.location')}}">Import</a>
+                                    </div>
+                                </li>
+                                @endadmin
+
+                                <li class="nav-item dropdown">
+                                    <a id="navbarDropdown" class="nav-link dropdown-toggle" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-regular fa-user"></i>
+                                        {{ Auth::user()->name }}
+                                        <span class="caret"></span>
                                     </a>
 
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                         <a class="dropdown-item" href="{{ route('user.settings') }}">
+                                            <i class="fa-solid fa-user-gear"></i>
                                             Einstellungen
                                         </a>
                                         <a class="dropdown-item" href="{{ route('logout') }}"
                                            onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                            {{ __('Logout') }}
+                                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                            Logout
                                         </a>
 
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST"
@@ -115,7 +139,6 @@
                     @yield('content')
                 </div>
             </div>
-
         </main>
 
         <footer class="text-muted">
@@ -127,21 +150,4 @@
             </div>
         </footer>
     </body>
-    <script type="text/javascript">
-        var _paq = window._paq = window._paq || [];
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function () {
-            var u = "//{{config('app.matomo.url')}}/";
-            _paq.push(['setTrackerUrl', u + 'matomo.php']);
-            _paq.push(['setSiteId', '{{config('app.matomo.id')}}']);
-            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-            g.type = 'text/javascript';
-            g.async = true;
-            g.src = u + 'matomo.js';
-            s.parentNode.insertBefore(g, s);
-        })();
-    </script>
-    <noscript><p><img src="//{{config('app.matomo.url')}}/matomo.php?idsite={{config('app.matomo.id')}}&amp;rec=1"
-                      style="border:0;" alt=""/></p></noscript>
 </html>

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API\v1;
 
 use App\Device;
 use App\Http\Controllers\IgnoredNetworkController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\ScanDeviceAuthentification;
 use App\Scan;
 use App\ScanDevice;
@@ -99,67 +98,12 @@ class ScanController extends ApiController {
 
         sort($unverified);
 
-        if(ScanDeviceAuthentification::getDevice()->notify) {
-            if(count($verified) > 0) {
-                $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Fahrzeug(e) lokalisiert</b>\r\n\r\n";
-                foreach($verified as $vehicle) {
-                    $message .= $vehicle['vehicle'] . "\r\n<i>" . $vehicle['company'] . "</i>\r\n---------------\r\n";
-                }
-                NotificationController::notifyRaw($message);
-            }
-            if(count($unverified) > 0) {
-                $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Unverifiziertes Fahrzeug lokalisiert</b>\r\n";
-                foreach($unverified as $vehicle) {
-                    $message .= '- ' . $vehicle . "\r\n";
-                }
-                NotificationController::notifyRaw($message);
-            }
-        }
-
         return response()->json([
                                     'status' => true,
                                     'data'   => [
                                         'verified'   => array_values($verified),
                                         'unverified' => array_values($unverified),
                                     ],
-                                ]);
-    }
-
-    /**
-     * GET: /api/v1/location?token&lat&lon&timestamp&hdop&altitude&speed
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function saveLocation(Request $request): JsonResponse {
-
-        $validated = $request->validate([
-                                            'token'     => ['required', 'exists:scan_devices,token'],
-                                            'lat'       => ['required', 'numeric'],
-                                            'lon'       => ['required', 'numeric'],
-                                            'timestamp' => ['required', 'numeric'],
-                                            'hdop'      => ['nullable', 'numeric'],
-                                            'altitude'  => ['nullable', 'numeric'],
-                                            'speed'     => ['nullable', 'numeric'],
-                                        ]);
-
-        $scanDevice = ScanDevice::where('token', $validated['token'])->firstOrFail();
-
-        $time  = Carbon::createFromTimestampMs($validated['timestamp']);
-        $count = Scan::where('scanDeviceId', $scanDevice->id)
-                     ->where('latitude', null)
-                     ->where('longitude', null)
-                     ->where('created_at', '>=', $time->clone()->subSeconds(5))
-                     ->where('created_at', '<=', $time->clone()->addSeconds(5))
-                     ->update([
-                                  'latitude'  => $validated['lat'],
-                                  'longitude' => $validated['lon'],
-                              ]);
-
-        return response()->json([
-                                    'success'  => true,
-                                    'affected' => $count,
                                 ]);
     }
 
