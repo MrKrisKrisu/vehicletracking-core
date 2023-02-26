@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API\v1;
 
 use App\Device;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\IgnoredNetworkController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\ScanDeviceAuthentification;
@@ -15,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class ScanController extends Controller {
+class ScanController extends ApiController {
 
     /**
      * POST: /api/v1/scan
@@ -66,10 +65,10 @@ class ScanController extends Controller {
             $scanElement['bssid'] = strtoupper($scanElement['bssid']);
 
             $device = Device::updateOrCreate([
-                                                 'bssid' => $scanElement['bssid']
+                                                 'bssid' => $scanElement['bssid'],
                                              ], [
                                                  'ssid'     => $scanElement['ssid'],
-                                                 'lastSeen' => Carbon::now()->toIso8601String()
+                                                 'lastSeen' => Carbon::now()->toIso8601String(),
                                              ]);
 
             if($device->blocked) {
@@ -84,7 +83,7 @@ class ScanController extends Controller {
                 if($vehicle->company->name !== 'Stationary') {
                     $verified[$vehicle->id] = [
                         'company' => $vehicle->company->name,
-                        'vehicle' => $vehicle->vehicle_name
+                        'vehicle' => $vehicle->vehicle_name,
                     ];
                 }
             } else {
@@ -103,14 +102,16 @@ class ScanController extends Controller {
         if(ScanDeviceAuthentification::getDevice()->notify) {
             if(count($verified) > 0) {
                 $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Fahrzeug(e) lokalisiert</b>\r\n\r\n";
-                foreach($verified as $vehicle)
+                foreach($verified as $vehicle) {
                     $message .= $vehicle['vehicle'] . "\r\n<i>" . $vehicle['company'] . "</i>\r\n---------------\r\n";
+                }
                 NotificationController::notifyRaw($message);
             }
             if(count($unverified) > 0) {
                 $message = '[' . ScanDeviceAuthentification::getDevice()->name . "] <b>Unverifiziertes Fahrzeug lokalisiert</b>\r\n";
-                foreach($unverified as $vehicle)
+                foreach($unverified as $vehicle) {
                     $message .= '- ' . $vehicle . "\r\n";
+                }
                 NotificationController::notifyRaw($message);
             }
         }
@@ -119,8 +120,8 @@ class ScanController extends Controller {
                                     'status' => true,
                                     'data'   => [
                                         'verified'   => array_values($verified),
-                                        'unverified' => array_values($unverified)
-                                    ]
+                                        'unverified' => array_values($unverified),
+                                    ],
                                 ]);
     }
 
@@ -158,8 +159,21 @@ class ScanController extends Controller {
 
         return response()->json([
                                     'success'  => true,
-                                    'affected' => $count
+                                    'affected' => $count,
                                 ]);
     }
 
+    public function update(Request $request, int $scanId): JsonResponse {
+        $validated = $request->validate([
+                                            'modified_vehicle_name' => ['required'],
+                                        ]);
+
+        $scan = Scan::findOrFail($scanId);
+        $this->authorize('update', $scan);
+
+        $validated['modified_vehicle_name'] = str_replace(["\r\n", "\r", "\n"], ',', $validated['modified_vehicle_name']);
+
+        $scan->update($validated);
+        return self::response();
+    }
 }

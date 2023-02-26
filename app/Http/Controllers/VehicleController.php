@@ -161,26 +161,6 @@ class VehicleController extends Controller {
         ]);
     }
 
-    public function saveVerify(Request $request): Renderable {
-        if(auth()->user()->id !== 1) {
-            abort(403);
-        }
-
-        if(isset($request->modified_vehicle_name)) {
-
-            $validated = $request->validate([
-                                                'modified_scan_id'      => ['required', 'integer', 'exists:scans,id'],
-                                                'modified_vehicle_name' => ['required'],
-                                            ]);
-
-            $scan = Scan::find($validated['modified_scan_id']);
-            $this->authorize('update', $scan);
-            $scan->update(['modified_vehicle_name' => str_replace("\r\n", ',', $validated['modified_vehicle_name'])]);
-        }
-
-        return self::verify();
-    }
-
     public static function renderVehicle(int $vehicleId, int $page = 1): Renderable {
         $vehicle = Vehicle::with(['company', 'devices.scans'])->findOrFail($vehicleId);
 

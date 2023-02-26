@@ -9,6 +9,7 @@
         @hasSection('meta-description')
             <meta name="description" content="@yield('title')"/>
         @endif
+        <meta name="csrf-token" content="{{ csrf_token() }}"/>
 
         <meta name="mobile-web-app-capable" content="yes"/>
         <meta name="apple-mobile-web-app-capable" content="yes"/>

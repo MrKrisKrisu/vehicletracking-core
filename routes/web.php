@@ -20,7 +20,6 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/scans/assign', [VehicleController::class, 'saveVehicle'])->name('scans.assign');
 
     Route::get('/verify', [VehicleController::class, 'verify']);
-    Route::post('/verify', [VehicleController::class, 'saveVerify']);
 
     Route::get('/notifications', [NotificationController::class, 'renderNotifications'])
          ->name('notifications');

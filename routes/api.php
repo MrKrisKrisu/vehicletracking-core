@@ -12,3 +12,9 @@ Route::prefix('v1')->middleware([])->group(function() {
     Route::get('/location', [ScanController::class, 'saveLocation']);
     Route::get('/networks', [MapController::class, 'getNetworksByBbox']);
 });
+
+Route::prefix('v1/model')->middleware(['auth'])->group(function() {
+    Route::apiResources([
+                            'scan' => ScanController::class,
+                        ]);
+});

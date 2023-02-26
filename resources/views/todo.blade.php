@@ -40,7 +40,7 @@
                             </thead>
                             <tbody>
                             @foreach($scans as $scan)
-                                <tr>
+                                <tr class="model scan" data-id="{{$scan->id}}">
                                     <td>
                                         @if($device->ssid !== $scan->ssid)
                                             <small>{{stripcslashes($scan->ssid)}}</small>
@@ -49,15 +49,11 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <form method="POST">
-                                            @csrf
-                                            <input type="hidden" name="modified_scan_id" value="{{$scan->id}}"/>
-                                            <textarea type="text" class="form-control"
-                                                      rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
-                                                      name="modified_vehicle_name">{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
-                                            <button class="btn btn-sm btn-primary"><i class="fas fa-save"></i>
-                                            </button>
-                                        </form>
+                                        <textarea type="text"
+                                                  class="form-control update"
+                                                  rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
+                                                  name="modified_vehicle_name"
+                                        >{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
                                     </td>
                                     <td>
                                         @if($scan->modified_vehicle_name !== null)

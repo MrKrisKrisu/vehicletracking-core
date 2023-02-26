@@ -1,3 +1,5 @@
+import {Notyf} from 'notyf';
+
 require('./bootstrap');
 
 require("datatables.net-bs4");
@@ -9,14 +11,21 @@ require("leaflet");
 
 require("select2");
 
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-});
+require("./api/api")
 
-$.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
+document.addEventListener("DOMContentLoaded", function () {
+    window.notyf = new Notyf({
+        duration: 5000,
+        position: {x: "right", y: "top"}
+    });
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $('[data-toggle="tooltip"]').tooltip()
 });
 
 window.createMap = function (containerId = 'map', ormLayer = true) {
