@@ -39,7 +39,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($device->scans->where('vehicle_name', '<>', null) as $scan)
+                            @foreach($scans as $scan)
                                 <tr>
                                     <td>
                                         @if($device->ssid !== $scan->ssid)

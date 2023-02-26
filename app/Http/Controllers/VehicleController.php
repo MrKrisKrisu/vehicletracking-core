@@ -10,6 +10,7 @@ use App\Vehicle;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -119,7 +120,6 @@ class VehicleController extends Controller {
                                        'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
                                        'devices.created_at', 'devices.updated_at',
                                        DB::raw('MAX(scans.created_at) AS lastScan'),
-
                                    ])
                           ->orderByDesc(DB::raw('MAX(scans.created_at)'));
 
@@ -145,8 +145,16 @@ class VehicleController extends Controller {
 
         $locationScans = $device->scans->where('latitude', '<>', null)->where('longitude', '<>', null);
 
+        $scansToCheck = $device->scans
+            ->whereNotNull('vehicle_name')
+            ->groupBy(['vehicle_name', 'created_at']) //Filter duplicate scans like airport
+            ->map(function(Collection $scans) {
+                return $scans->first()?->first();
+            });
+
         return view('todo', [
             'device'        => $device,
+            'scans'         => $scansToCheck,
             'count'         => $count,
             'companies'     => Company::all(),
             'locationScans' => $locationScans,
