@@ -1,5 +1,6 @@
 'use strict';
 
+require('./device');
 require('./scan');
 
 window.API = class API {

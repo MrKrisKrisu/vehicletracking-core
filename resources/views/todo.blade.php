@@ -134,9 +134,15 @@
                                 <i class="far fa-save"></i>
                                 Speichern
                             </button>
-                            <button type="submit" form="formSkip" class="btn btn-sm btn-secondary">
+                            <button type="submit" form="formSkip" class="btn btn-sm btn-secondary" id="btn-skip">
                                 <i class="far fa-clock"></i>
                                 Aufschieben
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="if(!confirm('Wirklich blockieren?')) return; Device.update({{$device->id}}, {blocked: 1}).then(function() {document.getElementById('btn-skip').click();});"
+                            >
+                                <i class="fa-solid fa-ban"></i>
+                                Blockieren
                             </button>
                         </div>
                         @if(session()->has('lastVehicle'))

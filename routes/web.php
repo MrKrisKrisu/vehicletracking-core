@@ -64,7 +64,7 @@ Route::middleware(['auth'])->group(function() {
             Route::post('/scans/update', [ScanController::class, 'update'])
                  ->name('scans.update');
             Route::post('/device/update', [DeviceController::class, 'update'])
-                 ->name('device.update');
+                 ->name('old.device.update');
             Route::post('/ignoredNetwork/create', [IgnoredNetworkController::class, 'create'])
                  ->name('ignoredNetwork.create');
         });

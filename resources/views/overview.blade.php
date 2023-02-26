@@ -172,7 +172,7 @@
             $('*[data-deviceid="' + id + '"] .hideDevice').prop("disabled", true);
 
             $.ajax({
-                url: '{{route('device.update')}}',
+                url: '{{route('old.device.update')}}',
                 type: "POST",
                 data: {
                     id: id,

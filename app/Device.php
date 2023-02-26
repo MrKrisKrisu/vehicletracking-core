@@ -11,7 +11,7 @@ class Device extends Model {
 
     use HasFactory;
 
-    protected $fillable = ['bssid', 'ssid', 'vehicle_id', 'ignore', 'moveVerifyUntil', 'firstSeen', 'lastSeen'];
+    protected $fillable = ['bssid', 'ssid', 'vehicle_id', 'ignore', 'blocked', 'moveVerifyUntil', 'firstSeen', 'lastSeen'];
     protected $hidden   = ['id', 'ssid', 'firstSeen', 'vehicle_id'];
     protected $casts    = [
         'blocked'         => 'boolean',

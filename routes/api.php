@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\v1\DeviceController;
 use App\Http\Controllers\API\v1\MapController;
 use App\Http\Controllers\API\v1\ScanController;
 use Illuminate\Support\Facades\Route;
@@ -17,7 +18,8 @@ Route::middleware('api')->group(function() {
 Route::middleware('web')->group(function() {
     Route::prefix('v1/model')->middleware(['auth'])->group(function() {
         Route::apiResources([
-                                'scan' => ScanController::class,
+                                'scan'   => ScanController::class,
+                                'device' => DeviceController::class,
                             ]);
     });
 });
