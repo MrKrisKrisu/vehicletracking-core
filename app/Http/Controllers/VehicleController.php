@@ -103,7 +103,10 @@ class VehicleController extends Controller {
             abort(403);
         }
 
-        $validated = $request->validate(['query' => ['nullable', 'string', 'max:32']]);
+        $validated = $request->validate([
+                                            'query'   => ['nullable', 'string', 'max:32'],
+                                            'orderBy' => ['nullable', Rule::in(['ssid', 'bssid'])],
+                                        ]);
 
         $devicesQ = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
                           ->whereNull('devices.vehicle_id')
@@ -121,7 +124,7 @@ class VehicleController extends Controller {
                                        'devices.created_at', 'devices.updated_at',
                                        DB::raw('MAX(scans.created_at) AS lastScan'),
                                    ])
-                          ->orderByDesc(DB::raw('MAX(scans.created_at)'));
+                          ->orderByDesc($validated['orderBy'] ?? DB::raw('MAX(scans.created_at)'));
 
         if(isset($validated['query'])) {
             $devicesQ->where('devices.ssid', 'like', '%' . $validated['query'] . '%');
@@ -137,7 +140,7 @@ class VehicleController extends Controller {
         $device = $devices->first();
 
         if($device === null) {
-            return redirect()->route('dashboard')
+            return redirect()->route('admin.dashboard')
                              ->with('alert-info', 'Es gibt aktuell keine Geräte zum verifizieren.');
         }
 
