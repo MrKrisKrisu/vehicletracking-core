@@ -21,7 +21,6 @@
                     </p>
                     <p><strong>Kontakt:</strong><br/>
                         Telefon: {{ config('app.imprint.phone') }}<br/>
-                        Fax: {{ config('app.imprint.fax') }}<br/>
                         E-Mail: {{ config('app.imprint.email') }}<br/>
                     </p>
                 </div>
