@@ -31,62 +31,70 @@
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
-                            <tr>
-                                <th>SSID</th>
-                                <th>Erfassung</th>
-                                <th></th>
-                                <th>Scantime</th>
-                            </tr>
+                                <tr>
+                                    <th>SSID</th>
+                                    <th>Erfassung</th>
+                                    <th></th>
+                                    <th>Scantime</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <tbody>
-                            @foreach($scans as $scan)
-                                <tr class="model scan" data-id="{{$scan->id}}">
-                                    <td>
-                                        @if($device->ssid !== $scan->ssid)
-                                            <small>{{stripcslashes($scan->ssid)}}</small>
-                                        @else
-                                            <small><i class="fas fa-long-arrow-alt-up text-secondary"></i></small>
-                                        @endif
-                                    </td>
-                                    <td>
+                                @foreach($scans as $scan)
+                                    <tr class="model scan" data-id="{{$scan->id}}">
+                                        <td>
+                                            @if($device->ssid !== $scan->ssid)
+                                                <small>{{stripcslashes($scan->ssid)}}</small>
+                                            @else
+                                                <small><i class="fas fa-long-arrow-alt-up text-secondary"></i></small>
+                                            @endif
+                                        </td>
+                                        <td>
                                         <textarea type="text"
                                                   class="form-control update"
                                                   rows="{{count(explode(',', $scan->modified_vehicle_name ?? $scan->vehicle_name))}}"
                                                   name="modified_vehicle_name"
                                         >{{str_replace(',', "\r\n", $scan->modified_vehicle_name ?? $scan->vehicle_name)}}</textarea>
-                                    </td>
-                                    <td>
-                                        @if($scan->modified_vehicle_name !== null)
-                                            <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
-                                               title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{$scan->created_at->format('d.m.Y H:i')}}
-                                        @isset($scan->scanDevice)
-                                            <br/>
-                                            <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
-                                        @endisset
-                                        @if($scan->latitude !== null && $scan->longitude !== null)
-                                            <br/>
-                                            <small>
-                                                <i class="fas fa-location-arrow"></i>
-                                                <a href="https://www.openstreetmap.org/?mlat={{$scan->latitude}}&mlon={{$scan->longitude}}"
-                                                   target="_blank">
-                                                    {{$scan->latitude}}, {{$scan->longitude}}
-                                                </a>
-                                            </small>
-                                        @endif
-                                        @if($scan?->speed !== null)
-                                            <br/>
-                                            <small>
-                                                <i class="fas fa-tachometer-alt"></i>
-                                                {{$scan->speed}} km/h
-                                            </small>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
+                                        </td>
+                                        <td>
+                                            @if($scan->modified_vehicle_name !== null)
+                                                <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="top"
+                                                   title="Originale Erfassung: {{$scan->vehicle_name}}"></i>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{$scan->created_at->format('d.m.Y H:i')}}
+                                            @isset($scan->scanDevice)
+                                                <br/>
+                                                <small><i class="fas fa-wifi"></i> {{$scan->scanDevice->name}}</small>
+                                            @endisset
+                                            @if($scan->latitude !== null && $scan->longitude !== null)
+                                                <br/>
+                                                <small>
+                                                    <i class="fas fa-location-arrow"></i>
+                                                    <a href="https://www.openstreetmap.org/?mlat={{$scan->latitude}}&mlon={{$scan->longitude}}"
+                                                       target="_blank">
+                                                        {{$scan->latitude}}, {{$scan->longitude}}
+                                                    </a>
+                                                </small>
+                                            @endif
+                                            @if($scan?->speed !== null)
+                                                <br/>
+                                                <small>
+                                                    <i class="fas fa-tachometer-alt"></i>
+                                                    {{$scan->speed}} km/h
+                                                </small>
+                                            @endif
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="if(confirm('wirklich?')) {Scan.update({{$scan->id}}, {vehicle_name: null}); this.parentNode.parentNode.remove(); notyf.success('whoooosh');}"
+                                            >
+                                                <i class="fa-solid fa-broom"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -109,7 +117,7 @@
                                     <option value="{{$vehicle->id}}">
                                         {{$vehicle->company->name}} // {{$vehicle->vehicle_name}}
                                         @if($vehicle->hasUic)
-                                            ({{$vehicle->uic}})
+                                                                    ({{$vehicle->uic}})
                                         @endif
                                     </option>
                                 @endforeach

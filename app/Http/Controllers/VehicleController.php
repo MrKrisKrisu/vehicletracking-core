@@ -146,11 +146,11 @@ class VehicleController extends Controller {
         $locationScans = $device->scans->where('latitude', '<>', null)->where('longitude', '<>', null);
 
         $scansToCheck = $device->scans
-            ->whereNotNull('vehicle_name')
-            ->groupBy(['vehicle_name', 'created_at']) //Filter duplicate scans like airport
-            ->map(function(Collection $scans) {
-                return $scans->first()?->first();
-            });
+            ->whereNotNull('vehicle_name');
+            //->groupBy(['vehicle_name', 'created_at']) //Filter duplicate scans like airport
+            //->map(function(Collection $scans) {
+            //    return $scans->first()?->first();
+            //});
 
         return view('todo', [
             'device'        => $device,

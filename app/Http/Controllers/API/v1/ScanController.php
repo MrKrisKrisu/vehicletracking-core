@@ -6,7 +6,6 @@ use App\Device;
 use App\Http\Controllers\IgnoredNetworkController;
 use App\Http\Middleware\ScanDeviceAuthentification;
 use App\Scan;
-use App\ScanDevice;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -109,13 +108,16 @@ class ScanController extends ApiController {
 
     public function update(Request $request, int $scanId): JsonResponse {
         $validated = $request->validate([
-                                            'modified_vehicle_name' => ['required'],
+                                            'vehicle_name'          => ['nullable'],
+                                            'modified_vehicle_name' => ['nullable'],
                                         ]);
 
         $scan = Scan::findOrFail($scanId);
         $this->authorize('update', $scan);
 
-        $validated['modified_vehicle_name'] = str_replace(["\r\n", "\r", "\n"], ',', $validated['modified_vehicle_name']);
+        if(isset($validated['modified_vehicle_name'])) {
+            $validated['modified_vehicle_name'] = str_replace(["\r\n", "\r", "\n"], ',', $validated['modified_vehicle_name']);
+        }
 
         $scan->update($validated);
         return self::response();
