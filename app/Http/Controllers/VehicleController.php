@@ -10,7 +10,6 @@ use App\Vehicle;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -108,6 +107,7 @@ class VehicleController extends Controller {
 
         $devicesQ = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
                           ->whereNull('devices.vehicle_id')
+                          ->where('devices.blocked', 0)
                           ->whereNotNull('scans.vehicle_name')
                           ->groupBy([
                                         'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
@@ -147,10 +147,10 @@ class VehicleController extends Controller {
 
         $scansToCheck = $device->scans
             ->whereNotNull('vehicle_name');
-            //->groupBy(['vehicle_name', 'created_at']) //Filter duplicate scans like airport
-            //->map(function(Collection $scans) {
-            //    return $scans->first()?->first();
-            //});
+        //->groupBy(['vehicle_name', 'created_at']) //Filter duplicate scans like airport
+        //->map(function(Collection $scans) {
+        //    return $scans->first()?->first();
+        //});
 
         return view('todo', [
             'device'        => $device,
