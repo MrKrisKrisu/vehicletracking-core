@@ -254,7 +254,6 @@ class VehicleController extends Controller {
                                     DB::raw('DATE(scans.created_at) AS date'),
                                     DB::raw('COUNT(scans.created_at) AS count'),
                                 ])
-                       ->orderBy('scans.created_at')
                        ->get()
                        ->groupBy('date')
                        ->map(function($row) {
