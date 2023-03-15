@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -240,8 +241,29 @@ class VehicleController extends Controller {
     }
 
     public function renderCompany(int $id): View {
+        $company = Company::with(['vehicles', 'vehicles.devices'])->findOrFail($id);
+
+        $dateCount = DB::table('scans')
+                       ->join('devices', 'devices.bssid', '=', 'scans.bssid')
+                       ->join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
+                       ->join('companies', 'vehicles.company_id', '=', 'companies.id')
+                       ->where('companies.id', $company->id)
+                       ->where('scans.created_at', '>', Date::now()->subYear()->toDateString())
+                       ->groupByRaw('DATE(created_at)')
+                       ->select([
+                                    DB::raw('DATE(scans.created_at) AS date'),
+                                    DB::raw('COUNT(scans.created_at) AS count'),
+                                ])
+                       ->orderBy('scans.created_at')
+                       ->get()
+                       ->groupBy('date')
+                       ->map(function($row) {
+                           return $row->first()->count;
+                       });
+
         return view('company', [
-            'company' => Company::with(['vehicles', 'vehicles.devices'])->findOrFail($id),
+            'company'   => $company,
+            'dateCount' => $dateCount,
         ]);
     }
 
