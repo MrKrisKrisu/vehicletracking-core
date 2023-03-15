@@ -7,11 +7,12 @@ use App\Http\Controllers\Controller;
 use App\IgnoredNetwork;
 use App\Scan;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller {
 
-    public function renderDashboard(): View {
+    public function renderDashboard(Request $request): View {
         //TODO: Quick and dirty; code duplication!
 
         $lastScansQ = Scan::join('devices', 'devices.bssid', '=', 'scans.bssid')
