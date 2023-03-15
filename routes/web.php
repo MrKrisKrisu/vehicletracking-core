@@ -21,6 +21,10 @@ Route::view('/', 'user.home')
 Route::middleware(['auth'])->group(function() {
     Route::get('/dashboard', [DashboardController::class, 'renderDashboard'])
          ->name('user.dashboard');
+    Route::post('/save-to-session', [SettingsController::class, 'saveToSession'])
+         ->name('save-to-session');
+    Route::post('/hideAll', [VehicleController::class, 'hideAll'])
+         ->name('hide-all');
 
     Route::prefix('admin')->middleware(['admin'])->group(function() {
         Route::get('/', [VehicleController::class, 'render'])
@@ -68,9 +72,6 @@ Route::middleware(['auth'])->group(function() {
             Route::post('/ignoredNetwork/create', [IgnoredNetworkController::class, 'create'])
                  ->name('ignoredNetwork.create');
         });
-
-        Route::post('/save-to-session', [SettingsController::class, 'saveToSession'])->name('save-to-session');
-        Route::post('/hideAll', [VehicleController::class, 'hideAll'])->name('hide-all');
     });
 
     Route::get('/settings', [SettingsController::class, 'renderSettings'])
