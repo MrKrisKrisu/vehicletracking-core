@@ -6,12 +6,12 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-striped table-hover" id="list">
                             <thead>
                                 <tr>
                                     <th>SSID</th>
                                     <th>Letzter Scan</th>
-                                    <th></th>
+                                    <th class="no-sort"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,4 +43,20 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+            $('#list').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.15/i18n/German.json"
+                },
+                "order": [[1, 'desc']],
+                "pageLength": 25,
+                "lengthMenu": [5, 10, 25, 50, 75, 100, "All"],
+                columnDefs: [
+                    {targets: 'no-sort', orderable: false}
+                ]
+            });
+
+    </script>
 @endsection
