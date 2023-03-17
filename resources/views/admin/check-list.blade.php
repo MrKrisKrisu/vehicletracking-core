@@ -22,7 +22,7 @@
                                         <td class="text-end">
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-sm btn-outline-danger"
-                                                        onclick="if(!confirm('Wirklich blockieren?')) return; Device.update({{$device->id}}, {blocked: 1}).then(function() {document.getElementById('device{{$device->id}}').remove(); notyf.success('Netzwerk blockiert.')});"
+                                                        onclick="if(!confirm('Wirklich blockieren?')) return; this.disabled = true; Device.update({{$device->id}}, {blocked: 1}).then(function() {document.getElementById('device{{$device->id}}').remove(); notyf.success('Netzwerk blockiert.')});"
                                                 >
                                                     <i class="fa-solid fa-ban"></i>
                                                     Blockieren
