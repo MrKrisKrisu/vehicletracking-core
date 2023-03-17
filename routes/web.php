@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AirportImportController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\Frontend\Admin\CheckController;
 use App\Http\Controllers\Frontend\User\DashboardController;
 use App\Http\Controllers\Frontend\User\SettingsController;
 use App\Http\Controllers\IgnoredNetworkController;
@@ -18,7 +19,7 @@ Auth::routes(['register' => false]);
 Route::view('/', 'user.home')
      ->name('user.home');
 
-Route::middleware(['auth'])->group(function() {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'renderDashboard'])
          ->name('user.dashboard');
     Route::post('/save-to-session', [SettingsController::class, 'saveToSession'])
@@ -26,7 +27,7 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/hideAll', [VehicleController::class, 'hideAll'])
          ->name('hide-all');
 
-    Route::prefix('admin')->middleware(['admin'])->group(function() {
+    Route::prefix('admin')->middleware(['admin'])->group(function () {
         Route::get('/', [VehicleController::class, 'render'])
              ->name('admin.dashboard');
         Route::post('/scans/assign', [VehicleController::class, 'saveVehicle'])
@@ -34,6 +35,8 @@ Route::middleware(['auth'])->group(function() {
 
         Route::get('/verify', [VehicleController::class, 'verify'])
              ->name('admin.verify');
+        Route::get('/check/list', [CheckController::class, 'listVehiclesToCheck'])
+             ->name('admin.check.list');
 
         Route::get('/ignored', [VehicleController::class, 'renderIgnored'])
              ->name('admin.ignored');
@@ -64,7 +67,7 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/map/networks', [MapController::class, 'renderNetworkMap'])
              ->name('map.networks');
 
-        Route::prefix('model')->group(function() {
+        Route::prefix('model')->group(function () {
             Route::post('/scans/update', [ScanController::class, 'update'])
                  ->name('scans.update');
             Route::post('/device/update', [DeviceController::class, 'update'])

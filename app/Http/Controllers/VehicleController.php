@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Company;
 use App\Device;
+use App\Http\Controllers\Backend\Admin\CheckController;
 use App\IgnoredNetwork;
 use App\Scan;
 use App\Vehicle;
@@ -27,15 +28,15 @@ class VehicleController extends Controller {
                           ->select('scans.*')
                           ->orderByDesc('scans.created_at');
 
-        if(session()->get('show-verified', '0') == '0') {
+        if (session()->get('show-verified', '0') == '0') {
             $lastScansQ->whereNull('devices.vehicle_id');
         }
 
-        if(session()->get('show-hidden', '0') != '1') {
+        if (session()->get('show-hidden', '0') != '1') {
             $lastScansQ->where('scans.hidden', 0);
         }
 
-        if(session()->get('show-ignored', '0') != '1') {
+        if (session()->get('show-ignored', '0') != '1') {
             $hiddenBssids = Device::join('vehicles', 'vehicles.id', '=', 'devices.vehicle_id')
                                   ->join('companies', 'companies.id', '=', 'vehicles.company_id')
                                   ->where('companies.name', 'Stationary')
@@ -48,16 +49,16 @@ class VehicleController extends Controller {
                        ->where('devices.ignore', '0');
         }
 
-        if(isset($request->device)) {
+        if (isset($request->device)) {
             $lastScansQ->where('scanDeviceId', $request->device);
         }
 
         $lastScans = $lastScansQ->simplePaginate(80);
 
         $possibleVehicles = [];
-        $bssidList        = [];
-        foreach($lastScans as $scan) {
-            if(!in_array($scan->bssid, $bssidList)) {
+        $bssidList = [];
+        foreach ($lastScans as $scan) {
+            if (!in_array($scan->bssid, $bssidList)) {
                 $bssidList[] = $scan->bssid;
             }
         }
@@ -68,14 +69,14 @@ class VehicleController extends Controller {
                      ->select('bssid', 'vehicle_name', 'modified_vehicle_name')
                      ->get();
 
-        foreach($scans as $scan) {
-            if(!isset($possibleVehicles[$scan->bssid])) {
+        foreach ($scans as $scan) {
+            if (!isset($possibleVehicles[$scan->bssid])) {
                 $possibleVehicles[$scan->bssid] = [];
             }
 
             $scanPos = $scan->possibleVehiclesRaw();
-            foreach($scanPos as $p) {
-                if(!in_array($p, $possibleVehicles[$scan->bssid])) {
+            foreach ($scanPos as $p) {
+                if (!in_array($p, $possibleVehicles[$scan->bssid])) {
                     $possibleVehicles[$scan->bssid][] = $p;
                 }
             }
@@ -88,8 +89,8 @@ class VehicleController extends Controller {
     }
 
     public function saveVehicle(Request $request): RedirectResponse {
-        if(isset($request->scans)) {
-            foreach($request->scans as $scanID => $v) {
+        if (isset($request->scans)) {
+            foreach ($request->scans as $scanID => $v) {
                 $scan = Scan::find($scanID);
                 $this->authorize('update', $scan);
                 $scan->update(['vehicle_name' => $request->vehicle_name]);
@@ -100,7 +101,7 @@ class VehicleController extends Controller {
     }
 
     public static function verify(Request $request): View|RedirectResponse {
-        if(auth()->user()->id !== 1) {
+        if (auth()->user()->id !== 1) {
             abort(403);
         }
 
@@ -109,38 +110,12 @@ class VehicleController extends Controller {
                                             'orderBy' => ['nullable', Rule::in(['ssid', 'bssid'])],
                                         ]);
 
-        $devicesQ = Device::join('scans', 'devices.bssid', '=', 'scans.bssid')
-                          ->whereNull('devices.vehicle_id')
-                          ->where('devices.blocked', 0)
-                          ->whereNotNull('scans.vehicle_name')
-                          ->groupBy([
-                                        'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
-                                        'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
-                                        'devices.created_at', 'devices.updated_at',
-                                    ])
-                          ->having(DB::raw('COUNT(*)'), '>', 2)
-                          ->select([
-                                       'devices.id', 'devices.bssid', 'devices.ssid', 'devices.vehicle_id',
-                                       'devices.moveVerifyUntil', 'devices.ignore', 'devices.firstSeen', 'devices.lastSeen',
-                                       'devices.created_at', 'devices.updated_at',
-                                       DB::raw('MAX(scans.created_at) AS lastScan'),
-                                   ])
-                          ->orderByDesc($validated['orderBy'] ?? DB::raw('MAX(scans.created_at)'));
+        $devices = CheckController::getDevicesToCheck($validated['query'] ?? null);
 
-        if(isset($validated['query'])) {
-            $devicesQ->where('devices.ssid', 'like', '%' . $validated['query'] . '%');
-        }
-
-        $devices = $devicesQ->get()
-                            ->filter(function($device) {
-                                return $device->moveVerifyUntil === null ||
-                                       ($device->lastScan !== null && Carbon::parse($device->lastScan)->isAfter($device->moveVerifyUntil));
-                            });
-
-        $count  = $devices->count();
+        $count = $devices->count();
         $device = $devices->first();
 
-        if($device === null) {
+        if ($device === null) {
             return redirect()->route('admin.dashboard')
                              ->with('alert-info', 'Es gibt aktuell keine Geräte zum verifizieren.');
         }
@@ -149,12 +124,7 @@ class VehicleController extends Controller {
 
         $locationScans = $device->scans->where('latitude', '<>', null)->where('longitude', '<>', null);
 
-        $scansToCheck = $device->scans
-            ->whereNotNull('vehicle_name');
-        //->groupBy(['vehicle_name', 'created_at']) //Filter duplicate scans like airport
-        //->map(function(Collection $scans) {
-        //    return $scans->first()?->first();
-        //});
+        $scansToCheck = $device->scans->whereNotNull('vehicle_name');
 
         return view('todo', [
             'device'        => $device,
@@ -168,22 +138,22 @@ class VehicleController extends Controller {
     public static function renderVehicle(int $vehicleId, int $page = 1): Renderable {
         $vehicle = Vehicle::with(['company', 'devices.scans'])->findOrFail($vehicleId);
 
-        if($vehicle->company->name === 'Stationary') {
+        if ($vehicle->company->name === 'Stationary') {
             abort(404);
         }
 
         $allScans = collect();
-        foreach($vehicle->devices as $device) {
+        foreach ($vehicle->devices as $device) {
             $allScans = $allScans->merge($device->scans);
         }
 
-        if($allScans->count() === 0) {
+        if ($allScans->count() === 0) {
             abort(404);
         }
 
-        $found = $allScans->groupBy(function($scan) {
+        $found = $allScans->groupBy(function ($scan) {
             return $scan->created_at->format('Y-m-d H:i');
-        })->map(function($scans) {
+        })->map(function ($scans) {
             return $scans->sortByDesc('latitude')->first();
         })->sortByDesc('created_at')->forPage($page, 15);
 
@@ -193,10 +163,10 @@ class VehicleController extends Controller {
                                  ->first();
 
         $dateCount = $allScans->sortByDesc('created_at')
-                              ->groupBy(function($scan) {
+                              ->groupBy(function ($scan) {
                                   return $scan->created_at->format('Y-m-j');
                               })
-                              ->map(function($scans) {
+                              ->map(function ($scans) {
                                   return $scans->count();
                               });
 
@@ -216,10 +186,10 @@ class VehicleController extends Controller {
                      ->get();
 
         $data = [];
-        foreach($scans as $scan) {
+        foreach ($scans as $scan) {
             $scanPos = $scan->possibleVehiclesRaw();
-            foreach($scanPos as $p) {
-                if(!in_array($p, $data)) {
+            foreach ($scanPos as $p) {
+                if (!in_array($p, $data)) {
                     $data[] = $p;
                 }
             }
@@ -234,7 +204,7 @@ class VehicleController extends Controller {
             'companies' => Company::with(['vehicles'])
                                   ->where('name', '<>', 'Stationary')
                                   ->get()
-                                  ->sortByDesc(function($company) {
+                                  ->sortByDesc(function ($company) {
                                       return $company->vehicles->count();
                                   }),
         ]);
@@ -256,7 +226,7 @@ class VehicleController extends Controller {
                                 ])
                        ->get()
                        ->groupBy('date')
-                       ->map(function($row) {
+                       ->map(function ($row) {
                            return $row->first()->count;
                        });
 
@@ -270,7 +240,7 @@ class VehicleController extends Controller {
      * @throws Exception
      */
     public function ignoreDevice(Request $request): RedirectResponse {
-        if(auth()->user()->id !== 1) {
+        if (auth()->user()->id !== 1) {
             abort(403);
         }
         $validated = $request->validate([
@@ -279,15 +249,15 @@ class VehicleController extends Controller {
                                             'ban'   => ['required', Rule::in(['bssid', 'ssid'])],
                                         ]);
 
-        if($validated['ban'] === 'bssid') {
+        if ($validated['ban'] === 'bssid') {
             Device::where('bssid', $validated['bssid'])
                   ->update(['ignore' => 1]);
             return back()->with('alert-success', 'Das Netzwerk wird jetzt ignoriert.');
         }
 
-        if($validated['ban'] === 'ssid') {
+        if ($validated['ban'] === 'ssid') {
 
-            if(in_array(strtolower($validated['ssid']), ['kvv-swlan', 'kvv-wlan', 'wifi@db', 'fahrgastfernsehen', 'uestra_regiobus_freewlan', 'wfb intern', 'westfalenbahn', 'wifionice', 'enno_wifi'])) {
+            if (in_array(strtolower($validated['ssid']), ['kvv-swlan', 'kvv-wlan', 'wifi@db', 'fahrgastfernsehen', 'uestra_regiobus_freewlan', 'wfb intern', 'westfalenbahn', 'wifionice', 'enno_wifi'])) {
                 abort(403);
             }
 
@@ -298,7 +268,7 @@ class VehicleController extends Controller {
     }
 
     public function renderIgnored(): View {
-        if(auth()->user()->id !== 1) {
+        if (auth()->user()->id !== 1) {
             abort(403);
         }
         return view('ignored', [
@@ -308,7 +278,7 @@ class VehicleController extends Controller {
     }
 
     public function unbanSSID(Request $request): RedirectResponse {
-        if(auth()->user()->id !== 1) {
+        if (auth()->user()->id !== 1) {
             abort(403);
         }
         $validated = $request->validate([
@@ -321,7 +291,7 @@ class VehicleController extends Controller {
     }
 
     public function unbanBSSID(Request $request): RedirectResponse {
-        if(auth()->user()->id !== 1) {
+        if (auth()->user()->id !== 1) {
             abort(403);
         }
         $validated = $request->validate([
@@ -336,7 +306,7 @@ class VehicleController extends Controller {
     }
 
     public function saveIgnoredNetwork(Request $request): RedirectResponse {
-        if(auth()->user()->id !== 1) {
+        if (auth()->user()->id !== 1) {
             abort(403);
         }
         $validated = $request->validate([
@@ -399,7 +369,7 @@ class VehicleController extends Controller {
         $query = Scan::where('scanDeviceId', $validated['scanDeviceId'])
                      ->where('hidden', '0');
 
-        if(isset($validated['onlyWithName'])) {
+        if (isset($validated['onlyWithName'])) {
             $query->whereNotNull('vehicle_name');
         }
 

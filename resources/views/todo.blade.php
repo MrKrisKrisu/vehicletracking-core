@@ -105,6 +105,17 @@
         <div class="col-md-4">
             <div class="card mb-4">
                 <div class="card-body">
+                    <p>Es gibt noch <b>{{$count}} Funknetze</b> zum zuordnen.</p>
+                    <div class="d-grid gap-0">
+                        <a class="btn btn-outline-secondary" href="{{route('admin.check.list')}}">
+                            Liste anzeigen
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
                     <h5 class="card-title">Fahrzeug zuweisen</h5>
                     <form method="POST" action="{{route('vehicle.assign')}}">
                         @csrf
@@ -117,7 +128,7 @@
                                     <option value="{{$vehicle->id}}">
                                         {{$vehicle->company->name}} // {{$vehicle->vehicle_name}}
                                         @if($vehicle->hasUic)
-                                                                    ({{$vehicle->uic}})
+                                            ({{$vehicle->uic}})
                                         @endif
                                     </option>
                                 @endforeach
@@ -126,6 +137,7 @@
                                 $('#vehicleList').select2({
                                     closeOnSelect: true
                                 });
+
                             </script>
                         </div>
 
@@ -200,12 +212,6 @@
                     </form>
                 </div>
             </div>
-
-            <div class="card mb-4">
-                <div class="card-body">
-                    <p>Es gibt noch <b>{{$count}} Funknetze</b> zum zuordnen.</p>
-                </div>
-            </div>
         </div>
 
         @if($locationScans->count() > 0)
@@ -229,10 +235,12 @@
                                 })
                                     .bindPopup('Position am {{$scan->created_at->format('d.m.Y H:i')}}')
                                     .addTo(featureGroup);
-                                @endforeach
 
-                                map.fitBounds(featureGroup.getBounds());
-                            }
+                            @endforeach
+
+                            map.fitBounds(featureGroup.getBounds());
+                        }
+
                         </script>
                     </div>
                 </div>
