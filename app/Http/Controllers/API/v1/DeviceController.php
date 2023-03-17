@@ -10,7 +10,8 @@ class DeviceController extends ApiController {
 
     public function update(Request $request, int $id): JsonResponse {
         $validated = $request->validate([
-                                            'blocked' => ['nullable', 'min:0', 'max:1'],
+                                            'blocked'         => ['nullable', 'min:0', 'max:1'],
+                                            'moveVerifyUntil' => ['nullable', 'date'],
                                         ]);
 
         $model = Device::findOrFail($id);
