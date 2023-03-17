@@ -18,7 +18,9 @@
                                 @foreach($devices as $device)
                                     <tr id="device{{$device->id}}">
                                         <td>
-                                            {{$device->ssid}}
+                                            <a href="{{route('admin.verify', ['deviceId' => $device->id])}}">
+                                                {{$device->ssid}}
+                                            </a>
                                             <br/>
                                             <code>{{$device->bssid}}</code>
                                         </td>

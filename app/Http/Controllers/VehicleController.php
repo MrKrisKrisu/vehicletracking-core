@@ -100,7 +100,7 @@ class VehicleController extends Controller {
         return back()->with('query', $request->vehicle_name);
     }
 
-    public static function verify(Request $request): View|RedirectResponse {
+    public static function verify(Request $request, int $deviceId = null): View|RedirectResponse {
         if (auth()->user()->id !== 1) {
             abort(403);
         }
@@ -110,17 +110,22 @@ class VehicleController extends Controller {
                                             'orderBy' => ['nullable', Rule::in(['ssid', 'bssid'])],
                                         ]);
 
-        $devices = CheckController::getDevicesToCheck($validated['query'] ?? null);
+        if ($deviceId === null) {
 
-        $count = $devices->count();
-        $device = $devices->first();
+            $devices = CheckController::getDevicesToCheck($validated['query'] ?? null);
 
-        if ($device === null) {
-            return redirect()->route('admin.dashboard')
-                             ->with('alert-info', 'Es gibt aktuell keine Geräte zum verifizieren.');
+            $count = $devices->count();
+            $device = $devices->first();
+
+            if ($device === null) {
+                return redirect()->route('admin.dashboard')
+                                 ->with('alert-info', 'Es gibt aktuell keine Geräte zum verifizieren.');
+            }
+
+            $device->load(['scans.scanDevice']);
+        } else {
+            $device = Device::with(['scans.scanDevice'])->findOrFail($deviceId);
         }
-
-        $device->load(['scans.scanDevice']);
 
         $locationScans = $device->scans->where('latitude', '<>', null)->where('longitude', '<>', null);
 
@@ -129,7 +134,7 @@ class VehicleController extends Controller {
         return view('todo', [
             'device'        => $device,
             'scans'         => $scansToCheck,
-            'count'         => $count,
+            'count'         => $count ?? 0,
             'companies'     => Company::all(),
             'locationScans' => $locationScans,
         ]);

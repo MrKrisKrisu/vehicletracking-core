@@ -33,7 +33,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/scans/assign', [VehicleController::class, 'saveVehicle'])
              ->name('scans.assign');
 
-        Route::get('/verify', [VehicleController::class, 'verify'])
+        Route::get('/verify/{deviceId?}', [VehicleController::class, 'verify'])
              ->name('admin.verify');
         Route::get('/check/list', [CheckController::class, 'listVehiclesToCheck'])
              ->name('admin.check.list');
